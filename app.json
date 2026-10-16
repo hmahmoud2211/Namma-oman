@@ -19,6 +19,8 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
+      "output": "single",
+      "bundler": "metro",
       "favicon": "./src/assets/images/app/favicon.png"
     },
     "plugins": [

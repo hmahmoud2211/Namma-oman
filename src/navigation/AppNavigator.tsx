@@ -12,6 +12,8 @@ import type { RootStackParamList } from '@/types/navigation.types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+const DOCUMENT_TITLE = 'Nama';
+
 const ROUTE_NAMES: readonly (keyof RootStackParamList)[] = [
   'Welcome',
   'SignIn',
@@ -38,7 +40,12 @@ export function AppNavigator() {
   }, [isDark, colors.background]);
 
   return (
-    <NavigationContainer theme={navigationTheme} direction={isRTL ? 'rtl' : 'ltr'}>
+    <NavigationContainer
+      theme={navigationTheme}
+      direction={isRTL ? 'rtl' : 'ltr'}
+      // Web: the browser tab shows the app name, not internal route names like "SignIn".
+      documentTitle={{ formatter: () => DOCUMENT_TITLE }}
+    >
       <Stack.Navigator
         initialRouteName={getInitialRoute()}
         // Screens push in from the side the reader moves towards.
