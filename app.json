@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Nama",
+    "slug": "nama",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/images/app/icon.png",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./src/assets/images/app/android-icon-foreground.png",
+        "backgroundImage": "./src/assets/images/app/android-icon-background.png",
+        "monochromeImage": "./src/assets/images/app/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./src/assets/images/app/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./src/assets/images/app/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#001612"
+        }
+      ],
+      "expo-asset"
+    ]
+  }
+}
