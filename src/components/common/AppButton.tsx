@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useId, type ReactNode } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   Pressable,
   StyleSheet,
@@ -23,8 +24,10 @@ import { makeStyles } from '@/utils/makeStyles';
  * - `emerald`: deep-green gradient pill with a pale-gold rim (Sign In "Sign In")
  * - `secondary`: transparent pill with a gold outline
  * - `outline`: transparent pill with a thin pale-gold outline and label (Home "Explore Community")
+ * - `surface`: transparent pill outlined in the cards' accent, for secondary actions on a themed
+ *   card or sheet (readable on both the green and the cream glass)
  */
-export type AppButtonVariant = 'primary' | 'emerald' | 'secondary' | 'outline';
+export type AppButtonVariant = 'primary' | 'emerald' | 'secondary' | 'outline' | 'surface';
 export type AppButtonSize = 'large' | 'medium' | 'small';
 export type AppButtonIconPosition = 'leading' | 'trailing';
 
@@ -44,6 +47,8 @@ export interface AppButtonProps extends Omit<PressableProps, 'style' | 'children
    * activate it like a normal button. Needs a leading `icon`.
    */
   onSlideComplete?: () => void;
+  /** Shows a spinner in place of the label and ignores presses (e.g. while a request runs). */
+  loading?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -77,10 +82,12 @@ export function AppButton({
   icon,
   iconPosition = 'leading',
   onSlideComplete,
-  disabled,
+  loading = false,
+  disabled: disabledProp,
   style,
   ...pressableProps
 }: AppButtonProps) {
+  const disabled = disabledProp || loading;
   const { colors } = useAppTheme();
   const { scale } = useResponsive();
   const styles = useStyles();
@@ -105,14 +112,15 @@ export function AppButton({
     emerald: colors.buttonEmeraldText,
     secondary: colors.buttonSecondaryText,
     outline: colors.buttonOutlineText,
+    surface: colors.surfaceAccentText,
   }[variant];
   const labelVariant =
-    size === 'small' ? 'pillLabel' : variant === 'emerald' ? 'buttonLabel' : 'button';
+    size === 'small' ? 'pillLabel' : variant === 'emerald' || variant === 'surface' ? 'buttonLabel' : 'button';
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled: !!disabled }}
+      accessibilityState={{ disabled: !!disabled, busy: loading }}
       disabled={disabled}
       style={({ pressed }) => [
         styles.base,
@@ -124,7 +132,7 @@ export function AppButton({
             : styles.paddedForLabel,
         styles[variant],
         pressed && styles.pressed,
-        disabled && styles.disabled,
+        disabled && !loading && styles.disabled,
         style,
       ]}
       {...pressableProps}
@@ -178,10 +186,14 @@ export function AppButton({
         style={[styles.labelRow, slide.enabled && slide.labelStyle]}
         pointerEvents="none"
       >
-        <AppText variant={labelVariant} color={labelColor} numberOfLines={1}>
-          {title}
-        </AppText>
-        {hasTrailingIcon && (
+        {loading ? (
+          <ActivityIndicator size="small" color={labelColor} accessibilityLabel={title} />
+        ) : (
+          <AppText variant={labelVariant} color={labelColor} numberOfLines={1}>
+            {title}
+          </AppText>
+        )}
+        {hasTrailingIcon && !loading && (
           <View style={size === 'small' ? styles.trailingIconSmall : styles.trailingIcon}>
             {icon}
           </View>
@@ -270,6 +282,11 @@ const useStyles = makeStyles(({ colors, borderRadius, shadows }, { scale }) => (
   outline: {
     borderWidth: scale(OUTLINE_BORDER_WIDTH),
     borderColor: colors.buttonOutlineBorder,
+    backgroundColor: colors.transparent,
+  },
+  surface: {
+    borderWidth: scale(OUTLINE_BORDER_WIDTH),
+    borderColor: colors.surfaceAccentText,
     backgroundColor: colors.transparent,
   },
   layer: {

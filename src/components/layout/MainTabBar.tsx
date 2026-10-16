@@ -1,41 +1,65 @@
-import { useMemo } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 import type { EdgeInsets } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AssistantIcon } from '@/components/icons/AssistantIcon';
 import { CommunityIcon } from '@/components/icons/CommunityIcon';
-import { CompassIcon } from '@/components/icons/CompassIcon';
-import { HomeFilledIcon } from '@/components/icons/HomeFilledIcon';
-import { HouseIcon } from '@/components/icons/HouseIcon';
-import { MoreHorizontalIcon } from '@/components/icons/MoreHorizontalIcon';
+import { GearIcon } from '@/components/icons/GearIcon';
 import { ServicesIcon } from '@/components/icons/ServicesIcon';
 import type { Localized } from '@/context/LocaleContext';
 import { useLocale } from '@/hooks/useLocale';
 import { spacing } from '@/theme/spacing';
+import type { ParamlessRoute, RootStackParamList } from '@/types/navigation.types';
 import { makeStyles } from '@/utils/makeStyles';
 import { createResponsive, DESIGN_FRAME, designFrameFromExport } from '@/utils/responsive';
 
-import { BOTTOM_TAB_BAR_HEIGHT, BottomTabBar, type BottomTabItem } from './BottomTabBar';
+import {
+  BOTTOM_TAB_BAR_HEIGHT,
+  BOTTOM_TAB_BAR_OVERHANG,
+  BottomTabBar,
+  type BottomTabItem,
+} from './BottomTabBar';
 
-export type MainTabKey = 'home' | 'community' | 'services' | 'discover' | 'more';
+export type MainTabKey = 'assistant' | 'community' | 'services' | 'settings';
 
 interface MainTab extends Omit<BottomTabItem<MainTabKey>, 'label'> {
   label: Localized<string>;
+  route: ParamlessRoute;
 }
 
-/** The app's main tabs, shown on every tab screen. */
-export const mainTabs: readonly MainTab[] = [
+/** Two tabs either side of the raised Home disc, as in Parklane's bar. */
+const LEADING_TABS: readonly MainTab[] = [
   {
-    key: 'home',
-    label: { en: 'Home', ar: 'الرئيسية' },
-    Icon: HouseIcon,
-    ActiveIcon: HomeFilledIcon,
+    key: 'assistant',
+    label: { en: 'Assistant', ar: 'المساعد' },
+    Icon: AssistantIcon,
+    route: 'Assistant',
   },
-  { key: 'community', label: { en: 'Community', ar: 'المجتمع' }, Icon: CommunityIcon },
-  { key: 'services', label: { en: 'Services', ar: 'الخدمات' }, Icon: ServicesIcon },
-  { key: 'discover', label: { en: 'Discover', ar: 'اكتشف' }, Icon: CompassIcon },
-  { key: 'more', label: { en: 'More', ar: 'المزيد' }, Icon: MoreHorizontalIcon },
+  {
+    key: 'community',
+    label: { en: 'Community', ar: 'المجتمع' },
+    Icon: CommunityIcon,
+    route: 'Community',
+  },
 ];
+const TRAILING_TABS: readonly MainTab[] = [
+  {
+    key: 'services',
+    label: { en: 'Services', ar: 'الخدمات' },
+    Icon: ServicesIcon,
+    route: 'Services',
+  },
+  {
+    key: 'settings',
+    label: { en: 'Settings', ar: 'الإعدادات' },
+    Icon: GearIcon,
+    route: 'Settings',
+  },
+];
+const HOME_LABEL: Localized<string> = { en: 'Home', ar: 'الرئيسية' };
 
 /**
  * The bar's placement, measured once from Home (home 1.png, 774×1385 px) and shared, so the
@@ -47,8 +71,13 @@ const DOCK = { left: 25.1, width: 297.2, bottom: 31.6, gapAbove: 20.9 } as const
 function getDockLayout(width: number, height: number, insets: EdgeInsets) {
   const { scale, verticalScale } = createResponsive(width, height, DOCK_FRAME);
   const bottom = Math.max(verticalScale(DOCK.bottom), insets.bottom + spacing.sm);
-  const contentInset =
-    bottom + scale(BOTTOM_TAB_BAR_HEIGHT) + Math.max(verticalScale(DOCK.gapAbove), spacing.lg);
+  // Content ends clear of the bar and of the Home disc rising out of it.
+  const gapAbove = Math.max(
+    verticalScale(DOCK.gapAbove),
+    scale(BOTTOM_TAB_BAR_OVERHANG) + spacing.sm,
+    spacing.lg,
+  );
+  const contentInset = bottom + scale(BOTTOM_TAB_BAR_HEIGHT) + gapAbove;
   return { bottom, contentInset };
 }
 
@@ -61,27 +90,64 @@ export function getMainTabBarInset(width: number, height: number, insets: EdgeIn
 }
 
 interface MainTabBarProps {
-  activeKey: MainTabKey;
-  onTabPress: (key: MainTabKey) => void;
+  /** Tapping the tab of the screen already showing, e.g. to scroll back to the top. */
+  onReselect?: () => void;
 }
 
-/** The floating main tab bar, docked over the bottom of the screen (pass as ScreenWrapper's `overlay`). */
-export function MainTabBar({ activeKey, onTabPress }: MainTabBarProps) {
+/**
+ * The floating main navigation, docked over the bottom of the screen (pass as ScreenWrapper's
+ * `overlay`). It reads the current route to light its tab, opens tabs with `navigate` (so Back
+ * returns where the resident came from) and returns Home with `popTo`.
+ */
+export function MainTabBar({ onReselect }: MainTabBarProps) {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute();
   const insets = useSafeAreaInsets();
   const styles = useStyles(insets);
   const { locale } = useLocale();
-  const items = useMemo(
-    () => mainTabs.map((tab) => ({ ...tab, label: tab.label[locale] })),
+
+  const tabs = useMemo(() => [...LEADING_TABS, ...TRAILING_TABS], []);
+  const activeTab = tabs.find((tab) => tab.route === route.name);
+  const activeKey = route.name === 'Home' ? 'home' : (activeTab?.key ?? null);
+
+  const localize = useCallback(
+    (items: readonly MainTab[]) => items.map((tab) => ({ ...tab, label: tab.label[locale] })),
     [locale],
   );
+  const leading = useMemo(() => localize(LEADING_TABS), [localize]);
+  const trailing = useMemo(() => localize(TRAILING_TABS), [localize]);
+
+  const handleTabPress = useCallback(
+    (key: MainTabKey) => {
+      const tab = tabs.find((item) => item.key === key);
+      if (!tab) return;
+      if (tab.key === activeKey) {
+        onReselect?.();
+        return;
+      }
+      navigation.navigate(tab.route);
+    },
+    [activeKey, navigation, onReselect, tabs],
+  );
+
+  const handleHomePress = useCallback(() => {
+    if (activeKey === 'home') {
+      onReselect?.();
+      return;
+    }
+    navigation.popTo('Home');
+  }, [activeKey, navigation, onReselect]);
 
   return (
     <View style={styles.dock} pointerEvents="box-none">
       <View style={styles.column} pointerEvents="box-none">
         <BottomTabBar
-          items={items}
+          leadingItems={leading}
+          trailingItems={trailing}
+          homeLabel={HOME_LABEL[locale]}
           activeKey={activeKey}
-          onTabPress={onTabPress}
+          onTabPress={handleTabPress}
+          onHomePress={handleHomePress}
           style={styles.bar}
         />
       </View>

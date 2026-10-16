@@ -11,7 +11,7 @@ import { BellIcon } from '@/components/icons/BellIcon';
 import { LogoutIcon } from '@/components/icons/LogoutIcon';
 import { MenuIcon } from '@/components/icons/MenuIcon';
 import { MoonIcon } from '@/components/icons/MoonIcon';
-import { MainTabBar, type MainTabKey } from '@/components/layout/MainTabBar';
+import { MainTabBar } from '@/components/layout/MainTabBar';
 import { ScreenWrapper } from '@/components/layout/ScreenWrapper';
 import {
   FeaturedCommunityCard,
@@ -29,6 +29,7 @@ import { useResponsive } from '@/hooks/useResponsive';
 import { useThemePreference } from '@/hooks/useThemePreference';
 import { useUnderDevelopment } from '@/hooks/useUnderDevelopment';
 import type { ColorScheme } from '@/theme';
+import type { ParamlessRoute } from '@/types/navigation.types';
 
 import {
   featuredCommunities,
@@ -38,6 +39,17 @@ import {
   type HomeServiceId,
 } from './HomeScreen.data';
 import { HOME_FRAME, homeDesign, useHomeStyles } from './HomeScreen.styles';
+
+/** The screen each shortcut opens; the rest show the "under development" notice. */
+const SERVICE_ROUTES: Partial<Record<HomeServiceId, ParamlessRoute>> = {
+  'construction-progress': 'ConstructionProgress',
+  'smart-home': 'SmartHome',
+  'visitor-access': 'VisitorAccess',
+  parking: 'Parking',
+  maintenance: 'Maintenance',
+  community: 'Community',
+  'amenities-booking': 'AmenitiesBooking',
+};
 
 export function HomeScreen() {
   const navigation = useNavigation();
@@ -93,36 +105,26 @@ export function HomeScreen() {
 
   const handleOpenService = useCallback(
     (service: HomeServiceId) => {
-      if (service === 'construction-progress') {
-        navigation.navigate('ConstructionProgress');
+      const route = SERVICE_ROUTES[service];
+      if (route) {
+        navigation.navigate(route);
         return;
       }
-      // TODO(navigation): route the other shortcuts to their screens once those are designed.
+      // TODO(navigation): the financial overview isn't designed yet.
       showUnderDevelopment();
     },
     [navigation, showUnderDevelopment],
   );
 
   const handleExploreCommunity = useCallback(
-    (_community: FeaturedCommunity) => {
-      // TODO(navigation): open the community screen once it is designed.
-      showUnderDevelopment();
-    },
-    [showUnderDevelopment],
+    (_community: FeaturedCommunity) => navigation.navigate('Community'),
+    [navigation],
   );
 
-  const handleTabPress = useCallback(
-    (tab: MainTabKey) => {
-      if (tab === 'home') {
-        // Already here: tapping the active tab returns to the top, as in native tab bars.
-        scrollRef.current?.scrollTo({ y: 0, animated: true });
-        return;
-      }
-      // TODO(navigation): the other tabs need their screens (and a bottom-tabs navigator).
-      showUnderDevelopment();
-    },
-    [showUnderDevelopment],
-  );
+  // Already here: tapping Home again returns to the top, as in native tab bars.
+  const scrollToTop = useCallback(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  }, []);
 
   return (
     <ScreenWrapper
@@ -132,7 +134,7 @@ export function HomeScreen() {
       scrollRef={scrollRef}
       overlay={
         <>
-          <MainTabBar activeKey="home" onTabPress={handleTabPress} />
+          <MainTabBar onReselect={scrollToTop} />
           {menuAnchor && (
             <PopoverMenu
               anchor={menuAnchor}

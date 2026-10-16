@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import { Animated, BackHandler, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  Animated,
+  BackHandler,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-context';
 
 import { AppText } from '@/components/common/AppText';
@@ -82,37 +91,45 @@ export function BottomSheet({ title, onClose, closeLabel, children }: BottomShee
           accessibilityLabel={closeText}
         />
       </Animated.View>
-      <Animated.View
-        style={[
-          styles.panel,
-          { maxHeight: height * d.maxHeight, opacity: progress, transform: [{ translateY }] },
-        ]}
-        accessibilityViewIsModal
+      {/* Lifts the sheet over the keyboard when it holds a form (iOS; Android resizes itself). */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="box-none"
       >
-        <GlassLayer borderRadius={scale(d.radius)} colors={colors.menuGradient} />
-        <View style={styles.handle} />
-        <View style={styles.header}>
-          <AppText variant="panelTitle" color={colors.surfaceText} accessibilityRole="header">
-            {title}
-          </AppText>
-          <Pressable
-            onPress={close}
-            hitSlop={scale(8)}
-            accessibilityRole="button"
-            accessibilityLabel={closeText}
-            style={({ pressed }) => [styles.close, pressed && styles.pressed]}
-          >
-            <CloseIcon size={scale(d.close.icon)} color={colors.surfaceText} />
-          </Pressable>
-        </View>
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.content}
-          showsVerticalScrollIndicator={false}
+        <Animated.View
+          style={[
+            styles.panel,
+            { maxHeight: height * d.maxHeight, opacity: progress, transform: [{ translateY }] },
+          ]}
+          accessibilityViewIsModal
         >
-          {typeof children === 'function' ? children(close) : children}
-        </ScrollView>
-      </Animated.View>
+          <GlassLayer borderRadius={scale(d.radius)} colors={colors.menuGradient} />
+          <View style={styles.handle} />
+          <View style={styles.header}>
+            <AppText variant="panelTitle" color={colors.surfaceText} accessibilityRole="header">
+              {title}
+            </AppText>
+            <Pressable
+              onPress={close}
+              hitSlop={scale(8)}
+              accessibilityRole="button"
+              accessibilityLabel={closeText}
+              style={({ pressed }) => [styles.close, pressed && styles.pressed]}
+            >
+              <CloseIcon size={scale(d.close.icon)} color={colors.surfaceText} />
+            </Pressable>
+          </View>
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            style={styles.scroll}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+          >
+            {typeof children === 'function' ? children(close) : children}
+          </ScrollView>
+        </Animated.View>
+      </KeyboardAvoidingView>
     </View>
   );
 }

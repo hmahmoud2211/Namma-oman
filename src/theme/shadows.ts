@@ -21,6 +21,8 @@ export function createShadows(colors: ColorTokens) {
     tabBarShadow: { offsetX: 0, offsetY: 3, blurRadius: 10, color: colors.tabBarShadow },
     // Construction Progress: soft light around the filled part of the progress bar.
     progressGlow: { offsetX: 0, offsetY: 0, blurRadius: 5, color: colors.progressGlow },
+    // Bottom navigation: the warm light around the raised Home disc.
+    homeDiscGlow: { offsetX: 0, offsetY: 0, blurRadius: 9, color: colors.homeDiscGlow },
   } satisfies Record<string, ShadowToken>;
 }
 

@@ -4,9 +4,18 @@ import { useMemo } from 'react';
 
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
+import { AmenitiesBookingScreen } from '@/screens/AmenitiesBookingScreen';
+import { AssistantScreen } from '@/screens/AssistantScreen';
+import { CommunityScreen } from '@/screens/CommunityScreen';
 import { ConstructionProgressScreen } from '@/screens/ConstructionProgressScreen';
 import { HomeScreen } from '@/screens/HomeScreen';
+import { MaintenanceScreen } from '@/screens/MaintenanceScreen';
+import { ParkingScreen } from '@/screens/ParkingScreen';
+import { ServicesScreen } from '@/screens/ServicesScreen';
+import { SettingsScreen } from '@/screens/SettingsScreen';
 import { SignInScreen } from '@/screens/SignInScreen';
+import { SmartHomeScreen } from '@/screens/SmartHomeScreen';
+import { VisitorAccessScreen } from '@/screens/VisitorAccessScreen';
 import { WelcomeScreen } from '@/screens/WelcomeScreen';
 import type { RootStackParamList } from '@/types/navigation.types';
 
@@ -19,6 +28,15 @@ const ROUTE_NAMES: readonly (keyof RootStackParamList)[] = [
   'SignIn',
   'Home',
   'ConstructionProgress',
+  'SmartHome',
+  'VisitorAccess',
+  'Parking',
+  'Maintenance',
+  'Community',
+  'AmenitiesBooking',
+  'Services',
+  'Settings',
+  'Assistant',
 ];
 
 /**
@@ -55,6 +73,17 @@ export function AppNavigator() {
         <Stack.Screen name="SignIn" component={SignInScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="ConstructionProgress" component={ConstructionProgressScreen} />
+        {/* Resident services, migrated from the Parklane app. */}
+        <Stack.Screen name="SmartHome" component={SmartHomeScreen} />
+        <Stack.Screen name="VisitorAccess" component={VisitorAccessScreen} />
+        <Stack.Screen name="Parking" component={ParkingScreen} />
+        <Stack.Screen name="Maintenance" component={MaintenanceScreen} />
+        <Stack.Screen name="Community" component={CommunityScreen} />
+        <Stack.Screen name="AmenitiesBooking" component={AmenitiesBookingScreen} />
+        {/* The main tab bar's other destinations. */}
+        <Stack.Screen name="Assistant" component={AssistantScreen} />
+        <Stack.Screen name="Services" component={ServicesScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
         {/* Register further screens here as their designs are implemented. */}
       </Stack.Navigator>
     </NavigationContainer>

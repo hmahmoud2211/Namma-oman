@@ -104,7 +104,9 @@ export type TextVariant =
   | 'label'
   | 'labelSmall'
   | 'labelTiny'
-  | 'initials';
+  | 'initials'
+  | 'chatBody'
+  | 'voiceCaption';
 
 /**
  * Sizes are in design dp (360-wide Figma frame); AppText scales them per device.
@@ -363,6 +365,19 @@ export const textVariants: Record<TextVariant, TextStyle> = {
     fontFamily: fontFamilies.roundedMedium,
     fontSize: 11,
     lineHeight: 13,
+  },
+
+  // Assistant: chat answers and live voice captions, set larger than the cards' type for
+  // reading at length.
+  chatBody: {
+    fontFamily: fontFamilies.roundedRegular,
+    fontSize: 10.6,
+    lineHeight: 15,
+  },
+  voiceCaption: {
+    fontFamily: fontFamilies.roundedMedium,
+    fontSize: 12.4,
+    lineHeight: 17,
   },
 };
 

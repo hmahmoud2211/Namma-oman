@@ -18,7 +18,7 @@ import { CraneIcon } from '@/components/icons/CraneIcon';
 import { LayersIcon } from '@/components/icons/LayersIcon';
 import { LogoutIcon } from '@/components/icons/LogoutIcon';
 import { MapPinIcon } from '@/components/icons/MapPinIcon';
-import { MainTabBar, type MainTabKey } from '@/components/layout/MainTabBar';
+import { MainTabBar } from '@/components/layout/MainTabBar';
 import { ScreenWrapper } from '@/components/layout/ScreenWrapper';
 import { BarChart } from '@/components/ui/BarChart';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -35,7 +35,6 @@ import { useLocale } from '@/hooks/useLocale';
 import { useLogout } from '@/hooks/useLogout';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useThemePreference } from '@/hooks/useThemePreference';
-import { useUnderDevelopment } from '@/hooks/useUnderDevelopment';
 import type { ColorScheme } from '@/theme';
 import type { RootStackParamList } from '@/types/navigation.types';
 
@@ -126,7 +125,6 @@ export function ConstructionProgressScreen() {
 
   const handleCloseMenu = useCallback(() => setMenuAnchor(null), []);
 
-  const showUnderDevelopment = useUnderDevelopment();
   const logout = useLogout();
   const handleLogout = useCallback(() => {
     setMenuAnchor(null);
@@ -159,18 +157,9 @@ export function ConstructionProgressScreen() {
     [],
   );
 
-  const handleTabPress = useCallback(
-    (tab: MainTabKey) => {
-      if (tab === 'home') {
-        // This screen is opened from Home, so the Home tab goes back to it.
-        navigation.popTo('Home');
-        return;
-      }
-      // TODO(navigation): the other tabs need their screens (and a bottom-tabs navigator).
-      showUnderDevelopment();
-    },
-    [navigation, showUnderDevelopment],
-  );
+  const scrollToTop = useCallback(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  }, []);
 
   return (
     <ScreenWrapper
@@ -180,7 +169,7 @@ export function ConstructionProgressScreen() {
       scrollRef={scrollRef}
       overlay={
         <>
-          <MainTabBar activeKey="home" onTabPress={handleTabPress} />
+          <MainTabBar onReselect={scrollToTop} />
           {sheet && renderSheet(sheet, locale, units, unit, handleSelectUnit, closeSheet)}
           {menuAnchor && (
             <PopoverMenu

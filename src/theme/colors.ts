@@ -58,6 +58,22 @@ const palette = {
   umber: '#3B3830',
   white: '#FFFFFF',
   black: '#000000',
+
+  /*
+   * Light colours a resident can set their lamps to (Smart Home presets and the custom-colour
+   * ring). They describe the bulb, not the brand, so they are the same in both themes.
+   */
+  bulbWarm: '#FECB74',
+  bulbAmber: '#FDA541',
+  bulbDaylight: '#E3F0FE',
+  bulbBlue: '#0AA7FF',
+  bulbViolet: '#A03CFD',
+  hueRed: '#FF3B5C',
+  hueOrange: '#FF9F2E',
+  hueYellow: '#FFE93D',
+  hueGreen: '#2EF07A',
+  hueBlue: '#2B6BFF',
+  hueMagenta: '#C23DFF',
 } as const;
 
 type Gradient2 = readonly [string, string];
@@ -202,6 +218,113 @@ export interface ColorTokens {
   pagerActive: string;
   pagerInactive: string;
 
+  /**
+   * Bottom navigation (after Parklane's bar): the raised Home disc in the middle, its seat,
+   * and the faint halo around it. The bar is dark-green glass in both themes.
+   */
+  homeDiscGradient: Gradient2;
+  homeDiscGlyph: string;
+  homeDiscGloss: Gradient2;
+  homeSeat: string;
+  homeHaloGradient: Gradient2;
+  homeHaloBorder: string;
+  homeDiscGlow: string;
+
+  /** Text fields and pickers laid on the themed cards (forms on the service screens). */
+  fieldFill: string;
+  fieldBorder: string;
+  fieldText: string;
+  fieldPlaceholder: string;
+
+  /** On/off switches: the lit track runs along this gradient. */
+  toggleOnGradient: Gradient2;
+  toggleOffTrack: string;
+  toggleTrackBorder: string;
+  toggleKnob: string;
+  toggleKnobOff: string;
+
+  /**
+   * Status pills. `positive`: arrived, approved, completed, going. `accent`: scheduled,
+   * in progress. `neutral`: entered, submitted, coming soon. `action`: an open invitation
+   * ("Register"), drawn filled. `warning` / `danger`: alerts and emergencies.
+   */
+  chipPositiveText: string;
+  chipPositiveFill: string;
+  chipPositiveBorder: string;
+  chipAccentText: string;
+  chipAccentFill: string;
+  chipAccentBorder: string;
+  chipNeutralText: string;
+  chipNeutralFill: string;
+  chipNeutralBorder: string;
+  chipActionText: string;
+  chipActionFill: string;
+  chipWarningText: string;
+  chipWarningFill: string;
+  chipWarningBorder: string;
+  chipDangerText: string;
+  chipDangerFill: string;
+  chipDangerBorder: string;
+
+  /** Initials discs (visitors, the resident chip). */
+  avatarFill: string;
+  avatarBorder: string;
+  avatarText: string;
+
+  /** Lit fixtures (lights, scenes) and cooling (AC); a selected scene is rimmed in `sceneActive`. */
+  iconWarm: string;
+  iconCool: string;
+  sceneActive: string;
+  sceneTileGradient: Gradient3;
+  sceneScrim: Gradient3;
+  /** Brightness slider fill and the well behind the colour presets. */
+  sliderGradient: Gradient2;
+  sliderTrack: string;
+  sliderThumb: string;
+  wellFill: string;
+  bulbPresets: Readonly<Record<'warm' | 'amber' | 'daylight' | 'blue' | 'violet', string>>;
+  hueRing: readonly string[];
+
+  /** Visitor pass QR code: dark modules on white, framed in the accent. */
+  qrModule: string;
+  qrBackground: string;
+  qrFrame: string;
+
+  /**
+   * Assistant. The orb is the brand's emerald and gold with an aqua glow: aqua while it
+   * listens, gold while it speaks, a coral wash on failure.
+   */
+  orbCoreGradient: Gradient3;
+  orbBlobListen: string;
+  orbBlobSpeak: string;
+  orbHaloListen: string;
+  orbHaloSpeak: string;
+  orbHaloEdge: string;
+  orbGloss: string;
+  orbGlossEdge: string;
+  orbRing: string;
+  orbRingSpeak: string;
+  orbRim: string;
+  orbAccent: string;
+  orbErrorGradient: Gradient2;
+  /** The resident's chat bubbles; the assistant's sit on a themed card. */
+  userBubbleGradient: Gradient2;
+  userBubbleBorder: string;
+  userBubbleText: string;
+  /** Voice call button: gold to start, coral to hang up. */
+  callStartGradient: Gradient2;
+  callEndGradient: Gradient2;
+  callGlyph: string;
+  /** Round controls laid straight on the background (camera, mute). */
+  controlFill: string;
+  controlBorder: string;
+  controlActiveFill: string;
+  cameraFill: string;
+  scanLine: Gradient2;
+  /** Text drawn straight on the background artwork, below `textPrimary`. */
+  textOnBackgroundMuted: string;
+  textOnBackgroundSubtle: string;
+
   white: string;
   black: string;
   transparent: string;
@@ -334,6 +457,103 @@ export const darkColors: ColorTokens = {
   pagerActive: palette.aqua,
   pagerInactive: 'rgba(110, 140, 132, 0.55)',
 
+  homeDiscGradient: [palette.richGold, palette.bronze],
+  homeDiscGlyph: palette.abyssGreen,
+  homeDiscGloss: ['rgba(255, 255, 255, 0.42)', 'rgba(255, 255, 255, 0)'],
+  homeSeat: palette.deepTeal,
+  homeHaloGradient: ['rgba(249, 210, 116, 0.3)', 'rgba(20, 168, 152, 0.24)'],
+  homeHaloBorder: 'rgba(245, 213, 148, 0.45)',
+  homeDiscGlow: 'rgba(249, 210, 116, 0.45)',
+
+  fieldFill: 'rgba(0, 26, 22, 0.32)',
+  fieldBorder: 'rgba(110, 190, 160, 0.38)',
+  fieldText: palette.white,
+  fieldPlaceholder: 'rgba(255, 255, 255, 0.48)',
+
+  toggleOnGradient: [palette.goldLight, palette.gold],
+  toggleOffTrack: 'rgba(255, 255, 255, 0.1)',
+  toggleTrackBorder: 'rgba(255, 255, 255, 0.2)',
+  toggleKnob: palette.white,
+  toggleKnobOff: 'rgba(255, 255, 255, 0.72)',
+
+  chipPositiveText: palette.aqua,
+  chipPositiveFill: 'rgba(0, 72, 62, 0.75)',
+  chipPositiveBorder: 'rgba(20, 227, 225, 0.55)',
+  chipAccentText: palette.gold,
+  chipAccentFill: 'rgba(249, 210, 116, 0.1)',
+  chipAccentBorder: 'rgba(249, 210, 116, 0.55)',
+  chipNeutralText: 'rgba(255, 255, 255, 0.82)',
+  chipNeutralFill: 'rgba(255, 255, 255, 0.06)',
+  chipNeutralBorder: 'rgba(255, 255, 255, 0.26)',
+  chipActionText: palette.abyssGreen,
+  chipActionFill: palette.gold,
+  chipWarningText: palette.amber,
+  chipWarningFill: 'rgba(245, 181, 74, 0.1)',
+  chipWarningBorder: 'rgba(245, 181, 74, 0.5)',
+  chipDangerText: palette.coral,
+  chipDangerFill: 'rgba(255, 143, 128, 0.1)',
+  chipDangerBorder: 'rgba(255, 143, 128, 0.5)',
+
+  avatarFill: 'rgba(249, 210, 116, 0.12)',
+  avatarBorder: 'rgba(249, 210, 116, 0.5)',
+  avatarText: palette.gold,
+
+  iconWarm: palette.signalGold,
+  iconCool: palette.aqua,
+  sceneActive: palette.gold,
+  sceneTileGradient: [palette.emeraldLight, palette.emeraldDark, palette.abyssGreen],
+  sceneScrim: ['rgba(0, 16, 14, 0)', 'rgba(0, 16, 14, 0.35)', 'rgba(0, 16, 14, 0.8)'],
+  sliderGradient: [palette.goldLight, palette.paleGoldCream],
+  sliderTrack: 'rgba(255, 255, 255, 0.14)',
+  sliderThumb: palette.white,
+  wellFill: 'rgba(0, 26, 22, 0.4)',
+  bulbPresets: {
+    warm: palette.bulbWarm,
+    amber: palette.bulbAmber,
+    daylight: palette.bulbDaylight,
+    blue: palette.bulbBlue,
+    violet: palette.bulbViolet,
+  },
+  hueRing: [
+    palette.hueRed,
+    palette.hueOrange,
+    palette.hueYellow,
+    palette.hueGreen,
+    palette.hueBlue,
+    palette.hueMagenta,
+  ],
+
+  qrModule: palette.ink,
+  qrBackground: palette.white,
+  qrFrame: palette.gold,
+
+  orbCoreGradient: [palette.emeraldLight, palette.emerald, palette.emeraldDeep],
+  orbBlobListen: 'rgba(20, 227, 225, 0.9)',
+  orbBlobSpeak: 'rgba(249, 210, 116, 0.88)',
+  orbHaloListen: 'rgba(20, 227, 225, 0.36)',
+  orbHaloSpeak: 'rgba(249, 210, 116, 0.38)',
+  orbHaloEdge: 'rgba(20, 227, 225, 0)',
+  orbGloss: 'rgba(255, 255, 255, 0.5)',
+  orbGlossEdge: 'rgba(255, 255, 255, 0)',
+  orbRing: 'rgba(20, 227, 225, 0.55)',
+  orbRingSpeak: 'rgba(249, 210, 116, 0.6)',
+  orbRim: 'rgba(245, 213, 148, 0.65)',
+  orbAccent: palette.aqua,
+  orbErrorGradient: [palette.coral, palette.brick],
+  userBubbleGradient: [palette.emeraldLight, palette.emeraldDeep],
+  userBubbleBorder: 'rgba(250, 239, 182, 0.7)',
+  userBubbleText: palette.white,
+  callStartGradient: [palette.richGold, palette.bronze],
+  callEndGradient: [palette.coral, palette.brick],
+  callGlyph: palette.abyssGreen,
+  controlFill: 'rgba(0, 26, 22, 0.45)',
+  controlBorder: 'rgba(110, 190, 160, 0.45)',
+  controlActiveFill: 'rgba(249, 210, 116, 0.16)',
+  cameraFill: 'rgba(0, 22, 18, 0.85)',
+  scanLine: ['rgba(20, 227, 225, 0)', 'rgba(20, 227, 225, 0.85)'],
+  textOnBackgroundMuted: 'rgba(255, 255, 255, 0.78)',
+  textOnBackgroundSubtle: 'rgba(255, 255, 255, 0.55)',
+
   white: palette.white,
   black: palette.black,
   transparent: 'transparent',
@@ -406,4 +626,47 @@ export const lightColors: ColorTokens = {
   surfaceDivider: 'rgba(18, 61, 43, 0.16)',
   pagerActive: palette.forestInk,
   pagerInactive: 'rgba(18, 61, 43, 0.22)',
+
+  // Forms and controls on the cream cards take the deep-green ink.
+  fieldFill: 'rgba(255, 255, 255, 0.5)',
+  fieldBorder: 'rgba(18, 61, 43, 0.24)',
+  fieldText: palette.charcoal,
+  fieldPlaceholder: 'rgba(59, 56, 48, 0.55)',
+
+  toggleOnGradient: [palette.pineGlow, palette.forestInk],
+  toggleOffTrack: 'rgba(18, 61, 43, 0.1)',
+  toggleTrackBorder: 'rgba(18, 61, 43, 0.22)',
+  toggleKnobOff: palette.white,
+
+  chipPositiveText: palette.forestInk,
+  chipPositiveFill: 'rgba(18, 61, 43, 0.08)',
+  chipPositiveBorder: 'rgba(18, 61, 43, 0.55)',
+  chipAccentText: palette.bronze,
+  chipAccentFill: 'rgba(138, 104, 47, 0.08)',
+  chipAccentBorder: 'rgba(138, 104, 47, 0.5)',
+  chipNeutralText: palette.umber,
+  chipNeutralFill: 'rgba(59, 56, 48, 0.05)',
+  chipNeutralBorder: 'rgba(59, 56, 48, 0.28)',
+  chipActionText: palette.cream,
+  chipActionFill: palette.forestInk,
+  chipWarningText: palette.ochre,
+  chipWarningFill: 'rgba(168, 106, 18, 0.08)',
+  chipWarningBorder: 'rgba(168, 106, 18, 0.5)',
+  chipDangerText: palette.brick,
+  chipDangerFill: 'rgba(179, 38, 30, 0.07)',
+  chipDangerBorder: 'rgba(179, 38, 30, 0.45)',
+
+  avatarFill: 'rgba(18, 61, 43, 0.08)',
+  avatarBorder: 'rgba(18, 61, 43, 0.35)',
+  avatarText: palette.forestInk,
+
+  iconWarm: palette.ochre,
+  iconCool: palette.azure,
+  sceneActive: palette.bronze,
+  sliderGradient: [palette.ochre, palette.gold],
+  sliderTrack: 'rgba(18, 61, 43, 0.12)',
+  sliderThumb: palette.forestInk,
+  wellFill: 'rgba(18, 61, 43, 0.07)',
+
+  qrFrame: palette.bronze,
 };
