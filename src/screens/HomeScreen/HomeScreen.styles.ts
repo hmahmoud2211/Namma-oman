@@ -1,6 +1,7 @@
 import type { EdgeInsets } from 'react-native-safe-area-context';
 
 import { getMainTabBarInset } from '@/components/layout/MainTabBar';
+import { getScreenHeaderTop } from '@/components/layout/screenHeader';
 import { SERVICE_TILE_HEIGHT } from '@/components/ui/ServiceTile';
 import { makeStyles } from '@/utils/makeStyles';
 import { DESIGN_FRAME, designFrameFromExport } from '@/utils/responsive';
@@ -46,16 +47,22 @@ const unitCardHeight = 83.7;
 
 export const useHomeStyles = makeStyles(
   ({ spacing }, { width, height, scale, verticalScale }, insets: EdgeInsets) => {
-    // Design positions, each pushed clear of the section above (and of the status bar).
-    const headerTop = Math.max(verticalScale(d.header.top), insets.top + spacing.sm);
+    // The header sits where every screen's header does (as on Construction Progress), which
+    // is higher than home 1.png draws it; the sections below move up with it, so the
+    // design's spacing under the header is kept.
+    const headerTop = getScreenHeaderTop(width, height, insets);
+    const lift = Math.max(verticalScale(d.header.top) - headerTop, 0);
+    const designTop = (top: number) => verticalScale(top) - lift;
+
+    // Design positions, each pushed clear of the section above.
     const headerBottom = headerTop + scale(d.header.height);
-    const greetingTop = Math.max(verticalScale(d.greeting.top), headerBottom + spacing.lg);
+    const greetingTop = Math.max(designTop(d.greeting.top), headerBottom + spacing.lg);
     const greetingBottom = greetingTop + scale(d.greeting.height);
-    const unitTop = Math.max(verticalScale(d.unit.top), greetingBottom + spacing.lg);
+    const unitTop = Math.max(designTop(d.unit.top), greetingBottom + spacing.lg);
     const unitBottom = unitTop + scale(unitCardHeight);
-    const servicesTop = Math.max(verticalScale(d.services.top), unitBottom + spacing.lg);
+    const servicesTop = Math.max(designTop(d.services.top), unitBottom + spacing.lg);
     const servicesBottom = servicesTop + scale(servicesHeight);
-    const featuredTop = Math.max(verticalScale(d.featured.top), servicesBottom + spacing.lg);
+    const featuredTop = Math.max(designTop(d.featured.top), servicesBottom + spacing.lg);
 
     // The tab bar floats over the scroll view; the content ends above it.
     const contentBottom = getMainTabBarInset(width, height, insets);

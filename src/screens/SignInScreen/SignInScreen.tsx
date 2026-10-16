@@ -19,6 +19,7 @@ import { TextDivider } from '@/components/ui/TextDivider';
 import { images } from '@/constants/images';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
+import { useUnderDevelopment } from '@/hooks/useUnderDevelopment';
 import { useResponsive } from '@/hooks/useResponsive';
 
 import { quickSignInOptions, signInContent, type QuickSignInMethod } from './SignInScreen.data';
@@ -56,17 +57,20 @@ export function SignInScreen() {
     navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
   }, [navigation]);
 
-  const handleForgotPassword = useCallback(() => {
-    // TODO(navigation): open the password-reset screen once it is designed.
-  }, []);
+  // Shown by everything here whose screen or service isn't built yet.
+  const showUnderDevelopment = useUnderDevelopment();
 
-  const handleSignUp = useCallback(() => {
-    // TODO(navigation): open the Sign Up screen once it is designed.
-  }, []);
+  // TODO(navigation): open the password-reset and Sign Up screens once they are designed.
+  const handleForgotPassword = showUnderDevelopment;
+  const handleSignUp = showUnderDevelopment;
 
-  const handleQuickSignIn = useCallback((_method: QuickSignInMethod) => {
-    // TODO(auth): Face ID / Touch ID need stored credentials from the auth service; "More" needs its design.
-  }, []);
+  const handleQuickSignIn = useCallback(
+    (_method: QuickSignInMethod) => {
+      // TODO(auth): Face ID / Touch ID need stored credentials from the auth service; "More" needs its design.
+      showUnderDevelopment();
+    },
+    [showUnderDevelopment],
+  );
 
   return (
     <ScreenWrapper background={images.signInBackground} scrollable keyboardAvoiding>

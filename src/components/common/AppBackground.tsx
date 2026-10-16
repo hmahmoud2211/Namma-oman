@@ -1,7 +1,9 @@
 import { BlurTargetView } from 'expo-blur';
 import { useRef, type ReactNode } from 'react';
-import { Image, StyleSheet, View, type ImageSourcePropType } from 'react-native';
+import { Image } from 'expo-image';
+import { StyleSheet, View } from 'react-native';
 
+import { type AppImageSource, IMAGE_TRANSITION_MS } from '@/constants/images';
 import { BlurTargetContext } from '@/context/BlurTargetContext';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
@@ -9,7 +11,7 @@ import { directionProps, directionStyle } from '@/utils/direction';
 
 interface AppBackgroundProps {
   /** Full-bleed artwork; omitted → plain theme background. */
-  source?: ImageSourcePropType;
+  source?: AppImageSource;
   /** Optional colour wash over the artwork (e.g. the light theme's deeper green). */
   tint?: string;
   children: ReactNode;
@@ -35,7 +37,14 @@ export function AppBackground({ source, tint, children }: AppBackgroundProps) {
     >
       {source && (
         <BlurTargetView ref={blurTargetRef} style={StyleSheet.absoluteFill}>
-          <Image source={source} resizeMode="cover" style={styles.image} />
+          <Image
+            source={source}
+            contentFit="cover"
+            // Fades in over the theme background, which matches the artwork's edges.
+            transition={IMAGE_TRANSITION_MS}
+            priority="high"
+            style={styles.image}
+          />
           {tint && <View style={[StyleSheet.absoluteFill, { backgroundColor: tint }]} />}
         </BlurTargetView>
       )}

@@ -2,7 +2,8 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useRef, useState } from 'react';
-import { Image, Pressable, View, type ScrollViewInstance, type ViewInstance } from 'react-native';
+import { Image } from 'expo-image';
+import { Pressable, View, type ScrollViewInstance, type ViewInstance } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppText } from '@/components/common/AppText';
@@ -15,6 +16,7 @@ import { CalendarIcon } from '@/components/icons/CalendarIcon';
 import { ChevronIcon } from '@/components/icons/ChevronIcon';
 import { CraneIcon } from '@/components/icons/CraneIcon';
 import { LayersIcon } from '@/components/icons/LayersIcon';
+import { LogoutIcon } from '@/components/icons/LogoutIcon';
 import { MapPinIcon } from '@/components/icons/MapPinIcon';
 import { MainTabBar, type MainTabKey } from '@/components/layout/MainTabBar';
 import { ScreenWrapper } from '@/components/layout/ScreenWrapper';
@@ -27,11 +29,13 @@ import { StageTile, type ConstructionStage } from '@/components/ui/StageTile';
 import { StatusTimeline } from '@/components/ui/StatusTimeline';
 import { appearanceMenu } from '@/constants/appearance';
 import type { Locale } from '@/context/LocaleContext';
-import { images } from '@/constants/images';
+import { IMAGE_TRANSITION_MS, images } from '@/constants/images';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
+import { useLogout } from '@/hooks/useLogout';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useThemePreference } from '@/hooks/useThemePreference';
+import { useUnderDevelopment } from '@/hooks/useUnderDevelopment';
 import type { ColorScheme } from '@/theme';
 import type { RootStackParamList } from '@/types/navigation.types';
 
@@ -122,6 +126,13 @@ export function ConstructionProgressScreen() {
 
   const handleCloseMenu = useCallback(() => setMenuAnchor(null), []);
 
+  const showUnderDevelopment = useUnderDevelopment();
+  const logout = useLogout();
+  const handleLogout = useCallback(() => {
+    setMenuAnchor(null);
+    logout();
+  }, [logout]);
+
   const handleSelectScheme = useCallback(
     (selected: ColorScheme) => {
       setPreference(selected);
@@ -153,10 +164,12 @@ export function ConstructionProgressScreen() {
       if (tab === 'home') {
         // This screen is opened from Home, so the Home tab goes back to it.
         navigation.popTo('Home');
+        return;
       }
       // TODO(navigation): the other tabs need their screens (and a bottom-tabs navigator).
+      showUnderDevelopment();
     },
-    [navigation],
+    [navigation, showUnderDevelopment],
   );
 
   return (
@@ -177,6 +190,15 @@ export function ConstructionProgressScreen() {
               selectedKey={scheme}
               onSelect={handleSelectScheme}
               onClose={handleCloseMenu}
+              actions={[
+                {
+                  key: 'logout',
+                  label: appearanceMenu[locale].logoutLabel,
+                  Icon: LogoutIcon,
+                  destructive: true,
+                  onPress: handleLogout,
+                },
+              ]}
             />
           )}
         </>
@@ -248,7 +270,12 @@ export function ConstructionProgressScreen() {
             style={({ pressed }) => [styles.unitCard, pressed && styles.pressed]}
           >
             <SurfaceCard radius={d.unit.radius} rim="feature" style={styles.cardFill}>
-              <Image source={unit.photo} resizeMode="cover" style={styles.unitPhoto} />
+              <Image
+                source={unit.photo}
+                contentFit="cover"
+                transition={IMAGE_TRANSITION_MS}
+                style={styles.unitPhoto}
+              />
               <View style={styles.unitDetails}>
                 <AppText variant="panelTitle" color={colors.surfaceText}>
                   {unit.projectName}

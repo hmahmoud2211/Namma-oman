@@ -28,7 +28,9 @@ interface LanguageToggleProps {
 /** EN | AR switch for the app language; each label is named in its own language for screen readers. */
 export function LanguageToggle({ style }: LanguageToggleProps) {
   const { colors } = useAppTheme();
-  const { locale, setLocale } = useLocale();
+  const { locale, setLocale, pendingLocale } = useLocale();
+  // Shows the choice at once, even while that language's fonts are still loading.
+  const shownLocale = pendingLocale ?? locale;
   const styles = useStyles();
 
   return (
@@ -40,7 +42,7 @@ export function LanguageToggle({ style }: LanguageToggleProps) {
         accessibilityRole="radiogroup"
       >
         {OPTIONS.map((option) => {
-          const isActive = option.locale === locale;
+          const isActive = option.locale === shownLocale;
           return (
             <Pressable
               key={option.locale}

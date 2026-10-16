@@ -1,4 +1,5 @@
-import { Image, Pressable, View } from 'react-native';
+import { Image } from 'expo-image';
+import { Pressable, View } from 'react-native';
 
 import { AppText } from '@/components/common/AppText';
 import { CheckIcon } from '@/components/icons/CheckIcon';
@@ -8,6 +9,7 @@ import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
 import { useResponsive } from '@/hooks/useResponsive';
 import { makeStyles } from '@/utils/makeStyles';
+import { IMAGE_TRANSITION_MS } from '@/constants/images';
 
 import {
   constructionContent,
@@ -72,7 +74,12 @@ export function UnitPickerSheet({
               pressed && styles.pressed,
             ]}
           >
-            <Image source={unit.photo} resizeMode="cover" style={styles.unitPhoto} />
+            <Image
+              source={unit.photo}
+              contentFit="cover"
+              transition={IMAGE_TRANSITION_MS}
+              style={styles.unitPhoto}
+            />
             <View style={styles.fill}>
               <AppText variant="panelHeading" color={colors.surfaceText}>
                 {unit.unitName}
@@ -169,7 +176,12 @@ export function UpdateDetailSheet({ update }: { update: SiteUpdate }) {
 
   return (
     <View>
-      <Image source={update.photo} resizeMode="cover" style={styles.updatePhoto} />
+      <Image
+        source={update.photo}
+        contentFit="cover"
+        transition={IMAGE_TRANSITION_MS}
+        style={styles.updatePhoto}
+      />
       <AppText variant="label" color={colors.surfaceAccentText} style={styles.sectionLabel}>
         {update.date}
       </AppText>

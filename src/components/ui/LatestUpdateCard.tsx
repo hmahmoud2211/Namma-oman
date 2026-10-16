@@ -1,13 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
-import {
-  Image,
-  PanResponder,
-  Pressable,
-  View,
-  type ImageSourcePropType,
-  type StyleProp,
-  type ViewStyle,
-} from 'react-native';
+import { Image } from 'expo-image';
+import { PanResponder, Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { AppText } from '@/components/common/AppText';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
@@ -16,13 +9,14 @@ import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
 import { useResponsive } from '@/hooks/useResponsive';
 import { makeStyles } from '@/utils/makeStyles';
+import { type AppImageSource, IMAGE_TRANSITION_MS } from '@/constants/images';
 
 export interface SiteUpdate {
   id: string;
   date: string;
   title: string;
   body: string;
-  photo: ImageSourcePropType;
+  photo: AppImageSource;
 }
 
 interface LatestUpdateCardProps {
@@ -104,7 +98,12 @@ export function LatestUpdateCard({
         style={({ pressed }) => [styles.fill, pressed && styles.pressed]}
       >
         <SurfaceCard radius={d.radius} rim="feature" style={styles.fill}>
-          <Image source={update.photo} resizeMode="cover" style={styles.photo} />
+          <Image
+            source={update.photo}
+            contentFit="cover"
+            transition={IMAGE_TRANSITION_MS}
+            style={styles.photo}
+          />
           <AppText variant="labelSmall" color={colors.surfaceTextMuted} style={styles.date}>
             {update.date}
           </AppText>

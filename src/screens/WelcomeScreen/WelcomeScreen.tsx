@@ -61,7 +61,8 @@ export function WelcomeScreen() {
               color={colors.buttonPrimaryText}
             />
           }
-          onPress={handleGetStarted}
+          accessibilityHint={content.ctaHint}
+          onSlideComplete={handleGetStarted}
           style={styles.cta}
         />
       </View>

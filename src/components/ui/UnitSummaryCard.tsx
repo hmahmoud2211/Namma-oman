@@ -1,11 +1,5 @@
-import {
-  Image,
-  Pressable,
-  View,
-  type ImageSourcePropType,
-  type StyleProp,
-  type ViewStyle,
-} from 'react-native';
+import { Image } from 'expo-image';
+import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { AppText } from '@/components/common/AppText';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
@@ -14,6 +8,7 @@ import { HouseIcon } from '@/components/icons/HouseIcon';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useResponsive } from '@/hooks/useResponsive';
 import { makeStyles } from '@/utils/makeStyles';
+import { type AppImageSource, IMAGE_TRANSITION_MS } from '@/constants/images';
 
 export interface UnitSummary {
   heading: string;
@@ -22,7 +17,7 @@ export interface UnitSummary {
   balanceLabel: string;
   currency: string;
   amount: string;
-  photo: ImageSourcePropType;
+  photo: AppImageSource;
 }
 
 interface UnitSummaryCardProps {
@@ -62,7 +57,12 @@ export function UnitSummaryCard({ unit, onPress, style }: UnitSummaryCardProps) 
       style={({ pressed }) => [pressed && styles.pressed, style]}
     >
       <SurfaceCard radius={d.radius} rim="feature" style={styles.card}>
-        <Image source={unit.photo} resizeMode="cover" style={styles.photo} />
+        <Image
+          source={unit.photo}
+          contentFit="cover"
+          transition={IMAGE_TRANSITION_MS}
+          style={styles.photo}
+        />
 
         <View style={styles.details}>
           <View style={styles.headingRow}>

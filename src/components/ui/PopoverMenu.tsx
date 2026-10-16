@@ -24,6 +24,16 @@ export interface PopoverAnchor {
   y: number;
 }
 
+/** A one-off command listed under the options, e.g. "Log out". */
+export interface PopoverMenuAction {
+  key: string;
+  label: string;
+  Icon: ComponentType<IconProps>;
+  /** Shown in the warning colour (e.g. log out). */
+  destructive?: boolean;
+  onPress: () => void;
+}
+
 interface PopoverMenuProps<K extends string> {
   anchor: PopoverAnchor;
   title: string;
@@ -31,9 +41,10 @@ interface PopoverMenuProps<K extends string> {
   selectedKey: K;
   onSelect: (key: K) => void;
   onClose: () => void;
+  /** Commands under the options, after a divider. */
+  actions?: readonly PopoverMenuAction[];
 }
 
-/** Design dp, scaled to the Home screen's type sizes. */
 /** Panel width in design dp, for screens that align the menu to a button's far edge. */
 export const POPOVER_MENU_WIDTH = 128;
 
@@ -46,6 +57,7 @@ const d = {
   row: { height: 28, paddingHorizontal: 7, radius: 6, gap: 7 },
   icon: 12,
   check: 10,
+  actionGap: 5,
 } as const;
 const FADE_MS = 140;
 
@@ -61,6 +73,7 @@ export function PopoverMenu<K extends string>({
   selectedKey,
   onSelect,
   onClose,
+  actions,
 }: PopoverMenuProps<K>) {
   const { colors } = useAppTheme();
   const { locale } = useLocale();
@@ -122,6 +135,24 @@ export function PopoverMenu<K extends string>({
             </Pressable>
           );
         })}
+        {actions && actions.length > 0 && <View style={[styles.divider, styles.actionsDivider]} />}
+        {actions?.map(({ key, label, Icon, destructive, onPress }) => {
+          const color = destructive ? colors.destructiveText : colors.surfaceText;
+          return (
+            <Pressable
+              key={key}
+              onPress={onPress}
+              accessibilityRole="menuitem"
+              accessibilityLabel={label}
+              style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+            >
+              <Icon size={scale(d.icon)} color={destructive ? color : colors.surfaceIcon} />
+              <AppText variant="value" color={color} style={styles.label}>
+                {label}
+              </AppText>
+            </Pressable>
+          );
+        })}
       </View>
     </Animated.View>
   );
@@ -158,6 +189,9 @@ const useStyles = makeStyles(({ colors, shadows }, { scale }) => ({
     gap: scale(d.row.gap),
     paddingHorizontal: scale(d.row.paddingHorizontal),
     borderRadius: scale(d.row.radius),
+  },
+  actionsDivider: {
+    marginTop: scale(d.actionGap),
   },
   rowSelected: {
     backgroundColor: colors.menuActiveFill,

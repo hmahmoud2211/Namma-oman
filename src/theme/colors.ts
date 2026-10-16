@@ -41,6 +41,8 @@ const palette = {
   tealDeep: '#01665A',
   mint: '#2CF978',
   amber: '#F5B54A',
+  coral: '#FF8F80',
+  brick: '#B3261E',
   ochre: '#A86A12',
   leaf: '#24955A',
   signalGold: '#FDE18E',
@@ -192,6 +194,8 @@ export interface ColorTokens {
   timelinePending: string;
   /** Gold text on the themed cards ("Latest Update"); deeper in light mode for contrast. */
   surfaceAccentText: string;
+  /** Destructive commands on menus and cards ("Log out"). */
+  destructiveText: string;
   /** Faintest text on the themed cards ("Pending", "In Progress"). */
   surfaceTextSubtle: string;
   surfaceDivider: string;
@@ -324,6 +328,7 @@ export const darkColors: ColorTokens = {
   timelineTick: palette.ink,
   timelinePending: 'rgba(255, 255, 255, 0.62)',
   surfaceAccentText: palette.gold,
+  destructiveText: palette.coral,
   surfaceTextSubtle: 'rgba(255, 255, 255, 0.48)',
   surfaceDivider: 'rgba(255, 255, 255, 0.14)',
   pagerActive: palette.aqua,
@@ -396,6 +401,7 @@ export const lightColors: ColorTokens = {
   timelineTick: palette.cream,
   timelinePending: 'rgba(28, 27, 23, 0.5)',
   surfaceAccentText: palette.bronze,
+  destructiveText: palette.brick,
   surfaceTextSubtle: 'rgba(59, 56, 48, 0.68)',
   surfaceDivider: 'rgba(18, 61, 43, 0.16)',
   pagerActive: palette.forestInk,

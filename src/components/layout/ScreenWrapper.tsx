@@ -6,7 +6,6 @@ import {
   ScrollView,
   StyleSheet,
   View,
-  type ImageSourcePropType,
   type ScrollViewInstance,
   type StyleProp,
   type ViewStyle,
@@ -15,11 +14,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppBackground } from '@/components/common/AppBackground';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import type { AppImageSource } from '@/constants/images';
 
 interface ScreenWrapperProps {
   children: ReactNode;
   /** Full-bleed background artwork drawn behind the system bars. */
-  background?: ImageSourcePropType;
+  background?: AppImageSource;
   /** Colour wash over `background`, e.g. a theme's `backgroundTint`. */
   backgroundTint?: string;
   /** Wrap content in a ScrollView for screens taller than small devices. */

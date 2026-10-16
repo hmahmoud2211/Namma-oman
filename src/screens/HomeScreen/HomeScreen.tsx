@@ -8,6 +8,7 @@ import { BrandLogo } from '@/components/common/BrandLogo';
 import { LanguageToggle } from '@/components/common/LanguageToggle';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
 import { BellIcon } from '@/components/icons/BellIcon';
+import { LogoutIcon } from '@/components/icons/LogoutIcon';
 import { MenuIcon } from '@/components/icons/MenuIcon';
 import { MoonIcon } from '@/components/icons/MoonIcon';
 import { MainTabBar, type MainTabKey } from '@/components/layout/MainTabBar';
@@ -23,8 +24,10 @@ import { appearanceMenu } from '@/constants/appearance';
 import { images } from '@/constants/images';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
+import { useLogout } from '@/hooks/useLogout';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useThemePreference } from '@/hooks/useThemePreference';
+import { useUnderDevelopment } from '@/hooks/useUnderDevelopment';
 import type { ColorScheme } from '@/theme';
 
 import {
@@ -48,6 +51,9 @@ export function HomeScreen() {
   const scrollRef = useRef<ScrollViewInstance>(null);
   const menuButtonRef = useRef<ViewInstance>(null);
   const [menuAnchor, setMenuAnchor] = useState<PopoverAnchor | null>(null);
+  // Shown by everything here whose screen isn't built yet.
+  const showUnderDevelopment = useUnderDevelopment();
+  const logout = useLogout();
 
   const hitSlop = scale(homeDesign.hitSlop);
   const { weather } = content;
@@ -76,35 +82,47 @@ export function HomeScreen() {
     [setPreference],
   );
 
-  const handleOpenNotifications = useCallback(() => {
-    // TODO(navigation): open the notifications screen once it is designed.
-  }, []);
+  const handleLogout = useCallback(() => {
+    setMenuAnchor(null);
+    logout();
+  }, [logout]);
 
-  const handleOpenUnit = useCallback(() => {
-    // TODO(navigation): open the unit details screen once it is designed.
-  }, []);
+  // TODO(navigation): the notifications and unit details screens aren't designed yet.
+  const handleOpenNotifications = showUnderDevelopment;
+  const handleOpenUnit = showUnderDevelopment;
 
   const handleOpenService = useCallback(
     (service: HomeServiceId) => {
       if (service === 'construction-progress') {
         navigation.navigate('ConstructionProgress');
+        return;
       }
       // TODO(navigation): route the other shortcuts to their screens once those are designed.
+      showUnderDevelopment();
     },
-    [navigation],
+    [navigation, showUnderDevelopment],
   );
 
-  const handleExploreCommunity = useCallback((_community: FeaturedCommunity) => {
-    // TODO(navigation): open the community screen once it is designed.
-  }, []);
+  const handleExploreCommunity = useCallback(
+    (_community: FeaturedCommunity) => {
+      // TODO(navigation): open the community screen once it is designed.
+      showUnderDevelopment();
+    },
+    [showUnderDevelopment],
+  );
 
-  const handleTabPress = useCallback((tab: MainTabKey) => {
-    if (tab === 'home') {
-      // Already here: tapping the active tab returns to the top, as in native tab bars.
-      scrollRef.current?.scrollTo({ y: 0, animated: true });
-    }
-    // TODO(navigation): the other tabs need their screens (and a bottom-tabs navigator).
-  }, []);
+  const handleTabPress = useCallback(
+    (tab: MainTabKey) => {
+      if (tab === 'home') {
+        // Already here: tapping the active tab returns to the top, as in native tab bars.
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
+        return;
+      }
+      // TODO(navigation): the other tabs need their screens (and a bottom-tabs navigator).
+      showUnderDevelopment();
+    },
+    [showUnderDevelopment],
+  );
 
   return (
     <ScreenWrapper
@@ -123,6 +141,15 @@ export function HomeScreen() {
               selectedKey={scheme}
               onSelect={handleSelectScheme}
               onClose={handleCloseMenu}
+              actions={[
+                {
+                  key: 'logout',
+                  label: appearanceMenu[locale].logoutLabel,
+                  Icon: LogoutIcon,
+                  destructive: true,
+                  onPress: handleLogout,
+                },
+              ]}
             />
           )}
         </>

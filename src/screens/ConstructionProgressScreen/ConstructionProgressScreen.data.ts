@@ -1,5 +1,4 @@
 import type { ComponentType } from 'react';
-import type { ImageSourcePropType } from 'react-native';
 
 import { BuildingsIcon } from '@/components/icons/BuildingsIcon';
 import { GearIcon } from '@/components/icons/GearIcon';
@@ -11,7 +10,7 @@ import type { BarChartPoint } from '@/components/ui/BarChart';
 import type { SiteUpdate } from '@/components/ui/LatestUpdateCard';
 import type { ConstructionStage } from '@/components/ui/StageTile';
 import type { TimelineStep } from '@/components/ui/StatusTimeline';
-import { images } from '@/constants/images';
+import { type AppImageSource, images } from '@/constants/images';
 import type { Locale, Localized } from '@/context/LocaleContext';
 import { formatDate, formatMonth, quarterParts } from '@/utils/date';
 
@@ -164,7 +163,7 @@ export interface UnitConstruction {
   unitName: string;
   role: string;
   location: string;
-  photo: ImageSourcePropType;
+  photo: AppImageSource;
   overall: { percent: number; status: ScheduleStatus; lastUpdate: string };
   /** The 3 × 2 stage grid, in reading order. */
   stages: readonly StageDetail[];
@@ -210,7 +209,7 @@ interface DemoUpdate {
   date: string;
   title: Text;
   body: Text;
-  photo: ImageSourcePropType;
+  photo: AppImageSource;
 }
 
 interface DemoStep {
@@ -224,7 +223,7 @@ interface DemoStep {
 interface DemoUnit {
   id: string;
   unitCode: string;
-  photo: ImageSourcePropType;
+  photo: AppImageSource;
   overall: { percent: number; status: ScheduleStatus; lastUpdate: string };
   stages: readonly DemoStage[];
   updates: readonly DemoUpdate[];

@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useId, type ReactNode } from 'react';
 import {
+  Animated,
   Pressable,
   StyleSheet,
   View,
@@ -13,6 +14,7 @@ import Svg, { Circle, Defs, Stop, LinearGradient as SvgLinearGradient } from 're
 import { AppText } from '@/components/common/AppText';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useResponsive } from '@/hooks/useResponsive';
+import { useSlideToConfirm } from '@/hooks/useSlideToConfirm';
 import { toBoxShadow } from '@/theme/shadows';
 import { makeStyles } from '@/utils/makeStyles';
 
@@ -36,6 +38,12 @@ export interface AppButtonProps extends Omit<PressableProps, 'style' | 'children
    * `trailing`: inline right after the title (Sign In).
    */
   iconPosition?: AppButtonIconPosition;
+  /**
+   * Turns the leading icon ring into a handle the user drags to the end edge to confirm
+   * ("slide to get started"). Taps then only nudge the handle; screen readers still
+   * activate it like a normal button. Needs a leading `icon`.
+   */
+  onSlideComplete?: () => void;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -68,6 +76,7 @@ export function AppButton({
   size = 'large',
   icon,
   iconPosition = 'leading',
+  onSlideComplete,
   disabled,
   style,
   ...pressableProps
@@ -77,6 +86,19 @@ export function AppButton({
   const styles = useStyles();
   const hasLeadingIcon = icon != null && iconPosition === 'leading';
   const hasTrailingIcon = icon != null && iconPosition === 'trailing';
+  const slide = useSlideToConfirm({
+    onComplete: hasLeadingIcon && !disabled ? onSlideComplete : undefined,
+    handleSize: scale(ICON_RING_SIZE),
+    handleInset: scale(ICON_RING_INSET),
+  });
+  // Assistive tech can't drag: its "activate" completes the slide directly.
+  const slideAccessibility = slide.enabled
+    ? {
+        accessibilityActions: [{ name: 'activate' as const }],
+        onAccessibilityAction: () => onSlideComplete?.(),
+        onAccessibilityTap: () => onSlideComplete?.(),
+      }
+    : null;
 
   const labelColor = {
     primary: colors.buttonPrimaryText,
@@ -106,6 +128,9 @@ export function AppButton({
         style,
       ]}
       {...pressableProps}
+      {...slideAccessibility}
+      // Only slide buttons measure their track; others keep any onLayout they were given.
+      {...(onSlideComplete && { onLayout: slide.onLayout })}
     >
       {variant === 'primary' && (
         <>
@@ -132,8 +157,12 @@ export function AppButton({
       )}
 
       {hasLeadingIcon && (
-        <View
-          style={[styles.iconSlot, size === 'large' ? styles.iconSlotLarge : styles.iconSlotMedium]}
+        <Animated.View
+          style={[
+            styles.iconSlot,
+            size === 'large' ? styles.iconSlotLarge : styles.iconSlotMedium,
+            slide.enabled && slide.handleStyle,
+          ]}
           pointerEvents="none"
         >
           <IconRing
@@ -142,10 +171,13 @@ export function AppButton({
             color={colors.buttonIconRing}
           />
           {icon}
-        </View>
+        </Animated.View>
       )}
 
-      <View style={styles.labelRow} pointerEvents="none">
+      <Animated.View
+        style={[styles.labelRow, slide.enabled && slide.labelStyle]}
+        pointerEvents="none"
+      >
         <AppText variant={labelVariant} color={labelColor} numberOfLines={1}>
           {title}
         </AppText>
@@ -154,7 +186,9 @@ export function AppButton({
             {icon}
           </View>
         )}
-      </View>
+      </Animated.View>
+      {/* Takes every touch on the pill, so a drag can start anywhere along it. */}
+      {slide.enabled && <View style={styles.layer} {...slide.panHandlers} />}
     </Pressable>
   );
 }

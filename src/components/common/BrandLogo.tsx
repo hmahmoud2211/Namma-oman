@@ -1,5 +1,6 @@
 import { Asset } from 'expo-asset';
-import { Image, type ImageStyle, type StyleProp } from 'react-native';
+import { Image } from 'expo-image';
+import type { ImageStyle, StyleProp } from 'react-native';
 
 import { images } from '@/constants/images';
 import { commonStrings } from '@/constants/strings';
@@ -21,9 +22,10 @@ export function BrandLogo({ width, style }: BrandLogoProps) {
   return (
     <Image
       source={images.brandLogo}
-      resizeMode="contain"
-      // Explicit height (not aspectRatio): Image pre-fills the asset's intrinsic size,
-      // and Yoga would derive the width from that height instead.
+      contentFit="contain"
+      // Loaded during the splash screen, so no fade: the logo is simply there.
+      priority="high"
+      // Explicit width and height, as for every image (see AGENTS.md).
       style={[{ width, height: width / LOGO_ASPECT_RATIO }, style]}
       accessibilityRole="image"
       accessibilityLabel={commonStrings[locale].brandName}

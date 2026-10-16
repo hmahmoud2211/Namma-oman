@@ -1,14 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Fragment, useCallback, useState } from 'react';
-import {
-  Image,
-  Pressable,
-  StyleSheet,
-  View,
-  type ImageSourcePropType,
-  type StyleProp,
-  type ViewStyle,
-} from 'react-native';
+import { Image } from 'expo-image';
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { AppButton } from '@/components/common/AppButton';
 import { AppText } from '@/components/common/AppText';
@@ -20,6 +13,7 @@ import { useLocale } from '@/hooks/useLocale';
 import { useResponsive } from '@/hooks/useResponsive';
 import { toBoxShadow } from '@/theme/shadows';
 import { makeStyles } from '@/utils/makeStyles';
+import { type AppImageSource, IMAGE_TRANSITION_MS } from '@/constants/images';
 
 export interface FeaturedCommunity {
   id: string;
@@ -28,7 +22,7 @@ export interface FeaturedCommunity {
   pillars: readonly string[];
   /** Description, one entry per line as laid out in the design. */
   descriptionLines: readonly string[];
-  photo: ImageSourcePropType;
+  photo: AppImageSource;
 }
 
 interface FeaturedCommunityCardProps {
@@ -111,7 +105,12 @@ export function FeaturedCommunityCard({
         colors={colors.heroGlassGradient}
       />
       <View style={styles.clip} pointerEvents="none">
-        <Image source={community.photo} resizeMode="cover" style={styles.photo} />
+        <Image
+          source={community.photo}
+          contentFit="cover"
+          transition={IMAGE_TRANSITION_MS}
+          style={styles.photo}
+        />
         <LinearGradient
           colors={colors.heroScrimGradient}
           locations={d.scrimStops}

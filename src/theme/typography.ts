@@ -1,16 +1,3 @@
-import { IBMPlexSansArabic_300Light } from '@expo-google-fonts/ibm-plex-sans-arabic/300Light';
-import { IBMPlexSansArabic_400Regular } from '@expo-google-fonts/ibm-plex-sans-arabic/400Regular';
-import { IBMPlexSansArabic_500Medium } from '@expo-google-fonts/ibm-plex-sans-arabic/500Medium';
-import { IBMPlexSansArabic_600SemiBold } from '@expo-google-fonts/ibm-plex-sans-arabic/600SemiBold';
-import { IBMPlexSansArabic_700Bold } from '@expo-google-fonts/ibm-plex-sans-arabic/700Bold';
-import { Montserrat_300Light } from '@expo-google-fonts/montserrat/300Light';
-import { NunitoSans_400Regular } from '@expo-google-fonts/nunito-sans/400Regular';
-import { NunitoSans_500Medium } from '@expo-google-fonts/nunito-sans/500Medium';
-import { NunitoSans_600SemiBold } from '@expo-google-fonts/nunito-sans/600SemiBold';
-import { NunitoSans_700Bold } from '@expo-google-fonts/nunito-sans/700Bold';
-import { OpenSans_700Bold } from '@expo-google-fonts/open-sans/700Bold';
-import { PlayfairDisplay_400Regular } from '@expo-google-fonts/playfair-display/400Regular';
-import { PlayfairDisplay_700Bold } from '@expo-google-fonts/playfair-display/700Bold';
 import type { TextStyle } from 'react-native';
 
 /**
@@ -38,21 +25,38 @@ export const fontFamilies = {
   arabicBold: 'IBMPlexSansArabic_700Bold',
 } as const;
 
-/** Passed to `useFonts` at startup. Only the faces listed here are bundled. */
-export const fontAssets = {
-  [fontFamilies.serifRegular]: PlayfairDisplay_400Regular,
-  [fontFamilies.serifBold]: PlayfairDisplay_700Bold,
-  [fontFamilies.sansLight]: Montserrat_300Light,
-  [fontFamilies.sansBold]: OpenSans_700Bold,
-  [fontFamilies.roundedRegular]: NunitoSans_400Regular,
-  [fontFamilies.roundedMedium]: NunitoSans_500Medium,
-  [fontFamilies.roundedSemiBold]: NunitoSans_600SemiBold,
-  [fontFamilies.roundedBold]: NunitoSans_700Bold,
-  [fontFamilies.arabicLight]: IBMPlexSansArabic_300Light,
-  [fontFamilies.arabicRegular]: IBMPlexSansArabic_400Regular,
-  [fontFamilies.arabicMedium]: IBMPlexSansArabic_500Medium,
-  [fontFamilies.arabicSemiBold]: IBMPlexSansArabic_600SemiBold,
-  [fontFamilies.arabicBold]: IBMPlexSansArabic_700Bold,
+/*
+ * Font files are the Google Fonts faces cut down to the characters the app shows (about 70%
+ * smaller), made by scripts/subset-fonts.py from the @expo-google-fonts packages. Re-run it
+ * after changing a font. Only the faces listed below are bundled.
+ */
+
+/** The Welcome screen's faces: loaded while the splash screen is up (App.tsx). */
+export const startupFontAssets = {
+  [fontFamilies.serifRegular]: require('../assets/fonts/PlayfairDisplay_400Regular.ttf'),
+  [fontFamilies.sansLight]: require('../assets/fonts/Montserrat_300Light.ttf'),
+  [fontFamilies.sansBold]: require('../assets/fonts/OpenSans_700Bold.ttf'),
+};
+
+/** The other Latin faces: loaded in the background once the first screen is showing. */
+export const deferredFontAssets = {
+  [fontFamilies.serifBold]: require('../assets/fonts/PlayfairDisplay_700Bold.ttf'),
+  [fontFamilies.roundedRegular]: require('../assets/fonts/NunitoSans_400Regular.ttf'),
+  [fontFamilies.roundedMedium]: require('../assets/fonts/NunitoSans_500Medium.ttf'),
+  [fontFamilies.roundedSemiBold]: require('../assets/fonts/NunitoSans_600SemiBold.ttf'),
+  [fontFamilies.roundedBold]: require('../assets/fonts/NunitoSans_700Bold.ttf'),
+};
+
+/**
+ * Arabic faces: loaded only when the app first switches to Arabic, so English visitors never
+ * download them (see LocaleProvider).
+ */
+export const arabicFontAssets = {
+  [fontFamilies.arabicLight]: require('../assets/fonts/IBMPlexSansArabic_300Light.ttf'),
+  [fontFamilies.arabicRegular]: require('../assets/fonts/IBMPlexSansArabic_400Regular.ttf'),
+  [fontFamilies.arabicMedium]: require('../assets/fonts/IBMPlexSansArabic_500Medium.ttf'),
+  [fontFamilies.arabicSemiBold]: require('../assets/fonts/IBMPlexSansArabic_600SemiBold.ttf'),
+  [fontFamilies.arabicBold]: require('../assets/fonts/IBMPlexSansArabic_700Bold.ttf'),
 };
 
 export type TextVariant =

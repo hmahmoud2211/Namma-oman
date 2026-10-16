@@ -1,6 +1,7 @@
 import type { EdgeInsets } from 'react-native-safe-area-context';
 
 import { getMainTabBarInset } from '@/components/layout/MainTabBar';
+import { getScreenHeaderTop } from '@/components/layout/screenHeader';
 import { LATEST_UPDATE_CARD_HEIGHT } from '@/components/ui/LatestUpdateCard';
 import { STAGE_TILE_HEIGHT } from '@/components/ui/StageTile';
 import { makeStyles } from '@/utils/makeStyles';
@@ -16,7 +17,8 @@ export const CONSTRUCTION_FRAME = designFrameFromExport(770, 1368);
  * Margins between text line boxes are set so baselines land where the design draws them.
  */
 export const constructionDesign = {
-  header: { top: 28.05, height: 36.6 },
+  // Its top is the shared screen-header position (`getScreenHeaderTop`).
+  header: { height: 36.6 },
   headerButton: { top: 4.4, size: 30.9 },
   back: { left: 27.4, chevron: 12, shiftX: -1 },
   logo: { left: 66.3, width: 93.5 },
@@ -78,12 +80,8 @@ const stageRows = 2;
 const stagesHeight = stageRows * STAGE_TILE_HEIGHT + (stageRows - 1) * d.stages.rowGap;
 
 export const useConstructionStyles = makeStyles(
-  (
-    { colors, spacing, borderRadius },
-    { width, height, scale, verticalScale },
-    insets: EdgeInsets,
-  ) => {
-    const headerTop = Math.max(verticalScale(d.header.top), insets.top + spacing.sm);
+  ({ colors, spacing, borderRadius }, { width, height, scale }, insets: EdgeInsets) => {
+    const headerTop = getScreenHeaderTop(width, height, insets);
     // The tab bar floats over the scroll view; the content ends above it.
     const contentBottom = getMainTabBarInset(width, height, insets);
 
