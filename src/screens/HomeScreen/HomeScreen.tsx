@@ -1,0 +1,221 @@
+import { useNavigation } from '@react-navigation/native';
+import { useCallback, useRef, useState } from 'react';
+import { Pressable, View, type ScrollViewInstance, type ViewInstance } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { AppText } from '@/components/common/AppText';
+import { BrandLogo } from '@/components/common/BrandLogo';
+import { LanguageToggle } from '@/components/common/LanguageToggle';
+import { SurfaceCard } from '@/components/common/SurfaceCard';
+import { BellIcon } from '@/components/icons/BellIcon';
+import { MenuIcon } from '@/components/icons/MenuIcon';
+import { MoonIcon } from '@/components/icons/MoonIcon';
+import { MainTabBar, type MainTabKey } from '@/components/layout/MainTabBar';
+import { ScreenWrapper } from '@/components/layout/ScreenWrapper';
+import {
+  FeaturedCommunityCard,
+  type FeaturedCommunity,
+} from '@/components/ui/FeaturedCommunityCard';
+import { POPOVER_MENU_WIDTH, PopoverMenu, type PopoverAnchor } from '@/components/ui/PopoverMenu';
+import { ServiceTile } from '@/components/ui/ServiceTile';
+import { UnitSummaryCard } from '@/components/ui/UnitSummaryCard';
+import { appearanceMenu } from '@/constants/appearance';
+import { images } from '@/constants/images';
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { useLocale } from '@/hooks/useLocale';
+import { useResponsive } from '@/hooks/useResponsive';
+import { useThemePreference } from '@/hooks/useThemePreference';
+import type { ColorScheme } from '@/theme';
+
+import {
+  featuredCommunities,
+  homeContent,
+  homeServices,
+  myUnit,
+  type HomeServiceId,
+} from './HomeScreen.data';
+import { HOME_FRAME, homeDesign, useHomeStyles } from './HomeScreen.styles';
+
+export function HomeScreen() {
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+  const styles = useHomeStyles(insets);
+  const { colors } = useAppTheme();
+  const { scheme, setPreference } = useThemePreference();
+  const { locale, isRTL } = useLocale();
+  const content = homeContent[locale];
+  const { scale } = useResponsive(HOME_FRAME);
+  const scrollRef = useRef<ScrollViewInstance>(null);
+  const menuButtonRef = useRef<ViewInstance>(null);
+  const [menuAnchor, setMenuAnchor] = useState<PopoverAnchor | null>(null);
+
+  const hitSlop = scale(homeDesign.hitSlop);
+  const { weather } = content;
+
+  // The menu opens just under the button, wherever the page is scrolled to.
+  // TODO(navigation): replace with the side menu once it is designed.
+  const handleOpenMenu = useCallback(() => {
+    menuButtonRef.current?.measureInWindow((x, y, width, height) => {
+      const offset = scale(homeDesign.menuPopover.offsetX);
+      setMenuAnchor({
+        // In Arabic the button is on the right, so the menu's right edge lines up with it.
+        x: isRTL ? x + width - scale(POPOVER_MENU_WIDTH) - offset : x + offset,
+        y: y + height + scale(homeDesign.menuPopover.gap),
+      });
+    });
+  }, [isRTL, scale]);
+
+  const handleCloseMenu = useCallback(() => setMenuAnchor(null), []);
+
+  const handleSelectScheme = useCallback(
+    (selected: ColorScheme) => {
+      // Overrides the device setting for this session.
+      setPreference(selected);
+      setMenuAnchor(null);
+    },
+    [setPreference],
+  );
+
+  const handleOpenNotifications = useCallback(() => {
+    // TODO(navigation): open the notifications screen once it is designed.
+  }, []);
+
+  const handleOpenUnit = useCallback(() => {
+    // TODO(navigation): open the unit details screen once it is designed.
+  }, []);
+
+  const handleOpenService = useCallback(
+    (service: HomeServiceId) => {
+      if (service === 'construction-progress') {
+        navigation.navigate('ConstructionProgress');
+      }
+      // TODO(navigation): route the other shortcuts to their screens once those are designed.
+    },
+    [navigation],
+  );
+
+  const handleExploreCommunity = useCallback((_community: FeaturedCommunity) => {
+    // TODO(navigation): open the community screen once it is designed.
+  }, []);
+
+  const handleTabPress = useCallback((tab: MainTabKey) => {
+    if (tab === 'home') {
+      // Already here: tapping the active tab returns to the top, as in native tab bars.
+      scrollRef.current?.scrollTo({ y: 0, animated: true });
+    }
+    // TODO(navigation): the other tabs need their screens (and a bottom-tabs navigator).
+  }, []);
+
+  return (
+    <ScreenWrapper
+      background={images.homeBackground}
+      backgroundTint={colors.backgroundTint}
+      scrollable
+      scrollRef={scrollRef}
+      overlay={
+        <>
+          <MainTabBar activeKey="home" onTabPress={handleTabPress} />
+          {menuAnchor && (
+            <PopoverMenu
+              anchor={menuAnchor}
+              title={appearanceMenu[locale].title}
+              options={appearanceMenu[locale].options}
+              selectedKey={scheme}
+              onSelect={handleSelectScheme}
+              onClose={handleCloseMenu}
+            />
+          )}
+        </>
+      }
+    >
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <Pressable
+            ref={menuButtonRef}
+            onPress={handleOpenMenu}
+            hitSlop={hitSlop}
+            accessibilityRole="button"
+            accessibilityLabel={content.menuLabel}
+            accessibilityState={{ expanded: menuAnchor !== null }}
+            style={styles.menuButton}
+          >
+            <MenuIcon size={scale(homeDesign.menu.size)} color={colors.headerIcon} />
+          </Pressable>
+          <BrandLogo width={scale(homeDesign.logo.width)} style={styles.logo} />
+          <LanguageToggle style={styles.languageToggle} />
+          <Pressable
+            onPress={handleOpenNotifications}
+            hitSlop={hitSlop}
+            accessibilityRole="button"
+            accessibilityLabel={content.notificationsLabel}
+            style={styles.bellButton}
+          >
+            <BellIcon size={scale(homeDesign.bell.size)} color={colors.headerIcon} />
+          </Pressable>
+        </View>
+
+        <View style={styles.greetingRow}>
+          <View style={styles.greeting}>
+            <AppText variant="greeting">{content.greeting}</AppText>
+            <AppText variant="greetingName" color={colors.accent}>
+              {content.residentName}
+            </AppText>
+            <AppText variant="greeting" style={styles.tagline}>
+              {content.tagline}
+            </AppText>
+          </View>
+
+          <SurfaceCard radius={homeDesign.weather.radius} style={styles.weatherCard}>
+            <View
+              style={styles.moon}
+              accessible
+              accessibilityLabel={`${weather.temperature}, ${weather.condition}`}
+            >
+              <MoonIcon
+                size={scale(homeDesign.weather.moon.size)}
+                color={colors.moonLight}
+                shadeColor={colors.moonShade}
+              />
+            </View>
+            <View style={styles.weatherText} importantForAccessibility="no-hide-descendants">
+              <AppText variant="value" color={colors.surfaceText}>
+                {weather.temperature}
+              </AppText>
+              <AppText
+                variant="cardLabel"
+                color={colors.surfaceText}
+                style={styles.weatherCondition}
+              >
+                {weather.condition}
+              </AppText>
+            </View>
+          </SurfaceCard>
+        </View>
+
+        <UnitSummaryCard unit={myUnit[locale]} onPress={handleOpenUnit} style={styles.unitCard} />
+
+        <View style={styles.services}>
+          {homeServices.map(({ id, label, Icon, iconSize }) => (
+            <ServiceTile
+              key={id}
+              label={label[locale]}
+              icon={<Icon size={scale(iconSize)} color={colors.surfaceIcon} />}
+              onPress={() => handleOpenService(id)}
+              style={styles.serviceTile}
+            />
+          ))}
+        </View>
+
+        <FeaturedCommunityCard
+          overline={content.featured.overline}
+          ctaLabel={content.featured.ctaLabel}
+          previousLabel={content.featured.previousLabel}
+          nextLabel={content.featured.nextLabel}
+          communities={featuredCommunities[locale]}
+          onExplore={handleExploreCommunity}
+          style={styles.featured}
+        />
+      </View>
+    </ScreenWrapper>
+  );
+}

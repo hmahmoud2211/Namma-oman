@@ -7,8 +7,9 @@ export function FingerprintIcon({ size, color }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 48 48" fill="none">
       <G
-        rotation={-14}
-        origin="24, 24"
+        // A transform string, not `rotation`/`origin`: on web those props become an
+        // invalid `transform-origin` DOM attribute (react-native-svg).
+        transform="rotate(-14 24 24)"
         stroke={color}
         strokeWidth={2.1}
         strokeLinecap="round"

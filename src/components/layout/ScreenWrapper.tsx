@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   View,
   type ImageSourcePropType,
+  type ScrollViewInstance,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
@@ -19,11 +20,20 @@ interface ScreenWrapperProps {
   children: ReactNode;
   /** Full-bleed background artwork drawn behind the system bars. */
   background?: ImageSourcePropType;
+  /** Colour wash over `background`, e.g. a theme's `backgroundTint`. */
+  backgroundTint?: string;
   /** Wrap content in a ScrollView for screens taller than small devices. */
   scrollable?: boolean;
   /** Keep focused inputs above the keyboard (form screens). Best combined with `scrollable`. */
   keyboardAvoiding?: boolean;
   contentStyle?: StyleProp<ViewStyle>;
+  /**
+   * Drawn above the content and outside the scroll view, e.g. a floating tab bar.
+   * Position it absolutely; it is not padded to the safe area.
+   */
+  overlay?: ReactNode;
+  /** Ref to the ScrollView when `scrollable` (e.g. to scroll back to the top). */
+  scrollRef?: Ref<ScrollViewInstance>;
 }
 
 /**
@@ -33,11 +43,14 @@ interface ScreenWrapperProps {
 export function ScreenWrapper({
   children,
   background,
+  backgroundTint,
   scrollable = false,
   keyboardAvoiding = false,
   contentStyle,
+  overlay,
+  scrollRef,
 }: ScreenWrapperProps) {
-  const { isDark } = useAppTheme();
+  const { statusBarStyle } = useAppTheme();
   const insets = useSafeAreaInsets();
   const safeAreaPadding: ViewStyle = {
     paddingTop: insets.top,
@@ -48,6 +61,7 @@ export function ScreenWrapper({
 
   const content = scrollable ? (
     <ScrollView
+      ref={scrollRef}
       contentContainerStyle={[styles.scrollContent, safeAreaPadding, contentStyle]}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
@@ -59,8 +73,8 @@ export function ScreenWrapper({
   );
 
   return (
-    <AppBackground source={background}>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
+    <AppBackground source={background} tint={backgroundTint}>
+      <StatusBar style={statusBarStyle} />
       {keyboardAvoiding ? (
         // Expo's guidance: `padding` on iOS; on Android the view alone is enough.
         <KeyboardAvoidingView
@@ -72,6 +86,7 @@ export function ScreenWrapper({
       ) : (
         content
       )}
+      {overlay}
     </AppBackground>
   );
 }

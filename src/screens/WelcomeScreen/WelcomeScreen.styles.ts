@@ -39,14 +39,14 @@ export const useWelcomeStyles = makeStyles(
         paddingBottom: ctaBottom - insets.bottom,
       },
       logo: {
-        marginLeft: scale(d.logo.left),
+        marginStart: scale(d.logo.left),
       },
       headline: {
         marginTop: headlineTop - logoBottom,
-        paddingLeft: scale(d.headline.left),
+        paddingStart: scale(d.headline.left),
       },
       title: {
-        marginLeft: scale(d.title.left - d.headline.left),
+        marginStart: scale(d.title.left - d.headline.left),
       },
       accentRule: {
         width: scale(d.accentRule.width),

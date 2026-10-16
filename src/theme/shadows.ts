@@ -15,6 +15,12 @@ export function createShadows(colors: ColorTokens) {
     emeraldButtonShadow: { offsetX: 0, offsetY: 1, blurRadius: 14, color: colors.buttonEmeraldShadow },
     glassCardGlow: { offsetX: 0, offsetY: 0, blurRadius: 10, color: colors.glassCardGlow },
     glassTileGlow: { offsetX: 0, offsetY: 0, blurRadius: 5, color: colors.glassTileGlow },
+    // Home: soft drop under the themed cards (a warm glow on the cream light-mode cards).
+    surfaceShadow: { offsetX: 0, offsetY: 1, blurRadius: 6, color: colors.surfaceShadow },
+    featureCardGlow: { offsetX: 0, offsetY: 0, blurRadius: 6, color: colors.featureCardGlow },
+    tabBarShadow: { offsetX: 0, offsetY: 3, blurRadius: 10, color: colors.tabBarShadow },
+    // Construction Progress: soft light around the filled part of the progress bar.
+    progressGlow: { offsetX: 0, offsetY: 0, blurRadius: 5, color: colors.progressGlow },
   } satisfies Record<string, ShadowToken>;
 }
 

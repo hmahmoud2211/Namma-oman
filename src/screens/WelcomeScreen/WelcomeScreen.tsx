@@ -11,6 +11,7 @@ import { ScreenWrapper } from '@/components/layout/ScreenWrapper';
 import { images } from '@/constants/images';
 import { useAppState } from '@/hooks/useAppState';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useLocale } from '@/hooks/useLocale';
 import { useResponsive } from '@/hooks/useResponsive';
 
 import { welcomeContent } from './WelcomeScreen.data';
@@ -22,6 +23,8 @@ export function WelcomeScreen() {
   const { colors } = useAppTheme();
   const { scale } = useResponsive();
   const { markWelcomeSeen } = useAppState();
+  const { locale } = useLocale();
+  const content = welcomeContent[locale];
 
   const navigation = useNavigation();
 
@@ -37,11 +40,11 @@ export function WelcomeScreen() {
 
         <View style={styles.headline}>
           <AppText variant="heading" style={styles.title}>
-            {welcomeContent.title}
+            {content.title}
           </AppText>
           <View style={styles.accentRule} />
           <View style={styles.tagline}>
-            {welcomeContent.taglineLines.map((line) => (
+            {content.taglineLines.map((line) => (
               <AppText key={line} variant="subheading">
                 {line}
               </AppText>
@@ -50,8 +53,8 @@ export function WelcomeScreen() {
         </View>
 
         <AppButton
-          title={welcomeContent.ctaLabel}
-          accessibilityLabel={welcomeContent.ctaAccessibilityLabel}
+          title={content.ctaLabel}
+          accessibilityLabel={content.ctaAccessibilityLabel}
           icon={
             <ArrowRightIcon
               size={scale(welcomeDesign.arrowIcon.size)}

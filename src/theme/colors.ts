@@ -2,6 +2,9 @@
  * Brand palette sampled from the Figma exports in /Assets (no official palette yet).
  * Components never read the palette directly — they use the semantic tokens below,
  * so a value changed here updates every component that uses it.
+ *
+ * Two token sets share one shape: `darkColors` (Assets/screens/mode 1.png) and
+ * `lightColors` (Assets/screens/mode 2.png, cream cards over the dark-green artwork).
  */
 const palette = {
   gold: '#F9D274',
@@ -31,11 +34,32 @@ const palette = {
   frostBottomLight: '#E6E6DA',
   warmLight: '#F2D9AE',
   goldLight: '#E6BE72',
+  paleGoldCream: '#FCF6C4',
+  aqua: '#14E3E1',
+  aquaBright: '#05FBF3',
+  tealBright: '#03D0BA',
+  tealDeep: '#01665A',
+  mint: '#2CF978',
+  amber: '#F5B54A',
+  ochre: '#A86A12',
+  leaf: '#24955A',
+  signalGold: '#FDE18E',
+  headerRingTeal: '#14A898',
+  azure: '#2489AC',
+  pineGlow: '#2C7258',
+  moonLight: '#F4F5F2',
+  moonShade: '#A9AFAE',
+  creamEdge: '#FFFBF2',
+  forestInk: '#123D2B',
+  sage: '#7AA68D',
+  charcoal: '#1C1B17',
+  umber: '#3B3830',
   white: '#FFFFFF',
   black: '#000000',
 } as const;
 
 type Gradient2 = readonly [string, string];
+type Gradient3 = readonly [string, string, string];
 type Gradient4 = readonly [string, string, string, string];
 
 export interface ColorTokens {
@@ -82,13 +106,104 @@ export interface ColorTokens {
   buttonEmeraldText: string;
   buttonSecondaryBorder: string;
   buttonSecondaryText: string;
+  /** Thin pale-gold outline pill (Home "Explore Community"). */
+  buttonOutlineBorder: string;
+  buttonOutlineText: string;
+
+  /** Home (home 1.png): glyphs drawn straight on the background (menu, bell). */
+  headerIcon: string;
+  /** Wash over the background artwork; transparent when the artwork is used as is. */
+  backgroundTint: string;
+
+  /** Frosted glass behind every Home panel: blur tint and a soft top-left sheen. */
+  glassBlurTint: 'light' | 'dark' | 'default';
+  glassSheenGradient: Gradient2;
+
+  /** Themed glass cards (weather, My Unit, service tiles): cream glass in light, green glass in dark. */
+  surfaceGradient: Gradient3;
+  surfaceBorder: string;
+  surfaceInnerHighlight: string;
+  surfaceShadow: string;
+  surfaceText: string;
+  surfaceTextMuted: string;
+  surfaceIcon: string;
+  surfaceIconTileGradient: Gradient2;
+  surfaceIconTileBorder: string;
+  /** My Unit card: diagonal rim (top-left → bottom-right) and the photo's thin frame. */
+  featureCardBorderGradient: Gradient4;
+  featureCardGlow: string;
+  photoBorder: string;
+  badgeFill: string;
+  badgeBorder: string;
+  badgeText: string;
+  moonLight: string;
+  moonShade: string;
+
+  /** Featured-community hero: a photo card, dark in both themes (like mode 2's hero). */
+  /** Glass behind the hero photo (shows where the photo doesn't reach). */
+  heroGlassGradient: Gradient2;
+  /** Left-to-right fade that keeps the copy readable, and a light bottom shade. */
+  heroScrimGradient: Gradient4;
+  heroScrimBottomGradient: Gradient2;
+  heroBorder: string;
+  heroText: string;
+  heroOverline: string;
+  heroAccent: string;
+  carouselActive: string;
+  carouselInactive: string;
+
+  /** Drop-down menu (Home header): denser glass, since it floats over busy content. */
+  menuGradient: Gradient2;
+  menuBackdrop: string;
+  menuActiveFill: string;
+  menuDivider: string;
+
+  /** Floating bottom tab bar. */
+  tabBarGradient: Gradient2;
+  /** The bar stays dark-green glass in both themes (mode 2's bar is green, not cream). */
+  tabBarBlurTint: 'light' | 'dark' | 'default';
+  tabBarBorder: string;
+  tabBarShadow: string;
+  tabActive: string;
+  tabInactive: string;
+  /** Underline under the active tab (dark) or the box around it (light); transparent when unused. */
+  tabIndicator: string;
+  tabActiveFill: string;
+  tabActiveBorder: string;
+
+  /** Round header buttons over the background (Construction Progress: bell and avatar). */
+  headerButtonBorder: string;
+  headerAvatarBorder: string;
+  notificationDot: string;
+
+  /** Construction Progress (construction.png): percentages, rings, bars and the chart. */
+  progressText: string;
+  progressFillGradient: Gradient2;
+  progressTrack: string;
+  progressGlow: string;
+  chartBarGradient: Gradient2;
+  chartAxis: string;
+  /** "On Schedule" dot. */
+  statusPositive: string;
+  /** "Slight Delay" dot and label. */
+  statusWarning: string;
+  /** Timeline: reached steps are filled with `surfaceIcon` and carry this tick. */
+  timelineTick: string;
+  timelinePending: string;
+  /** Gold text on the themed cards ("Latest Update"); deeper in light mode for contrast. */
+  surfaceAccentText: string;
+  /** Faintest text on the themed cards ("Pending", "In Progress"). */
+  surfaceTextSubtle: string;
+  surfaceDivider: string;
+  pagerActive: string;
+  pagerInactive: string;
 
   white: string;
   black: string;
   transparent: string;
 }
 
-export const colors: ColorTokens = {
+export const darkColors: ColorTokens = {
   background: palette.abyssGreen,
   textPrimary: palette.white,
   accent: palette.gold,
@@ -135,8 +250,154 @@ export const colors: ColorTokens = {
   buttonEmeraldText: palette.white,
   buttonSecondaryBorder: palette.gold,
   buttonSecondaryText: palette.white,
+  buttonOutlineBorder: palette.paleGoldCream,
+  buttonOutlineText: palette.paleGoldCream,
+
+  headerIcon: palette.white,
+  backgroundTint: 'transparent',
+
+  glassBlurTint: 'dark',
+  glassSheenGradient: ['rgba(190, 255, 230, 0.1)', 'rgba(190, 255, 230, 0)'],
+
+  surfaceGradient: ['rgba(26, 92, 78, 0.22)', 'rgba(6, 46, 40, 0.18)', 'rgba(0, 26, 22, 0.28)'],
+  surfaceBorder: 'rgba(80, 170, 140, 0.45)',
+  surfaceInnerHighlight: 'rgba(160, 235, 205, 0.2)',
+  surfaceShadow: 'rgba(0, 0, 0, 0.35)',
+  surfaceText: palette.white,
+  surfaceTextMuted: 'rgba(255, 255, 255, 0.86)',
+  surfaceIcon: palette.gold,
+  surfaceIconTileGradient: ['rgba(30, 100, 84, 0.26)', 'rgba(4, 42, 36, 0.26)'],
+  surfaceIconTileBorder: 'rgba(110, 190, 160, 0.3)',
+  featureCardBorderGradient: [palette.paleGold, palette.rimGold, palette.pineGlow, palette.rimGold],
+  featureCardGlow: 'rgba(245, 213, 148, 0.28)',
+  photoBorder: 'rgba(245, 213, 148, 0.85)',
+  badgeFill: 'rgba(0, 72, 62, 0.75)',
+  badgeBorder: 'rgba(20, 227, 225, 0.55)',
+  badgeText: palette.aqua,
+  moonLight: palette.moonLight,
+  moonShade: palette.moonShade,
+
+  // Translucent over the glass on the left, opaque where the photo's left edge sits
+  // (27% across) so that edge never shows, then fading out over the photo.
+  heroScrimGradient: [
+    'rgba(1, 12, 9, 0.28)',
+    'rgba(1, 12, 9, 0.9)',
+    'rgba(1, 12, 9, 0.55)',
+    'rgba(1, 12, 9, 0)',
+  ],
+  heroScrimBottomGradient: ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.45)'],
+  heroGlassGradient: ['rgba(10, 46, 40, 0.18)', 'rgba(0, 16, 14, 0.3)'],
+  heroBorder: 'rgba(245, 213, 148, 0.8)',
+  heroText: palette.white,
+  heroOverline: palette.paleGold,
+  heroAccent: palette.aqua,
+  carouselActive: palette.paleGoldCream,
+  carouselInactive: palette.azure,
+
+  menuGradient: ['rgba(14, 62, 52, 0.86)', 'rgba(2, 28, 24, 0.9)'],
+  menuBackdrop: 'rgba(0, 0, 0, 0.3)',
+  menuActiveFill: 'rgba(249, 210, 116, 0.12)',
+  menuDivider: 'rgba(255, 255, 255, 0.12)',
+
+  tabBarGradient: ['rgba(14, 76, 62, 0.26)', 'rgba(0, 28, 24, 0.38)'],
+  tabBarBlurTint: 'dark',
+  tabBarBorder: 'rgba(60, 170, 140, 0.5)',
+  tabBarShadow: 'rgba(0, 0, 0, 0.5)',
+  tabActive: palette.gold,
+  tabInactive: palette.white,
+  tabIndicator: palette.gold,
+  tabActiveFill: 'transparent',
+  tabActiveBorder: 'transparent',
+
+  headerButtonBorder: palette.headerRingTeal,
+  headerAvatarBorder: palette.gold,
+  notificationDot: palette.signalGold,
+
+  progressText: palette.aqua,
+  progressFillGradient: [palette.aqua, palette.aquaBright],
+  progressTrack: 'rgba(20, 227, 225, 0.13)',
+  progressGlow: 'rgba(20, 227, 225, 0.35)',
+  chartBarGradient: [palette.tealBright, palette.tealDeep],
+  chartAxis: 'rgba(80, 170, 140, 0.4)',
+  statusPositive: palette.mint,
+  statusWarning: palette.amber,
+  timelineTick: palette.ink,
+  timelinePending: 'rgba(255, 255, 255, 0.62)',
+  surfaceAccentText: palette.gold,
+  surfaceTextSubtle: 'rgba(255, 255, 255, 0.48)',
+  surfaceDivider: 'rgba(255, 255, 255, 0.14)',
+  pagerActive: palette.aqua,
+  pagerInactive: 'rgba(110, 140, 132, 0.55)',
 
   white: palette.white,
   black: palette.black,
   transparent: 'transparent',
+};
+
+/**
+ * Light mode (mode 2.png): the artwork stays dark green, so Welcome / Sign In and the
+ * text drawn on the background are unchanged. Cards turn cream with deep-green ink, and
+ * the active tab sits in a gold-rimmed box instead of over an underline.
+ */
+export const lightColors: ColorTokens = {
+  ...darkColors,
+
+  backgroundTint: 'rgba(14, 62, 38, 0.38)',
+
+  // `default` (no white wash) keeps the cream warm instead of grey.
+  glassBlurTint: 'default',
+  glassSheenGradient: ['rgba(255, 255, 255, 0.34)', 'rgba(255, 255, 255, 0)'],
+
+  // Warm cream: the dark green showing through would turn a cooler cream olive-grey.
+  surfaceGradient: [
+    'rgba(255, 246, 226, 0.6)',
+    'rgba(255, 242, 216, 0.54)',
+    'rgba(250, 234, 202, 0.5)',
+  ],
+  surfaceBorder: 'rgba(255, 252, 242, 0.8)',
+  surfaceInnerHighlight: 'rgba(255, 255, 255, 0.75)',
+  surfaceShadow: 'rgba(240, 205, 140, 0.45)',
+  surfaceText: palette.charcoal,
+  // Darker than mode 2's grey so it stays readable on the thinner glass.
+  surfaceTextMuted: palette.umber,
+  surfaceIcon: palette.forestInk,
+  surfaceIconTileGradient: ['rgba(255, 255, 255, 0.24)', 'rgba(233, 223, 200, 0.32)'],
+  surfaceIconTileBorder: 'rgba(255, 255, 255, 0.75)',
+  featureCardBorderGradient: [palette.white, palette.creamEdge, palette.rimGold, palette.creamEdge],
+  featureCardGlow: 'rgba(245, 213, 148, 0.55)',
+  photoBorder: 'rgba(196, 160, 90, 0.9)',
+  badgeFill: 'rgba(18, 61, 43, 0.08)',
+  badgeBorder: 'rgba(18, 61, 43, 0.55)',
+  badgeText: palette.forestInk,
+  moonLight: palette.forestInk,
+  moonShade: palette.sage,
+
+  menuGradient: ['rgba(255, 248, 232, 0.93)', 'rgba(246, 236, 214, 0.9)'],
+  menuBackdrop: 'rgba(0, 0, 0, 0.2)',
+  menuActiveFill: 'rgba(18, 61, 43, 0.08)',
+  menuDivider: 'rgba(18, 61, 43, 0.14)',
+
+  tabBarGradient: ['rgba(30, 90, 62, 0.3)', 'rgba(12, 48, 32, 0.42)'],
+  tabBarBorder: 'rgba(150, 196, 170, 0.6)',
+  tabBarShadow: 'rgba(0, 0, 0, 0.35)',
+  tabIndicator: 'transparent',
+  tabActiveFill: 'rgba(249, 210, 116, 0.14)',
+  tabActiveBorder: 'rgba(235, 212, 128, 0.75)',
+
+  // Deep green on cream, like mode 2's "54% Paid" bar; the header buttons stay as in dark.
+  progressText: palette.forestInk,
+  progressFillGradient: [palette.forestInk, palette.pineGlow],
+  progressTrack: 'rgba(18, 61, 43, 0.12)',
+  progressGlow: 'rgba(18, 61, 43, 0)',
+  chartBarGradient: [palette.pineGlow, palette.forestInk],
+  chartAxis: 'rgba(18, 61, 43, 0.22)',
+  statusPositive: palette.leaf,
+  statusWarning: palette.ochre,
+  timelineTick: palette.cream,
+  timelinePending: 'rgba(28, 27, 23, 0.5)',
+  surfaceAccentText: palette.bronze,
+  surfaceTextSubtle: 'rgba(59, 56, 48, 0.68)',
+  surfaceDivider: 'rgba(18, 61, 43, 0.16)',
+  pagerActive: palette.forestInk,
+  pagerInactive: 'rgba(18, 61, 43, 0.22)',
 };

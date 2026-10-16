@@ -15,7 +15,14 @@ export const SIGN_IN_FRAME = designFrameFromExport(767, 1398);
  */
 export const signInDesign = {
   logo: { top: 56.3, left: 150.2, width: 92, height: 36 },
-  card: { top: 196, left: 53.7, width: 243.9, paddingTop: 38, paddingHorizontal: 14.6, paddingBottom: 14.9 },
+  card: {
+    top: 196,
+    left: 53.7,
+    width: 243.9,
+    paddingTop: 38,
+    paddingHorizontal: 14.6,
+    paddingBottom: 14.9,
+  },
   subtitle: { marginTop: 0.85 },
   emailField: { marginTop: 12.05 },
   passwordField: { marginTop: 5.9 },
@@ -48,11 +55,11 @@ export const useSignInStyles = makeStyles(
         paddingBottom: scale(d.bottomGap),
       },
       logo: {
-        marginLeft: scale(d.logo.left),
+        marginStart: scale(d.logo.left),
       },
       card: {
         width: scale(d.card.width),
-        marginLeft: scale(d.card.left),
+        marginStart: scale(d.card.left),
         marginTop: cardTop - logoBottom,
         paddingTop: scale(d.card.paddingTop),
         paddingHorizontal: scale(d.card.paddingHorizontal),
@@ -97,7 +104,7 @@ export const useSignInStyles = makeStyles(
         alignItems: 'baseline',
       },
       signUpLink: {
-        marginLeft: scale(d.footer.gap),
+        marginStart: scale(d.footer.gap),
       },
     };
   },

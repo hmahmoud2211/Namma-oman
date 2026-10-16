@@ -2,6 +2,8 @@ import { Asset } from 'expo-asset';
 import { Image, type ImageStyle, type StyleProp } from 'react-native';
 
 import { images } from '@/constants/images';
+import { commonStrings } from '@/constants/strings';
+import { useLocale } from '@/hooks/useLocale';
 
 // Read from the bundled file, so swapping in the official logo keeps its own proportions.
 // expo-asset works on iOS, Android and web (react-native-web has no Image.resolveAssetSource).
@@ -15,6 +17,7 @@ interface BrandLogoProps {
 }
 
 export function BrandLogo({ width, style }: BrandLogoProps) {
+  const { locale } = useLocale();
   return (
     <Image
       source={images.brandLogo}
@@ -23,7 +26,7 @@ export function BrandLogo({ width, style }: BrandLogoProps) {
       // and Yoga would derive the width from that height instead.
       style={[{ width, height: width / LOGO_ASPECT_RATIO }, style]}
       accessibilityRole="image"
-      accessibilityLabel="Nama Real Estate"
+      accessibilityLabel={commonStrings[locale].brandName}
     />
   );
 }

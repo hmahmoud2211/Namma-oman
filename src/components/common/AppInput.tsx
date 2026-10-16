@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useLocale } from '@/hooks/useLocale';
 import { useResponsive } from '@/hooks/useResponsive';
 import { makeStyles } from '@/utils/makeStyles';
 import { scaleTextStyle } from '@/utils/textStyle';
@@ -24,8 +25,10 @@ const TEXT_INSET_WITHOUT_ICON = 12;
 const TRAILING_SLOT_INSET = 6.35;
 const BORDER_WIDTH = 0.5;
 
-export interface AppInputProps
-  extends Omit<TextInputProps, 'style' | 'placeholderTextColor' | 'ref'> {
+export interface AppInputProps extends Omit<
+  TextInputProps,
+  'style' | 'placeholderTextColor' | 'ref'
+> {
   ref?: Ref<TextInputInstance>;
   /** Icon shown at the leading edge. */
   icon?: ReactNode;
@@ -37,12 +40,17 @@ export interface AppInputProps
 /** Frosted-glass text field with an optional leading icon and trailing accessory. */
 export function AppInput({ ref, icon, trailing, style, ...inputProps }: AppInputProps) {
   const { colors, typography } = useAppTheme();
+  const { locale, isRTL } = useLocale();
   const { scale } = useResponsive();
   const styles = useStyles();
 
   const textStyle = useMemo(
-    () => scaleTextStyle(typography.variants.input, scale),
-    [typography, scale],
+    () =>
+      scaleTextStyle(
+        (locale === 'ar' ? typography.arabicVariants : typography.variants).input,
+        scale,
+      ),
+    [typography, locale, scale],
   );
 
   return (
@@ -54,7 +62,13 @@ export function AppInput({ ref, icon, trailing, style, ...inputProps }: AppInput
         selectionColor={colors.textOnGlassStrong}
         maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
         {...inputProps}
-        style={[textStyle, styles.input, icon ? styles.inputAfterIcon : styles.inputAlone]}
+        style={[
+          textStyle,
+          styles.input,
+          icon ? styles.inputAfterIcon : styles.inputAlone,
+          // Native inputs align to the physical left unless told otherwise.
+          { textAlign: isRTL ? 'right' : 'left' },
+        ]}
       />
       {trailing && <View style={[styles.slot, styles.trailingSlot]}>{trailing}</View>}
     </View>
@@ -77,10 +91,10 @@ const useStyles = makeStyles(({ colors, borderRadius }, { scale }) => ({
     justifyContent: 'center',
   },
   leadingSlot: {
-    marginLeft: scale(LEADING_SLOT_INSET),
+    marginStart: scale(LEADING_SLOT_INSET),
   },
   trailingSlot: {
-    marginRight: scale(TRAILING_SLOT_INSET),
+    marginEnd: scale(TRAILING_SLOT_INSET),
   },
   input: {
     flex: 1,
@@ -94,9 +108,9 @@ const useStyles = makeStyles(({ colors, borderRadius }, { scale }) => ({
     outlineWidth: 0,
   },
   inputAfterIcon: {
-    marginLeft: scale(TEXT_INSET_AFTER_ICON),
+    marginStart: scale(TEXT_INSET_AFTER_ICON),
   },
   inputAlone: {
-    marginLeft: scale(TEXT_INSET_WITHOUT_ICON),
+    marginStart: scale(TEXT_INSET_WITHOUT_ICON),
   },
 }));

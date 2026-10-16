@@ -1,12 +1,20 @@
 import { borderRadius, type BorderRadius } from './borderRadius';
-import { colors, type ColorTokens } from './colors';
+import { darkColors, lightColors, type ColorTokens } from './colors';
 import { createShadows, type Shadows } from './shadows';
 import { spacing, type Spacing } from './spacing';
 import { typography, type Typography } from './typography';
 
+export type ColorScheme = 'light' | 'dark';
+
 export interface AppTheme {
-  /** Drives the status bar and navigation chrome. */
+  scheme: ColorScheme;
+  /** Drives the navigation chrome. */
   isDark: boolean;
+  /**
+   * Status bar content. Light in both themes: every screen's artwork is dark,
+   * including behind the light theme's cream cards (mode 2.png).
+   */
+  statusBarStyle: 'light' | 'dark';
   colors: ColorTokens;
   typography: Typography;
   spacing: Spacing;
@@ -14,15 +22,31 @@ export interface AppTheme {
   shadows: Shadows;
 }
 
-/**
- * The only theme for now (the dark-green Nama look).
- * A second theme (e.g. the cream "mode 2" design) is another AppTheme passed to ThemeProvider.
- */
-export const defaultTheme: AppTheme = {
+/** Dark-green Nama look (Assets/screens/mode 1.png). */
+export const darkTheme: AppTheme = {
+  scheme: 'dark',
   isDark: true,
-  colors,
+  statusBarStyle: 'light',
+  colors: darkColors,
   typography,
   spacing,
   borderRadius,
-  shadows: createShadows(colors),
+  shadows: createShadows(darkColors),
+};
+
+/** Cream cards over the dark-green artwork (Assets/screens/mode 2.png). */
+export const lightTheme: AppTheme = {
+  scheme: 'light',
+  isDark: false,
+  statusBarStyle: 'light',
+  colors: lightColors,
+  typography,
+  spacing,
+  borderRadius,
+  shadows: createShadows(lightColors),
+};
+
+export const themes: Readonly<Record<ColorScheme, AppTheme>> = {
+  dark: darkTheme,
+  light: lightTheme,
 };

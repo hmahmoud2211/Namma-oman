@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import { useCallback, useRef, useState } from 'react';
 import { Keyboard, Pressable, View, type TextInputInstance } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -17,6 +18,7 @@ import { IconTile } from '@/components/ui/IconTile';
 import { TextDivider } from '@/components/ui/TextDivider';
 import { images } from '@/constants/images';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useLocale } from '@/hooks/useLocale';
 import { useResponsive } from '@/hooks/useResponsive';
 
 import { quickSignInOptions, signInContent, type QuickSignInMethod } from './SignInScreen.data';
@@ -29,22 +31,30 @@ export function SignInScreen() {
   const styles = useSignInStyles(insets);
   const { colors } = useAppTheme();
   const { scale } = useResponsive(SIGN_IN_FRAME);
+  const { locale } = useLocale();
+  const content = signInContent[locale];
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const passwordRef = useRef<TextInputInstance>(null);
+  const navigation = useNavigation();
 
   const iconColor = colors.textOnGlassStrong;
   const icons = signInDesign.icons;
 
   const focusPassword = useCallback(() => passwordRef.current?.focus(), []);
-  const togglePasswordVisibility = useCallback(() => setIsPasswordVisible((visible) => !visible), []);
+  const togglePasswordVisibility = useCallback(
+    () => setIsPasswordVisible((visible) => !visible),
+    [],
+  );
 
   const handleSignIn = useCallback(() => {
     Keyboard.dismiss();
-    // TODO(auth): validate `email` / `password` and submit them once the auth service exists.
-  }, []);
+    // TODO(auth): validate `email` / `password` with the auth service before entering the app.
+    // Reset rather than push, so Back from Home doesn't return to the sign-in form.
+    navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+  }, [navigation]);
 
   const handleForgotPassword = useCallback(() => {
     // TODO(navigation): open the password-reset screen once it is designed.
@@ -65,13 +75,13 @@ export function SignInScreen() {
 
         <GlassCard style={styles.card}>
           <AppText variant="display" color={colors.textOnGlassStrong} style={styles.title}>
-            {signInContent.titleLead}{' '}
+            {content.titleLead}{' '}
             <AppText variant="display" style={styles.titleAccent}>
-              {signInContent.titleAccent}
+              {content.titleAccent}
             </AppText>
           </AppText>
           <AppText variant="body" color={colors.textOnGlass} style={styles.subtitle}>
-            {signInContent.subtitle}
+            {content.subtitle}
           </AppText>
 
           <AppInput
@@ -79,8 +89,8 @@ export function SignInScreen() {
             icon={<MailIcon size={scale(icons.mail)} color={iconColor} />}
             value={email}
             onChangeText={setEmail}
-            placeholder={signInContent.emailPlaceholder}
-            accessibilityLabel={signInContent.emailPlaceholder}
+            placeholder={content.emailPlaceholder}
+            accessibilityLabel={content.emailPlaceholder}
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
@@ -100,7 +110,7 @@ export function SignInScreen() {
                 hitSlop={scale(EYE_HIT_SLOP)}
                 accessibilityRole="button"
                 accessibilityLabel={
-                  isPasswordVisible ? signInContent.hidePasswordLabel : signInContent.showPasswordLabel
+                  isPasswordVisible ? content.hidePasswordLabel : content.showPasswordLabel
                 }
               >
                 <EyeIcon size={scale(icons.eye)} color={iconColor} crossed={!isPasswordVisible} />
@@ -108,8 +118,8 @@ export function SignInScreen() {
             }
             value={password}
             onChangeText={setPassword}
-            placeholder={signInContent.passwordPlaceholder}
-            accessibilityLabel={signInContent.passwordPlaceholder}
+            placeholder={content.passwordPlaceholder}
+            accessibilityLabel={content.passwordPlaceholder}
             secureTextEntry={!isPasswordVisible}
             autoCapitalize="none"
             autoCorrect={false}
@@ -120,7 +130,7 @@ export function SignInScreen() {
           />
 
           <TextLink
-            title={signInContent.forgotPassword}
+            title={content.forgotPassword}
             variant="bodySmall"
             color={colors.textOnGlass}
             onPress={handleForgotPassword}
@@ -128,7 +138,7 @@ export function SignInScreen() {
           />
 
           <AppButton
-            title={signInContent.submitLabel}
+            title={content.submitLabel}
             variant="emerald"
             size="medium"
             icon={<ArrowRightSlimIcon size={scale(icons.arrow)} color={colors.buttonEmeraldText} />}
@@ -138,7 +148,7 @@ export function SignInScreen() {
           />
 
           <TextDivider
-            label={signInContent.dividerLabel}
+            label={content.dividerLabel}
             textColor={colors.textOnGlass}
             lineColor={colors.dividerOnGlass}
             style={styles.divider}
@@ -148,9 +158,9 @@ export function SignInScreen() {
             {quickSignInOptions.map(({ id, label, accessibilityLabel, Icon, iconSize }) => (
               <IconTile
                 key={id}
-                label={label}
+                label={label[locale]}
                 labelColor={colors.textOnGlass}
-                accessibilityLabel={accessibilityLabel}
+                accessibilityLabel={accessibilityLabel[locale]}
                 icon={<Icon size={scale(iconSize)} color={iconColor} />}
                 onPress={() => handleQuickSignIn(id)}
               />
@@ -159,10 +169,10 @@ export function SignInScreen() {
 
           <View style={styles.footer}>
             <AppText variant="bodySmall" color={colors.textOnGlass}>
-              {signInContent.signUpPrompt}
+              {content.signUpPrompt}
             </AppText>
             <TextLink
-              title={signInContent.signUpLabel}
+              title={content.signUpLabel}
               variant="link"
               color={colors.textOnGlassStrong}
               underline

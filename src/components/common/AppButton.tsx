@@ -20,9 +20,10 @@ import { makeStyles } from '@/utils/makeStyles';
  * - `primary`: gold gradient pill with glow (Welcome "GET STARTED")
  * - `emerald`: deep-green gradient pill with a pale-gold rim (Sign In "Sign In")
  * - `secondary`: transparent pill with a gold outline
+ * - `outline`: transparent pill with a thin pale-gold outline and label (Home "Explore Community")
  */
-export type AppButtonVariant = 'primary' | 'emerald' | 'secondary';
-export type AppButtonSize = 'large' | 'medium';
+export type AppButtonVariant = 'primary' | 'emerald' | 'secondary' | 'outline';
+export type AppButtonSize = 'large' | 'medium' | 'small';
 export type AppButtonIconPosition = 'leading' | 'trailing';
 
 export interface AppButtonProps extends Omit<PressableProps, 'style' | 'children'> {
@@ -39,7 +40,7 @@ export interface AppButtonProps extends Omit<PressableProps, 'style' | 'children
 }
 
 /** Dimensions in design dp, measured from the buttons in the Figma exports. */
-const BUTTON_HEIGHT: Record<AppButtonSize, number> = { large: 45.5, medium: 31.5 };
+const BUTTON_HEIGHT: Record<AppButtonSize, number> = { large: 45.5, medium: 31.5, small: 19 };
 const ICON_RING_SIZE = 36;
 const ICON_RING_INSET = 7;
 const ICON_RING_STROKE = 0.6;
@@ -47,6 +48,10 @@ const HIGHLIGHT_WIDTH = 0.5;
 const EMERALD_BORDER_WIDTH = 0.6;
 const TRAILING_ICON_GAP = 6.1;
 const LABEL_PADDING = 16;
+/** Small pill (Home): tighter padding and a wider gap before the trailing arrow. */
+const SMALL_LABEL_PADDING = 9;
+const SMALL_TRAILING_ICON_GAP = 11.1;
+const OUTLINE_BORDER_WIDTH = 0.8;
 
 /**
  * The gold fill is a slightly tilted, near-vertical gradient: bronze at the bottom-left,
@@ -77,7 +82,10 @@ export function AppButton({
     primary: colors.buttonPrimaryText,
     emerald: colors.buttonEmeraldText,
     secondary: colors.buttonSecondaryText,
+    outline: colors.buttonOutlineText,
   }[variant];
+  const labelVariant =
+    size === 'small' ? 'pillLabel' : variant === 'emerald' ? 'buttonLabel' : 'button';
 
   return (
     <Pressable
@@ -86,8 +94,12 @@ export function AppButton({
       disabled={disabled}
       style={({ pressed }) => [
         styles.base,
-        size === 'large' ? styles.large : styles.medium,
-        hasLeadingIcon ? styles.paddedForRing : styles.paddedForLabel,
+        styles[size],
+        hasLeadingIcon
+          ? styles.paddedForRing
+          : size === 'small'
+            ? styles.paddedForSmallLabel
+            : styles.paddedForLabel,
         styles[variant],
         pressed && styles.pressed,
         disabled && styles.disabled,
@@ -134,14 +146,14 @@ export function AppButton({
       )}
 
       <View style={styles.labelRow} pointerEvents="none">
-        <AppText
-          variant={variant === 'emerald' ? 'buttonLabel' : 'button'}
-          color={labelColor}
-          numberOfLines={1}
-        >
+        <AppText variant={labelVariant} color={labelColor} numberOfLines={1}>
           {title}
         </AppText>
-        {hasTrailingIcon && <View style={styles.trailingIcon}>{icon}</View>}
+        {hasTrailingIcon && (
+          <View style={size === 'small' ? styles.trailingIconSmall : styles.trailingIcon}>
+            {icon}
+          </View>
+        )}
       </View>
     </Pressable>
   );
@@ -191,11 +203,17 @@ const useStyles = makeStyles(({ colors, borderRadius, shadows }, { scale }) => (
   medium: {
     height: scale(BUTTON_HEIGHT.medium),
   },
+  small: {
+    height: scale(BUTTON_HEIGHT.small),
+  },
   paddedForRing: {
     paddingHorizontal: scale(ICON_RING_INSET * 2 + ICON_RING_SIZE),
   },
   paddedForLabel: {
     paddingHorizontal: scale(LABEL_PADDING),
+  },
+  paddedForSmallLabel: {
+    paddingHorizontal: scale(SMALL_LABEL_PADDING),
   },
   primary: {
     boxShadow: toBoxShadow(shadows.buttonGlow, scale),
@@ -215,6 +233,11 @@ const useStyles = makeStyles(({ colors, borderRadius, shadows }, { scale }) => (
     borderColor: colors.buttonSecondaryBorder,
     backgroundColor: colors.transparent,
   },
+  outline: {
+    borderWidth: scale(OUTLINE_BORDER_WIDTH),
+    borderColor: colors.buttonOutlineBorder,
+    backgroundColor: colors.transparent,
+  },
   layer: {
     ...StyleSheet.absoluteFill,
     borderRadius: borderRadius.pill,
@@ -228,7 +251,7 @@ const useStyles = makeStyles(({ colors, borderRadius, shadows }, { scale }) => (
   },
   iconSlot: {
     position: 'absolute',
-    left: scale(ICON_RING_INSET),
+    start: scale(ICON_RING_INSET),
     width: scale(ICON_RING_SIZE),
     height: scale(ICON_RING_SIZE),
     alignItems: 'center',
@@ -245,7 +268,10 @@ const useStyles = makeStyles(({ colors, borderRadius, shadows }, { scale }) => (
     alignItems: 'center',
   },
   trailingIcon: {
-    marginLeft: scale(TRAILING_ICON_GAP),
+    marginStart: scale(TRAILING_ICON_GAP),
+  },
+  trailingIconSmall: {
+    marginStart: scale(SMALL_TRAILING_ICON_GAP),
   },
   pressed: {
     opacity: 0.88,
