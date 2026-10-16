@@ -29,7 +29,7 @@ import { StageTile, type ConstructionStage } from '@/components/ui/StageTile';
 import { StatusTimeline } from '@/components/ui/StatusTimeline';
 import { appearanceMenu } from '@/constants/appearance';
 import type { Locale } from '@/context/LocaleContext';
-import { IMAGE_TRANSITION_MS, images } from '@/constants/images';
+import { IMAGE_TRANSITION_MS } from '@/constants/images';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
 import { useLogout } from '@/hooks/useLogout';
@@ -77,7 +77,7 @@ export function ConstructionProgressScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
   const styles = useConstructionStyles(insets);
-  const { colors } = useAppTheme();
+  const { colors, artwork } = useAppTheme();
   const { scheme, setPreference } = useThemePreference();
   const { locale, isRTL } = useLocale();
   const content = constructionContent[locale];
@@ -163,7 +163,7 @@ export function ConstructionProgressScreen() {
 
   return (
     <ScreenWrapper
-      background={images.homeBackground}
+      background={artwork.homeBackground}
       backgroundTint={colors.backgroundTint}
       scrollable
       scrollRef={scrollRef}

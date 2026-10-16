@@ -28,7 +28,7 @@ export function loadArabicFonts(): Promise<void> {
 }
 
 interface LocaleProviderProps {
-  /** Starting language; English, as in the designs. App.tsx loads its fonts first. */
+  /** Starting language; Arabic by default. App.tsx loads its fonts before the first screen. */
   initialLocale?: Locale;
   children: ReactNode;
 }
@@ -38,7 +38,7 @@ interface LocaleProviderProps {
  * Switching mirrors the screens through the `direction` style instead of I18nManager, which
  * would need an app restart. Arabic waits for its fonts so text never shows in a fallback face.
  */
-export function LocaleProvider({ initialLocale = 'en', children }: LocaleProviderProps) {
+export function LocaleProvider({ initialLocale = 'ar', children }: LocaleProviderProps) {
   const [locale, setActiveLocale] = useState<Locale>(initialLocale);
   const [pendingLocale, setPendingLocale] = useState<Locale | null>(null);
 

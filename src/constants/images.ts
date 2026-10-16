@@ -4,7 +4,9 @@ type ImageKey =
   | 'welcomeBackground'
   | 'signInBackground'
   | 'homeBackground'
+  | 'homeBackgroundLight'
   | 'brandLogo'
+  | 'brandLogoOnLight'
   | 'myUnitPhoto'
   | 'featuredCommunityOpal'
   | 'constructionUpdateFacade';
@@ -20,11 +22,18 @@ type ImageKey =
 export const images: Readonly<Record<ImageKey, number>> = {
   welcomeBackground: require('../assets/images/backgrounds/welcome-background.webp'),
   signInBackground: require('../assets/images/backgrounds/sign-in-background.webp'),
-  // Assets/bg/bg home.png. Used by both themes: no separate light-mode background was supplied.
+  // Assets/bg/bg home.png: the dark theme's artwork behind Home and the service screens.
   homeBackground: require('../assets/images/backgrounds/home-background.webp'),
+  // Assets/bg/bg home mode 2.png: the light theme's cream artwork. The export is slightly
+  // transparent with rounded mockup corners, so it is flattened onto its own cream (the light
+  // theme's `background`) and trimmed 52 px a side to drop the corners.
+  homeBackgroundLight: require('../assets/images/backgrounds/home-background-light.webp'),
   // TEMPORARY: cut out of the Figma screenshot (Assets/screens/start 1.png) at 2x.
   // Replace this file with the official logo export (SVG or 3x PNG) — no code changes needed.
   brandLogo: require('../assets/images/logos/nama-logo.png'),
+  // The same logo for cream backgrounds: its white wordmark recoloured to the forest ink
+  // (the gold is unchanged). Replace with the official dark-on-light export when supplied.
+  brandLogoOnLight: require('../assets/images/logos/nama-logo-on-light.png'),
   // Assets/helper photos, sized to about 3x their largest on-screen size.
   myUnitPhoto: require('../assets/images/photos/my-unit.webp'),
   featuredCommunityOpal: require('../assets/images/photos/featured-community-opal.webp'),

@@ -158,7 +158,7 @@ function AmenitiesContent() {
       {canExpand ? (
         <AppButton
           title={expanded ? copy.showLess : copy.viewMore}
-          variant="outline"
+          variant="surface"
           size="medium"
           accessibilityState={{ expanded }}
           onPress={() => setExpanded((current) => !current)}

@@ -1,6 +1,8 @@
 import { DarkTheme, DefaultTheme, NavigationContainer, type Theme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
+
+import { ThemeContext } from '@/context/ThemeContext';
 
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
@@ -17,6 +19,7 @@ import { SignInScreen } from '@/screens/SignInScreen';
 import { SmartHomeScreen } from '@/screens/SmartHomeScreen';
 import { VisitorAccessScreen } from '@/screens/VisitorAccessScreen';
 import { WelcomeScreen } from '@/screens/WelcomeScreen';
+import { darkTheme } from '@/theme';
 import type { RootStackParamList } from '@/types/navigation.types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -38,6 +41,14 @@ const ROUTE_NAMES: readonly (keyof RootStackParamList)[] = [
   'Settings',
   'Assistant',
 ];
+
+/**
+ * Welcome and Sign In sit on dark artwork in both modes (mode 2 changes only the screens after
+ * sign-in), so they always render with the dark theme.
+ */
+function DarkThemeLayout({ children }: { children: ReactNode }) {
+  return <ThemeContext value={darkTheme}>{children}</ThemeContext>;
+}
 
 /**
  * Development only: `EXPO_PUBLIC_INITIAL_ROUTE=Home npx expo start` opens straight on a
@@ -69,8 +80,8 @@ export function AppNavigator() {
         // Screens push in from the side the reader moves towards.
         screenOptions={{ headerShown: false, animation: isRTL ? 'slide_from_left' : 'default' }}
       >
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="SignIn" component={SignInScreen} />
+        <Stack.Screen name="Welcome" component={WelcomeScreen} layout={DarkThemeLayout} />
+        <Stack.Screen name="SignIn" component={SignInScreen} layout={DarkThemeLayout} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="ConstructionProgress" component={ConstructionProgressScreen} />
         {/* Resident services, migrated from the Parklane app. */}

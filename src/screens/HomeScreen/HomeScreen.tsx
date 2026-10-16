@@ -21,7 +21,6 @@ import { POPOVER_MENU_WIDTH, PopoverMenu, type PopoverAnchor } from '@/component
 import { ServiceTile } from '@/components/ui/ServiceTile';
 import { UnitSummaryCard } from '@/components/ui/UnitSummaryCard';
 import { appearanceMenu } from '@/constants/appearance';
-import { images } from '@/constants/images';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
 import { useLogout } from '@/hooks/useLogout';
@@ -55,7 +54,7 @@ export function HomeScreen() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const styles = useHomeStyles(insets);
-  const { colors } = useAppTheme();
+  const { colors, artwork } = useAppTheme();
   const { scheme, setPreference } = useThemePreference();
   const { locale, isRTL } = useLocale();
   const content = homeContent[locale];
@@ -128,7 +127,7 @@ export function HomeScreen() {
 
   return (
     <ScreenWrapper
-      background={images.homeBackground}
+      background={artwork.homeBackground}
       backgroundTint={colors.backgroundTint}
       scrollable
       scrollRef={scrollRef}

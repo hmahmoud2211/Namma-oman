@@ -66,7 +66,7 @@ export function SceneTile({ label, icon, active, onPress }: SceneTileProps) {
           <AppIcon
             {...icon}
             size={scale(d.scene.icon)}
-            color={active ? colors.accent : colors.white}
+            color={colors.white}
           />
           <AppText variant="labelSmall" color={colors.white} align="center" numberOfLines={2}>
             {label}

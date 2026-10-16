@@ -13,11 +13,12 @@ import { AppNavigator } from '@/navigation/AppNavigator';
 import { deferredFontAssets, startupFontAssets } from '@/theme/typography';
 
 /**
- * Development only: `EXPO_PUBLIC_INITIAL_LOCALE=ar npx expo start` starts in Arabic, so the
- * screens before Home (where the EN | AR switch is) can be checked in Arabic too.
+ * The app opens in Arabic; the EN | AR switch changes it for the session.
+ * Development only: `EXPO_PUBLIC_INITIAL_LOCALE=en npx expo start` starts in English, so the
+ * screens before Home (where the switch is) can be checked in English too.
  */
 const initialLocale: Locale =
-  __DEV__ && process.env.EXPO_PUBLIC_INITIAL_LOCALE === 'ar' ? 'ar' : 'en';
+  __DEV__ && process.env.EXPO_PUBLIC_INITIAL_LOCALE === 'en' ? 'en' : 'ar';
 
 const STARTUP_IMAGES = [...startupImages];
 

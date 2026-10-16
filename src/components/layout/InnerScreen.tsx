@@ -9,7 +9,6 @@ import { getScreenHeaderTop } from '@/components/layout/screenHeader';
 import { ScreenWrapper } from '@/components/layout/ScreenWrapper';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { OptionList, type ListOption } from '@/components/ui/OptionList';
-import { images } from '@/constants/images';
 import { resident } from '@/constants/resident';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -83,7 +82,7 @@ export function InnerScreen({
 }: InnerScreenProps) {
   const insets = useSafeAreaInsets();
   const styles = useStyles(insets);
-  const { colors } = useAppTheme();
+  const { colors, artwork } = useAppTheme();
   const { scale } = useResponsive();
   const account = useAccountMenu();
 
@@ -135,7 +134,7 @@ export function InnerScreen({
   return (
     <InnerScreenContext value={context}>
       <ScreenWrapper
-        background={images.homeBackground}
+        background={artwork.homeBackground}
         backgroundTint={colors.backgroundTint}
         scrollable
         keyboardAvoiding={keyboardAvoiding}

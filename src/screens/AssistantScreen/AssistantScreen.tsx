@@ -19,7 +19,6 @@ import { ScreenWrapper } from '@/components/layout/ScreenWrapper';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { OptionList, type ListOption } from '@/components/ui/OptionList';
 import { assistantStrings } from '@/constants/assistantStrings';
-import { images } from '@/constants/images';
 import { resident as signedInResident } from '@/constants/resident';
 import { useAppState } from '@/hooks/useAppState';
 import { useAppTheme } from '@/hooks/useAppTheme';
@@ -47,7 +46,7 @@ const PANE_SHIFT = 22;
  */
 export function AssistantScreen({ navigation, route }: RootStackScreenProps<'Assistant'>) {
   const insets = useSafeAreaInsets();
-  const { colors } = useAppTheme();
+  const { colors, artwork } = useAppTheme();
   const { locale, isRTL } = useLocale();
   const { scale } = useResponsive();
   const copy = assistantStrings[locale];
@@ -161,7 +160,7 @@ export function AssistantScreen({ navigation, route }: RootStackScreenProps<'Ass
 
   return (
     <ScreenWrapper
-      background={images.homeBackground}
+      background={artwork.homeBackground}
       backgroundTint={colors.backgroundTint}
       keyboardAvoiding
       overlay={

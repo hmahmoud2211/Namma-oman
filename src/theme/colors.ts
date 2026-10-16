@@ -56,6 +56,8 @@ const palette = {
   sage: '#7AA68D',
   charcoal: '#1C1B17',
   umber: '#3B3830',
+  /** The light theme's cream artwork (Assets/bg/bg home mode 2.png), sampled from its plain area. */
+  parchment: '#F4ECDF',
   white: '#FFFFFF',
   black: '#000000',
 
@@ -560,36 +562,55 @@ export const darkColors: ColorTokens = {
 };
 
 /**
- * Light mode (mode 2.png): the artwork stays dark green, so Welcome / Sign In and the
- * text drawn on the background are unchanged. Cards turn cream with deep-green ink, and
- * the active tab sits in a gold-rimmed box instead of over an underline.
+ * Light mode: cream cards with deep-green ink (mode 2.png) over the cream home artwork
+ * (Assets/bg/bg home mode 2.png). Everything drawn straight on that artwork (titles, header
+ * glyphs, the tab bar) takes the deep-green ink and the bronze accent instead of white and gold.
+ * Welcome and Sign In keep their dark artwork and render with the dark theme in both modes.
  */
 export const lightColors: ColorTokens = {
   ...darkColors,
 
-  backgroundTint: 'rgba(14, 62, 38, 0.38)',
+  // On the cream artwork: matches its edges, and needs no wash.
+  background: palette.parchment,
+  backgroundTint: 'transparent',
+  textPrimary: palette.forestInk,
+  accent: palette.bronze,
+  headerIcon: palette.forestInk,
+  headerButtonBorder: palette.pineGlow,
+  headerAvatarBorder: palette.bronze,
+  notificationDot: palette.ochre,
+  textOnBackgroundMuted: 'rgba(18, 61, 43, 0.78)',
+  textOnBackgroundSubtle: 'rgba(18, 61, 43, 0.55)',
+  // Round controls on the artwork (the assistant's toolbar and call controls).
+  controlFill: 'rgba(255, 255, 255, 0.55)',
+  controlBorder: 'rgba(18, 61, 43, 0.22)',
+  controlActiveFill: 'rgba(138, 104, 47, 0.12)',
 
   // `default` (no white wash) keeps the cream warm instead of grey.
   glassBlurTint: 'default',
-  glassSheenGradient: ['rgba(255, 255, 255, 0.34)', 'rgba(255, 255, 255, 0)'],
+  // A brighter sheen across the top-left: the cards read as glass, not paper.
+  glassSheenGradient: ['rgba(255, 255, 255, 0.55)', 'rgba(255, 255, 255, 0)'],
 
-  // Warm cream: the dark green showing through would turn a cooler cream olive-grey.
+  // Cards sit on cream artwork, so their glass can't be cream too or they vanish: white at the
+  // top, clearer through the middle (the blurred artwork shows), framed in gold, and lifted by
+  // a warm shadow rather than a glow.
   surfaceGradient: [
-    'rgba(255, 246, 226, 0.6)',
-    'rgba(255, 242, 216, 0.54)',
-    'rgba(250, 234, 202, 0.5)',
+    'rgba(255, 255, 255, 0.62)',
+    'rgba(255, 252, 246, 0.34)',
+    'rgba(255, 248, 236, 0.46)',
   ],
-  surfaceBorder: 'rgba(255, 252, 242, 0.8)',
-  surfaceInnerHighlight: 'rgba(255, 255, 255, 0.75)',
-  surfaceShadow: 'rgba(240, 205, 140, 0.45)',
+  surfaceBorder: 'rgba(176, 138, 62, 0.55)',
+  surfaceInnerHighlight: 'rgba(255, 255, 255, 0.95)',
+  surfaceShadow: 'rgba(110, 82, 36, 0.24)',
   surfaceText: palette.charcoal,
   // Darker than mode 2's grey so it stays readable on the thinner glass.
   surfaceTextMuted: palette.umber,
   surfaceIcon: palette.forestInk,
   surfaceIconTileGradient: ['rgba(255, 255, 255, 0.24)', 'rgba(233, 223, 200, 0.32)'],
-  surfaceIconTileBorder: 'rgba(255, 255, 255, 0.75)',
-  featureCardBorderGradient: [palette.white, palette.creamEdge, palette.rimGold, palette.creamEdge],
-  featureCardGlow: 'rgba(245, 213, 148, 0.55)',
+  surfaceIconTileBorder: 'rgba(176, 138, 62, 0.4)',
+  // Feature cards (My Unit, stages): a white catch-light at the top-left running into gold.
+  featureCardBorderGradient: [palette.white, palette.goldLight, palette.bronze, palette.goldLight],
+  featureCardGlow: 'rgba(110, 82, 36, 0.26)',
   photoBorder: 'rgba(196, 160, 90, 0.9)',
   badgeFill: 'rgba(18, 61, 43, 0.08)',
   badgeBorder: 'rgba(18, 61, 43, 0.55)',
@@ -602,9 +623,15 @@ export const lightColors: ColorTokens = {
   menuActiveFill: 'rgba(18, 61, 43, 0.08)',
   menuDivider: 'rgba(18, 61, 43, 0.14)',
 
-  tabBarGradient: ['rgba(30, 90, 62, 0.3)', 'rgba(12, 48, 32, 0.42)'],
-  tabBarBorder: 'rgba(150, 196, 170, 0.6)',
-  tabBarShadow: 'rgba(0, 0, 0, 0.35)',
+  // Cream glass on the cream artwork, ink labels, the active tab boxed in gold.
+  tabBarGradient: ['rgba(255, 250, 238, 0.74)', 'rgba(244, 234, 214, 0.86)'],
+  tabBarBlurTint: 'light',
+  tabBarBorder: 'rgba(196, 160, 90, 0.55)',
+  tabBarShadow: 'rgba(120, 90, 40, 0.22)',
+  tabActive: palette.bronze,
+  tabInactive: palette.umber,
+  homeSeat: palette.creamEdge,
+  homeHaloBorder: 'rgba(138, 104, 47, 0.45)',
   tabIndicator: 'transparent',
   tabActiveFill: 'rgba(249, 210, 116, 0.14)',
   tabActiveBorder: 'rgba(235, 212, 128, 0.75)',

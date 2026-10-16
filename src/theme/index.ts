@@ -1,3 +1,5 @@
+import { images } from '@/constants/images';
+
 import { borderRadius, type BorderRadius } from './borderRadius';
 import { darkColors, lightColors, type ColorTokens } from './colors';
 import { createShadows, type Shadows } from './shadows';
@@ -11,10 +13,12 @@ export interface AppTheme {
   /** Drives the navigation chrome. */
   isDark: boolean;
   /**
-   * Status bar content. Light in both themes: every screen's artwork is dark,
-   * including behind the light theme's cream cards (mode 2.png).
+   * Status bar content: light over the dark artwork, dark over the light theme's cream one.
+   * Welcome and Sign In always use the dark theme (their artwork is dark in both modes).
    */
   statusBarStyle: 'light' | 'dark';
+  /** Artwork that changes with the theme: the background behind Home and the logo on it. */
+  artwork: { homeBackground: number; brandLogo: number };
   colors: ColorTokens;
   typography: Typography;
   spacing: Spacing;
@@ -27,6 +31,7 @@ export const darkTheme: AppTheme = {
   scheme: 'dark',
   isDark: true,
   statusBarStyle: 'light',
+  artwork: { homeBackground: images.homeBackground, brandLogo: images.brandLogo },
   colors: darkColors,
   typography,
   spacing,
@@ -34,11 +39,12 @@ export const darkTheme: AppTheme = {
   shadows: createShadows(darkColors),
 };
 
-/** Cream cards over the dark-green artwork (Assets/screens/mode 2.png). */
+/** Cream cards with deep-green ink over the cream artwork (Assets/bg/bg home mode 2.png). */
 export const lightTheme: AppTheme = {
   scheme: 'light',
   isDark: false,
-  statusBarStyle: 'light',
+  statusBarStyle: 'dark',
+  artwork: { homeBackground: images.homeBackgroundLight, brandLogo: images.brandLogoOnLight },
   colors: lightColors,
   typography,
   spacing,
