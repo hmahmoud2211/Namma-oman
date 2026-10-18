@@ -46,8 +46,7 @@ const d = {
   photo: { top: -24.2, left: 79.5, width: 235.8, height: 176.7 },
   scrimStops: [0, 0.27, 0.42, 0.62] as const, // 0.27 = the photo's left edge
   copy: { top: 8.45, left: 11.6 },
-  // The serif's side bearing would leave the title indented past the overline.
-  title: { marginTop: -0.65, shiftX: -1.8 },
+  title: { marginTop: -0.65 },
   pillars: { marginTop: 1.5, dot: 2.8, gap: 6.1 },
   description: { marginTop: 1.5 },
   cta: { top: 94.4, left: 9.3, width: 95.8, arrow: 6.7 },
@@ -134,7 +133,7 @@ export function FeaturedCommunityCard({
           variant="heroTitle"
           color={colors.heroText}
           numberOfLines={1}
-          style={[styles.title, isRTL && styles.titleRTL]}
+          style={styles.title}
         >
           {community.name}
         </AppText>
@@ -248,12 +247,6 @@ const useStyles = makeStyles(({ colors, borderRadius, shadows }, { scale }) => {
     },
     title: {
       marginTop: scale(d.title.marginTop),
-      // A shift, not a negative margin, so the line keeps its full width.
-      transform: [{ translateX: scale(d.title.shiftX) }],
-    },
-    // The shift offsets Playfair's side bearing; the Arabic face needs none.
-    titleRTL: {
-      transform: [],
     },
     pillars: {
       marginTop: scale(d.pillars.marginTop),

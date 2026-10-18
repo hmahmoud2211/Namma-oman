@@ -35,7 +35,7 @@ Run lint and typecheck before declaring any task done.
 - Colors, typography, spacing, radii and shadows live in `src/theme/`. Never hard-code hex values in components; read tokens via `useAppTheme()` or `makeStyles`.
 - Scale sizes with `scale()` and screen positions with `verticalScale()` from `useResponsive()`.
 - Figma exports differ in pixel size and aspect ratio. Measure each screen in its own export, convert to dp with `designFrameFromExport(pxWidth, pxHeight)` (always 360 dp wide), and pass that frame to `makeStyles(..., { frame })` so `verticalScale` follows the export's height (see `SignInScreen.styles.ts`).
-- Sans-serif text on the Sign In screen uses the platform UI font (SF Pro / Roboto): those text variants set `fontWeight` and no `fontFamily`.
+- Latin text is set in Inter (as in the Parklane app); Arabic in IBM Plex Sans Arabic. Weights are chosen by `fontFamily` (e.g. `Inter_600SemiBold`), never by `fontWeight`. Fonts are subset by `scripts/subset-fonts.py`.
 - Images are referenced only through `src/constants/images.ts`. Note: RN's `Image` pre-fills the asset's intrinsic size, so give images explicit `width`/`height` (not `aspectRatio` or `absoluteFill` alone).
 
 ## Building with EAS

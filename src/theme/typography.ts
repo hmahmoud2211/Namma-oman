@@ -1,23 +1,16 @@
 import type { TextStyle } from 'react-native';
 
 /**
- * Closest Google Fonts matches for the Figma typefaces (unconfirmed).
- * Swap the files here once the exact fonts are supplied.
- * Variants without a `fontFamily` use the platform UI font (SF Pro on iOS, Roboto on
- * Android) — the closest match for the Sign In screen's sans-serif text.
- * Home's rounded sans-serif matches Nunito Sans.
- * None of these has Arabic glyphs, so Arabic text uses IBM Plex Sans Arabic throughout
+ * Latin text is set in Inter, as in the Parklane app; weights are chosen by family name, never
+ * by `fontWeight`, so Android renders the real cut instead of synthesising one.
+ * Inter has no Arabic glyphs, so Arabic text uses IBM Plex Sans Arabic throughout
  * (see `arabicTextVariants`); its geometric forms sit close to the logo's Arabic wordmark.
  */
 export const fontFamilies = {
-  serifRegular: 'PlayfairDisplay_400Regular',
-  serifBold: 'PlayfairDisplay_700Bold',
-  sansLight: 'Montserrat_300Light',
-  sansBold: 'OpenSans_700Bold',
-  roundedRegular: 'NunitoSans_400Regular',
-  roundedMedium: 'NunitoSans_500Medium',
-  roundedSemiBold: 'NunitoSans_600SemiBold',
-  roundedBold: 'NunitoSans_700Bold',
+  regular: 'Inter_400Regular',
+  medium: 'Inter_500Medium',
+  semiBold: 'Inter_600SemiBold',
+  bold: 'Inter_700Bold',
   arabicLight: 'IBMPlexSansArabic_300Light',
   arabicRegular: 'IBMPlexSansArabic_400Regular',
   arabicMedium: 'IBMPlexSansArabic_500Medium',
@@ -33,18 +26,14 @@ export const fontFamilies = {
 
 /** The Welcome screen's faces: loaded while the splash screen is up (App.tsx). */
 export const startupFontAssets = {
-  [fontFamilies.serifRegular]: require('../assets/fonts/PlayfairDisplay_400Regular.ttf'),
-  [fontFamilies.sansLight]: require('../assets/fonts/Montserrat_300Light.ttf'),
-  [fontFamilies.sansBold]: require('../assets/fonts/OpenSans_700Bold.ttf'),
+  [fontFamilies.regular]: require('../assets/fonts/Inter_400Regular.ttf'),
+  [fontFamilies.semiBold]: require('../assets/fonts/Inter_600SemiBold.ttf'),
+  [fontFamilies.bold]: require('../assets/fonts/Inter_700Bold.ttf'),
 };
 
 /** The other Latin faces: loaded in the background once the first screen is showing. */
 export const deferredFontAssets = {
-  [fontFamilies.serifBold]: require('../assets/fonts/PlayfairDisplay_700Bold.ttf'),
-  [fontFamilies.roundedRegular]: require('../assets/fonts/NunitoSans_400Regular.ttf'),
-  [fontFamilies.roundedMedium]: require('../assets/fonts/NunitoSans_500Medium.ttf'),
-  [fontFamilies.roundedSemiBold]: require('../assets/fonts/NunitoSans_600SemiBold.ttf'),
-  [fontFamilies.roundedBold]: require('../assets/fonts/NunitoSans_700Bold.ttf'),
+  [fontFamilies.medium]: require('../assets/fonts/Inter_500Medium.ttf'),
 };
 
 /**
@@ -115,19 +104,19 @@ export type TextVariant =
 export const textVariants: Record<TextVariant, TextStyle> = {
   // Welcome (start 1.png)
   heading: {
-    fontFamily: fontFamilies.serifRegular,
+    fontFamily: fontFamilies.semiBold,
     fontSize: 20,
     lineHeight: 26,
-    letterSpacing: -0.75,
+    letterSpacing: -0.2,
   },
   subheading: {
-    fontFamily: fontFamilies.sansLight,
+    fontFamily: fontFamilies.regular,
     fontSize: 10.5,
     lineHeight: 14,
     letterSpacing: 1.6,
   },
   button: {
-    fontFamily: fontFamilies.sansBold,
+    fontFamily: fontFamilies.bold,
     fontSize: 12,
     lineHeight: 16,
     letterSpacing: 0.42,
@@ -135,234 +124,224 @@ export const textVariants: Record<TextVariant, TextStyle> = {
 
   // Sign In (sign in.png)
   display: {
-    fontFamily: fontFamilies.serifBold,
+    fontFamily: fontFamilies.bold,
     fontSize: 22.9,
     lineHeight: 28,
-    letterSpacing: -1.7,
+    letterSpacing: -0.2,
   },
   body: {
-    fontWeight: '300',
+    fontFamily: fontFamilies.regular,
     fontSize: 13,
     lineHeight: 16,
-    letterSpacing: -0.95,
-  },
+      },
   bodySmall: {
-    fontWeight: '300',
+    fontFamily: fontFamilies.regular,
     fontSize: 9.9,
     lineHeight: 12,
-    letterSpacing: -0.7,
-  },
+      },
   caption: {
-    fontWeight: '300',
+    fontFamily: fontFamilies.regular,
     fontSize: 9.3,
     lineHeight: 11,
-    letterSpacing: -0.9,
-  },
+      },
   micro: {
-    fontWeight: '400',
+    fontFamily: fontFamilies.regular,
     fontSize: 7.5,
     lineHeight: 9,
   },
   input: {
-    fontWeight: '300',
+    fontFamily: fontFamilies.regular,
     fontSize: 10.6,
     lineHeight: 13,
-    letterSpacing: -0.85,
-  },
+      },
   buttonLabel: {
-    fontWeight: '600',
+    fontFamily: fontFamilies.semiBold,
     fontSize: 12.45,
     lineHeight: 15,
-    letterSpacing: -0.8,
-  },
+      },
   link: {
-    fontWeight: '600',
+    fontFamily: fontFamilies.semiBold,
     fontSize: 11.35,
     lineHeight: 14,
-    letterSpacing: -1,
-  },
+      },
 
   // Home (home 1.png)
   greeting: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 11,
     lineHeight: 13,
   },
   greetingName: {
-    fontFamily: fontFamilies.roundedBold,
+    fontFamily: fontFamilies.bold,
     fontSize: 16.2,
     lineHeight: 17,
   },
   cardTitle: {
-    fontFamily: fontFamilies.roundedSemiBold,
+    fontFamily: fontFamilies.semiBold,
     fontSize: 11.25,
     lineHeight: 14,
   },
   cardLabel: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 7.8,
     lineHeight: 10,
   },
   value: {
-    fontFamily: fontFamilies.roundedMedium,
+    fontFamily: fontFamilies.medium,
     fontSize: 10.6,
     lineHeight: 13,
   },
   amount: {
-    fontFamily: fontFamilies.roundedBold,
+    fontFamily: fontFamilies.bold,
     fontSize: 14,
     lineHeight: 17,
   },
   badge: {
-    fontFamily: fontFamilies.roundedMedium,
+    fontFamily: fontFamilies.medium,
     fontSize: 7.5,
     lineHeight: 9,
   },
+  // Sized so the longest Home tile label ("Construction Progress") fits Inter's wider set.
   tileLabel: {
-    fontFamily: fontFamilies.roundedRegular,
-    fontSize: 5.3,
+    fontFamily: fontFamilies.regular,
+    fontSize: 5,
     lineHeight: 7,
+    letterSpacing: -0.05,
   },
   overline: {
-    fontFamily: fontFamilies.roundedMedium,
+    fontFamily: fontFamilies.medium,
     fontSize: 6.7,
     lineHeight: 8.5,
     letterSpacing: 0.92,
   },
   heroTitle: {
-    fontFamily: fontFamilies.serifBold,
+    fontFamily: fontFamilies.bold,
     fontSize: 21.5,
     lineHeight: 26,
-    letterSpacing: -1.35,
+    letterSpacing: -0.2,
   },
   heroTagline: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 10.4,
     lineHeight: 13,
   },
   heroBody: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 6.65,
     lineHeight: 9.8,
   },
   pillLabel: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 6.8,
     lineHeight: 9,
   },
   counter: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 6.5,
     lineHeight: 8,
   },
   tabLabel: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 6.2,
     lineHeight: 8,
   },
   tabLabelActive: {
-    fontFamily: fontFamilies.roundedSemiBold,
+    fontFamily: fontFamilies.semiBold,
     fontSize: 6.45,
     lineHeight: 8,
   },
 
   // Construction Progress (construction.png). Sizes match the export's text widths:
-  // Nunito Sans runs wider than the design's sans, so its caps sit a little lower.
   pageOverline: {
-    fontFamily: fontFamilies.roundedSemiBold,
+    fontFamily: fontFamilies.semiBold,
     fontSize: 7.2,
     lineHeight: 9,
     letterSpacing: 2.05,
   },
   pageTitle: {
-    fontFamily: fontFamilies.serifBold,
+    fontFamily: fontFamilies.bold,
     fontSize: 23.1,
     lineHeight: 24,
-    letterSpacing: -0.9,
+    letterSpacing: -0.2,
   },
   pageSubtitle: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 10.55,
     lineHeight: 13,
   },
   sectionTitle: {
-    fontFamily: fontFamilies.serifBold,
+    fontFamily: fontFamilies.bold,
     fontSize: 10.5,
     lineHeight: 14,
-    letterSpacing: -0.3,
-  },
+      },
   panelTitle: {
-    fontFamily: fontFamilies.serifBold,
+    fontFamily: fontFamilies.bold,
     fontSize: 13.1,
     lineHeight: 16,
-    letterSpacing: -0.4,
-  },
+      },
   panelHeadline: {
-    fontFamily: fontFamilies.serifBold,
+    fontFamily: fontFamilies.bold,
     fontSize: 8,
     lineHeight: 11,
-    letterSpacing: -0.3,
-  },
+      },
   panelHeading: {
-    fontFamily: fontFamilies.roundedSemiBold,
+    fontFamily: fontFamilies.semiBold,
     fontSize: 10.4,
     lineHeight: 13,
   },
   displaySerif: {
-    fontFamily: fontFamilies.serifBold,
+    fontFamily: fontFamilies.bold,
     fontSize: 17.6,
     lineHeight: 20,
     letterSpacing: -0.2,
-    // Playfair's default old-style figures would drop the "2"s below the baseline.
-    fontVariant: ['lining-nums'],
   },
   statLarge: {
-    fontFamily: fontFamilies.roundedBold,
+    fontFamily: fontFamilies.bold,
     fontSize: 23,
     lineHeight: 26,
   },
   statMedium: {
-    fontFamily: fontFamilies.roundedMedium,
+    fontFamily: fontFamilies.medium,
     fontSize: 10,
     lineHeight: 12,
   },
   bodyLarge: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 10,
     lineHeight: 12.5,
   },
   bodyTight: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 7.25,
     lineHeight: 8.4,
   },
   panelLabel: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 8,
     lineHeight: 10,
   },
   labelLarge: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 8.3,
     lineHeight: 10.5,
   },
   label: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 7.4,
     lineHeight: 8.6,
   },
   labelSmall: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 6.7,
     lineHeight: 8.5,
   },
   labelTiny: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 6.1,
     lineHeight: 7.5,
   },
   initials: {
-    fontFamily: fontFamilies.roundedMedium,
+    fontFamily: fontFamilies.medium,
     fontSize: 11,
     lineHeight: 13,
   },
@@ -370,12 +349,12 @@ export const textVariants: Record<TextVariant, TextStyle> = {
   // Assistant: chat answers and live voice captions, set larger than the cards' type for
   // reading at length.
   chatBody: {
-    fontFamily: fontFamilies.roundedRegular,
+    fontFamily: fontFamilies.regular,
     fontSize: 10.6,
     lineHeight: 15,
   },
   voiceCaption: {
-    fontFamily: fontFamilies.roundedMedium,
+    fontFamily: fontFamilies.medium,
     fontSize: 12.4,
     lineHeight: 17,
   },
@@ -383,14 +362,10 @@ export const textVariants: Record<TextVariant, TextStyle> = {
 
 /** The Arabic face standing in for each Latin face (by weight). */
 const ARABIC_FAMILY: Readonly<Record<string, string>> = {
-  [fontFamilies.serifRegular]: fontFamilies.arabicMedium,
-  [fontFamilies.serifBold]: fontFamilies.arabicBold,
-  [fontFamilies.sansLight]: fontFamilies.arabicLight,
-  [fontFamilies.sansBold]: fontFamilies.arabicBold,
-  [fontFamilies.roundedRegular]: fontFamilies.arabicRegular,
-  [fontFamilies.roundedMedium]: fontFamilies.arabicMedium,
-  [fontFamilies.roundedSemiBold]: fontFamilies.arabicSemiBold,
-  [fontFamilies.roundedBold]: fontFamilies.arabicBold,
+  [fontFamilies.regular]: fontFamilies.arabicRegular,
+  [fontFamilies.medium]: fontFamilies.arabicMedium,
+  [fontFamilies.semiBold]: fontFamilies.arabicSemiBold,
+  [fontFamilies.bold]: fontFamilies.arabicBold,
 };
 /** Platform-font variants are matched by weight. */
 const ARABIC_FAMILY_BY_WEIGHT: Readonly<Record<string, string>> = {

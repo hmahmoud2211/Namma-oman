@@ -4,7 +4,7 @@ Writes the app's fonts to src/assets/fonts/, cut down to the characters the app 
 The Google Fonts files also carry Greek, Cyrillic and Vietnamese, which the app never shows;
 dropping them makes the fonts several times smaller, which matters on the web, where they
 download before the first screen. Every OpenType feature is kept (Arabic letter joining,
-Playfair's lining figures).
+Inter's contextual alternates).
 
 Run after changing a font or adding text in a new script:
     python3 scripts/subset-fonts.py        (needs `pip install fonttools`)
@@ -30,14 +30,11 @@ LATIN = (
 ARABIC = 'U+0600-06FF,U+0750-077F,U+0870-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200F'
 
 FONTS = {
-    'playfair-display/400Regular/PlayfairDisplay_400Regular.ttf': LATIN,
-    'playfair-display/700Bold/PlayfairDisplay_700Bold.ttf': LATIN,
-    'montserrat/300Light/Montserrat_300Light.ttf': LATIN,
-    'open-sans/700Bold/OpenSans_700Bold.ttf': LATIN,
-    'nunito-sans/400Regular/NunitoSans_400Regular.ttf': LATIN,
-    'nunito-sans/500Medium/NunitoSans_500Medium.ttf': LATIN,
-    'nunito-sans/600SemiBold/NunitoSans_600SemiBold.ttf': LATIN,
-    'nunito-sans/700Bold/NunitoSans_700Bold.ttf': LATIN,
+    # Latin text is set in Inter, as in the Parklane app.
+    'inter/400Regular/Inter_400Regular.ttf': LATIN,
+    'inter/500Medium/Inter_500Medium.ttf': LATIN,
+    'inter/600SemiBold/Inter_600SemiBold.ttf': LATIN,
+    'inter/700Bold/Inter_700Bold.ttf': LATIN,
     # Arabic text also contains Latin digits, unit codes ("A-304") and punctuation.
     'ibm-plex-sans-arabic/300Light/IBMPlexSansArabic_300Light.ttf': f'{ARABIC},{LATIN}',
     'ibm-plex-sans-arabic/400Regular/IBMPlexSansArabic_400Regular.ttf': f'{ARABIC},{LATIN}',

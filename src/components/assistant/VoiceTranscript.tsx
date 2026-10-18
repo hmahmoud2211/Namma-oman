@@ -122,7 +122,7 @@ const TurnRow = memo(function TurnRow({ turn, latest, onOpenRoute, onSignIn }: T
         {turn.text}
         {!turn.final && !turn.interrupted ? (
           <AppText variant="voiceCaption" color={colors.accent}>
-            {' ▍'}
+            {' |'}
           </AppText>
         ) : null}
       </AppText>

@@ -103,7 +103,7 @@ interface PageIntroProps {
   subtitle?: string;
 }
 
-/** Overline, serif title and supporting line under the header (as on Construction Progress). */
+/** Overline, title and supporting line under the header (as on Construction Progress). */
 export function PageIntro({ overline, title, subtitle }: PageIntroProps) {
   const { colors } = useAppTheme();
   const styles = useStyles();

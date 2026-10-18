@@ -121,7 +121,7 @@ function RichTextView({
         const bold = {
           fontFamily: rtl
             ? typography.fontFamilies.arabicBold
-            : typography.fontFamilies.roundedBold,
+            : typography.fontFamilies.bold,
         };
         if (block.kind === 'heading') {
           return (
