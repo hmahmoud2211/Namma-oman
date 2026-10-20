@@ -102,17 +102,19 @@ export type TextVariant =
  * and are not scaled with the screen width, as there. Weights are this app's (Inter by role).
  */
 export const textVariants: Record<TextVariant, TextStyle> = {
-  // Welcome (start 1.png)
+  // Welcome (start 4.png, which draws them about 6% smaller than the earlier start 1.png)
+  // The design sets this in a thin serif the app doesn't bundle; Inter Regular at this size
+  // matches its width and height.
   heading: {
-    fontFamily: fontFamilies.semiBold,
-    fontSize: 29,
-    lineHeight: 32,
+    fontFamily: fontFamilies.regular,
+    fontSize: 19,
+    lineHeight: 24,
   },
   subheading: {
     fontFamily: fontFamilies.regular,
-    fontSize: 10,
-    lineHeight: 14,
-    letterSpacing: 2,
+    fontSize: 9.5,
+    lineHeight: 13,
+    letterSpacing: 1.9,
   },
   button: {
     fontFamily: fontFamilies.bold,

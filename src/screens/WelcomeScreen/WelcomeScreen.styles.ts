@@ -1,21 +1,28 @@
 import type { EdgeInsets } from 'react-native-safe-area-context';
 
+import { DESIGN_FRAME, designFrameFromExport } from '@/utils/responsive';
 import { makeStyles } from '@/utils/makeStyles';
-import { DESIGN_FRAME } from '@/utils/responsive';
 
 /**
- * Layout measured from Assets/screens/start 1.png, in design dp (360×714 frame).
+ * Assets/screens/start 4.png is 791×1367 px, a 22 px phone bezel on its left and the 769 px
+ * screen beside it (the width of its background, Assets/bg/start bg 4.png): a 360×640 dp frame.
+ */
+export const WELCOME_FRAME = designFrameFromExport(769, 1367);
+
+/**
+ * Layout measured from Assets/screens/start 4.png, in design dp (360×640 frame). The headline
+ * sits low, under the building; the logo and the button are centred.
  * `top` / `bottom` values are screen positions and scale with screen height so the
  * content keeps its place over the background artwork; everything else scales with width.
  */
 export const welcomeDesign = {
-  logo: { top: 69.5, left: 126, width: 97, height: 38 },
-  headline: { top: 185.7, left: 31 },
-  title: { left: 27 },
-  accentRule: { width: 28, height: 1.5, marginTop: 4 },
-  tagline: { marginTop: 5.5 },
+  logo: { top: 77.2, width: 117, height: 45.7 },
+  headline: { top: 449.9, left: 18.7 },
+  title: { left: 16 },
+  accentRule: { width: 25.7, height: 1.4, marginTop: 8.3 },
+  tagline: { marginTop: 6.1 },
   arrowIcon: { size: 10.8 },
-  cta: { width: 292, bottom: 76 },
+  cta: { width: 273.4, bottom: 52.4 },
 } as const;
 
 const d = welcomeDesign;
@@ -39,7 +46,7 @@ export const useWelcomeStyles = makeStyles(
         paddingBottom: ctaBottom - insets.bottom,
       },
       logo: {
-        marginStart: scale(d.logo.left),
+        alignSelf: 'center',
       },
       headline: {
         marginTop: headlineTop - logoBottom,
@@ -64,4 +71,5 @@ export const useWelcomeStyles = makeStyles(
       },
     };
   },
+  { frame: WELCOME_FRAME },
 );

@@ -9,7 +9,7 @@ export interface WelcomeContent {
   ctaHint: string;
 }
 
-/** English copy exactly as shown in Assets/screens/start 1.png. */
+/** English copy exactly as shown in Assets/screens/start 4.png. */
 export const welcomeContent: Localized<WelcomeContent> = {
   en: {
     title: 'opal residence',

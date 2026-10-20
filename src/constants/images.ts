@@ -23,6 +23,7 @@ type ImageKey =
  * backgrounds at quality 95, photos at quality 85 and at most 1000 px wide.
  */
 export const images: Readonly<Record<ImageKey, number>> = {
+  // Assets/bg/start bg 4.png, its rounded mockup corners flattened onto the art's own near-black.
   welcomeBackground: require('../assets/images/backgrounds/welcome-background.webp'),
   signInBackground: require('../assets/images/backgrounds/sign-in-background.webp'),
   // Assets/bg/bg home.png: the dark theme's artwork behind Home and the service screens.
