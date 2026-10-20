@@ -41,6 +41,7 @@ import { HOME_FRAME, homeDesign, useHomeStyles } from './HomeScreen.styles';
 
 /** The screen each shortcut opens; the rest show the "under development" notice. */
 const SERVICE_ROUTES: Partial<Record<HomeServiceId, ParamlessRoute>> = {
+  'financial-overview': 'FinancialOverview',
   'construction-progress': 'ConstructionProgress',
   'smart-home': 'SmartHome',
   'visitor-access': 'VisitorAccess',
@@ -109,7 +110,7 @@ export function HomeScreen() {
         navigation.navigate(route);
         return;
       }
-      // TODO(navigation): the financial overview isn't designed yet.
+      // A shortcut whose screen isn't built yet.
       showUnderDevelopment();
     },
     [navigation, showUnderDevelopment],

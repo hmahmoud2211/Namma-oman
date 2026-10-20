@@ -33,7 +33,11 @@ const INTENTS: Record<
     label: { en: 'Profile', ar: 'الملف الشخصي' },
     icon: ion('person-circle-outline'),
   },
-  unit_finance: { label: { en: 'Payments', ar: 'المدفوعات' }, icon: ion('wallet-outline') },
+  unit_finance: {
+    label: { en: 'Payments', ar: 'المدفوعات' },
+    icon: ion('wallet-outline'),
+    route: 'FinancialOverview',
+  },
   parking: { label: { en: 'Parking', ar: 'المواقف' }, icon: ion('car-outline'), route: 'Parking' },
   visitors: {
     label: { en: 'Visitors', ar: 'الزوّار' },

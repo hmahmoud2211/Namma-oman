@@ -199,6 +199,10 @@ export interface ColorTokens {
   /** Construction Progress (construction.png): percentages, rings, bars and the chart. */
   progressText: string;
   progressFillGradient: Gradient2;
+  /** Financial Overview: the paid share (gold) and what remains (green), and the bars' track. */
+  financePaid: string;
+  financeRemaining: string;
+  financeTrack: string;
   progressTrack: string;
   progressGlow: string;
   chartBarGradient: Gradient2;
@@ -441,6 +445,9 @@ export const darkColors: ColorTokens = {
 
   progressText: palette.aqua,
   progressFillGradient: [palette.aqua, palette.aquaBright],
+  financePaid: palette.goldLight,
+  financeRemaining: palette.leaf,
+  financeTrack: 'rgba(255, 255, 255, 0.42)',
   progressTrack: 'rgba(20, 227, 225, 0.13)',
   progressGlow: 'rgba(20, 227, 225, 0.35)',
   chartBarGradient: [palette.tealBright, palette.tealDeep],
@@ -635,6 +642,9 @@ export const lightColors: ColorTokens = {
   // Deep green on cream, like mode 2's "54% Paid" bar; the header buttons stay as in dark.
   progressText: palette.forestInk,
   progressFillGradient: [palette.forestInk, palette.pineGlow],
+  financePaid: palette.bronze,
+  financeRemaining: palette.leaf,
+  financeTrack: 'rgba(18, 61, 43, 0.16)',
   progressTrack: 'rgba(18, 61, 43, 0.12)',
   progressGlow: 'rgba(18, 61, 43, 0)',
   chartBarGradient: [palette.pineGlow, palette.forestInk],

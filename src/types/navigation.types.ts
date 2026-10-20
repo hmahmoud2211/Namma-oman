@@ -21,6 +21,8 @@ export type RootStackParamList = {
   Settings: undefined;
   /** Opens in chat unless `mode` asks for voice. */
   Assistant: { mode?: 'chat' | 'voice' } | undefined;
+  /** The unit's price, payments, instalments, maintenance fees and payment schedule. */
+  FinancialOverview: undefined;
   /** Start a call or join one with a code. */
   VideoCall: undefined;
   /** In a call: `code` is canonical (no dashes); `name` is how others see the resident. */

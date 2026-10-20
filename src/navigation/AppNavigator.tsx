@@ -19,6 +19,7 @@ import { ChargingSessionScreen } from '@/screens/ChargingSessionScreen';
 import { CommunityScreen } from '@/screens/CommunityScreen';
 import { ConstructionProgressScreen } from '@/screens/ConstructionProgressScreen';
 import { DemoControlsScreen } from '@/screens/DemoControlsScreen';
+import { FinancialOverviewScreen } from '@/screens/FinancialOverviewScreen';
 import { GuestPassScreen } from '@/screens/GuestPassScreen';
 import { HomeScreen } from '@/screens/HomeScreen';
 import { MaintenanceScreen } from '@/screens/MaintenanceScreen';
@@ -58,6 +59,7 @@ const ROUTE_NAMES: readonly (keyof RootStackParamList)[] = [
   'Settings',
   'Assistant',
   'VideoCall',
+  'FinancialOverview',
   'ReservationHistory',
   'SecurityConsole',
   'DemoControls',
@@ -137,6 +139,7 @@ export function AppNavigator() {
         <Stack.Screen name="SignIn" component={SignInScreen} layout={DarkThemeLayout} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="ConstructionProgress" component={ConstructionProgressScreen} />
+        <Stack.Screen name="FinancialOverview" component={FinancialOverviewScreen} />
         {/* Resident services, migrated from the Parklane app. */}
         <Stack.Screen name="SmartHome" component={SmartHomeScreen} />
         <Stack.Screen name="VisitorAccess" component={VisitorAccessScreen} />

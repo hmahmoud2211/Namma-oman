@@ -12,6 +12,10 @@ interface ProgressBarProps {
   progress: number;
   /** Bar height in design dp. */
   height: number;
+  /** Fill colours, start to end; defaults to the theme's progress gradient. */
+  colors?: readonly [string, string];
+  /** Defaults to the theme's progress track. */
+  trackColor?: string;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -20,7 +24,7 @@ const FILL_END = { x: 1, y: 0.5 };
 const FILL_MS = 700;
 
 /** Rounded horizontal progress bar with a glowing gradient fill that eases to its value. */
-export function ProgressBar({ progress, height, style }: ProgressBarProps) {
+export function ProgressBar({ progress, height, colors: fillColors, trackColor, style }: ProgressBarProps) {
   const { colors } = useAppTheme();
   const { isRTL } = useLocale();
   const styles = useStyles(height);
@@ -41,10 +45,10 @@ export function ProgressBar({ progress, height, style }: ProgressBarProps) {
   const width = fill.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] });
 
   return (
-    <View style={[styles.track, style]}>
+    <View style={[styles.track, trackColor ? { backgroundColor: trackColor } : null, style]}>
       <Animated.View style={[styles.fill, { width }]}>
         <LinearGradient
-          colors={colors.progressFillGradient}
+          colors={fillColors ?? colors.progressFillGradient}
           // The fill grows from the start edge, so its gradient runs from there too.
           start={isRTL ? FILL_END : FILL_START}
           end={isRTL ? FILL_START : FILL_END}
