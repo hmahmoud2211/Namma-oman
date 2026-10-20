@@ -299,6 +299,8 @@ export function ConstructionProgressScreen() {
           </Pressable>
 
           <SurfaceCard radius={d.overall.radius} rim="feature" style={styles.overallCard}>
+            {/* Icon, text and figure share a row, so a long title wraps instead of colliding. */}
+            <View style={styles.overallRow}>
             <LinearGradient colors={colors.surfaceIconTileGradient} style={styles.overallIconBox}>
               <CraneIcon size={scale(d.overall.iconBox.icon)} color={colors.surfaceIcon} />
             </LinearGradient>
@@ -330,6 +332,7 @@ export function ConstructionProgressScreen() {
               >
                 {content.percentLabel}
               </AppText>
+            </View>
             </View>
             <ProgressBar
               progress={overall.percent / 100}

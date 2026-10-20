@@ -275,7 +275,7 @@ export function DeviceCard({
         </LinearGradient>
         <View style={styles.deviceText}>
           <AppText
-            variant="panelHeading"
+            variant="panelLabel"
             color={colors.surfaceText}
             numberOfLines={2}
             style={styles.deviceName}
@@ -349,7 +349,7 @@ export function AutomationRow({
           <AppIcon {...icon} size={scale(d.automation.icon)} color={colors.surfaceIcon} />
         </View>
         <View style={styles.flex}>
-          <AppText variant="panelHeading" color={colors.surfaceText} numberOfLines={1}>
+          <AppText variant="panelLabel" color={colors.surfaceText} numberOfLines={1}>
             {title}
           </AppText>
           <AppText variant="label" color={colors.surfaceTextMuted} numberOfLines={2}>

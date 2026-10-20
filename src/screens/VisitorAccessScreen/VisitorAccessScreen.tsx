@@ -303,7 +303,7 @@ function VisitorAccessContent() {
             <ParkingIcon size={scale(14)} color={colors.surfaceIcon} />
           </LinearGradient>
           <View style={styles.parkingText}>
-            <AppText variant="panelHeading" color={colors.surfaceText}>
+            <AppText variant="panelLabel" color={colors.surfaceText}>
               {copy.parkingTitle}
             </AppText>
             <AppText variant="label" color={colors.surfaceTextMuted}>

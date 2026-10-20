@@ -35,13 +35,15 @@ export const homeDesign = {
     text: { top: 13.85, left: 30.2, right: 1.9, conditionGap: 0.95 },
   },
   unit: { top: 200.5, left: 27.4, width: 296.8 },
-  services: { top: 307.4, left: 27.4, width: 296.8, columns: 4, columnGap: 7.3, rowGap: 11 },
+  // Two to a row, as Parklane's Home lays its tiles out at its type size.
+  services: { top: 307.4, left: 27.4, width: 296.8, columns: 2, columnGap: 7.3, rowGap: 7.3 },
   featured: { top: 432.6, left: 25.6, width: 295.3, height: 123.3 },
   hitSlop: 12,
 } as const;
 
 const d = homeDesign;
-const serviceRows = 2;
+/** The eight shortcuts, two to a row. */
+const serviceRows = 4;
 const servicesHeight = serviceRows * SERVICE_TILE_HEIGHT + (serviceRows - 1) * d.services.rowGap;
 const unitCardHeight = 83.7;
 

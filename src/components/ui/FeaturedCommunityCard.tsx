@@ -45,14 +45,15 @@ const d = {
   borderWidth: 0.7,
   photo: { top: -24.2, left: 79.5, width: 235.8, height: 176.7 },
   scrimStops: [0, 0.27, 0.42, 0.62] as const, // 0.27 = the photo's left edge
-  copy: { top: 8.45, left: 11.6 },
+  copy: { top: 8.45, left: 11.6, bottom: 9, end: 108 },
   title: { marginTop: -0.65 },
   pillars: { marginTop: 1.5, dot: 2.8, gap: 6.1 },
   description: { marginTop: 1.5 },
-  cta: { top: 94.4, left: 9.3, width: 95.8, arrow: 6.7 },
-  counter: { top: 82.7, right: 12.5 },
+  // The button follows the description, so larger type moves it down rather than over it.
+  cta: { marginTop: 7, shiftX: -2.3, arrow: 6.7 },
+  counter: { bottom: 31, right: 12.5 },
   pager: {
-    top: 95.35,
+    bottom: 7.45,
     right: 6.65,
     size: 20.5,
     gap: 4.2,
@@ -154,18 +155,17 @@ export function FeaturedCommunityCard({
             </AppText>
           ))}
         </View>
+        <AppButton
+          title={ctaLabel}
+          variant="outline"
+          size="small"
+          icon={<ArrowRightIcon size={scale(d.cta.arrow)} color={colors.buttonOutlineText} />}
+          iconPosition="trailing"
+          accessibilityLabel={`${ctaLabel}: ${community.name}`}
+          onPress={() => onExplore(community)}
+          style={styles.cta}
+        />
       </View>
-
-      <AppButton
-        title={ctaLabel}
-        variant="outline"
-        size="small"
-        icon={<ArrowRightIcon size={scale(d.cta.arrow)} color={colors.buttonOutlineText} />}
-        iconPosition="trailing"
-        accessibilityLabel={`${ctaLabel}: ${community.name}`}
-        onPress={() => onExplore(community)}
-        style={styles.cta}
-      />
 
       <AppText variant="counter" color={colors.heroText} style={styles.counter}>
         {`${index + 1} / ${count}`}
@@ -220,8 +220,9 @@ const useStyles = makeStyles(({ colors, borderRadius, shadows }, { scale }) => {
   const borderWidth = scale(d.borderWidth);
 
   return {
+    // At least the design's height; taller when the copy needs it.
     card: {
-      height: scale(d.height),
+      minHeight: scale(d.height),
       borderRadius: radius,
       borderWidth,
       borderColor: colors.heroBorder,
@@ -241,9 +242,11 @@ const useStyles = makeStyles(({ colors, borderRadius, shadows }, { scale }) => {
       height: scale(d.photo.height),
     },
     copy: {
-      position: 'absolute',
-      top: scale(d.copy.top),
-      start: scale(d.copy.left),
+      paddingTop: scale(d.copy.top),
+      paddingBottom: scale(d.copy.bottom),
+      marginStart: scale(d.copy.left),
+      // Clear of the pager at the bottom end.
+      marginEnd: scale(d.copy.end),
     },
     title: {
       marginTop: scale(d.title.marginTop),
@@ -264,19 +267,19 @@ const useStyles = makeStyles(({ colors, borderRadius, shadows }, { scale }) => {
       marginTop: scale(d.description.marginTop),
     },
     cta: {
-      position: 'absolute',
-      top: scale(d.cta.top),
-      start: scale(d.cta.left),
-      width: scale(d.cta.width),
+      alignSelf: 'flex-start',
+      marginTop: scale(d.cta.marginTop),
+      // The pill's rim sits just outside the copy's edge, as in the design.
+      marginStart: scale(d.cta.shiftX),
     },
     counter: {
       position: 'absolute',
-      top: scale(d.counter.top),
+      bottom: scale(d.counter.bottom),
       end: scale(d.counter.right),
     },
     pagerButton: {
       position: 'absolute',
-      top: scale(d.pager.top),
+      bottom: scale(d.pager.bottom),
       width: scale(d.pager.size),
       height: scale(d.pager.size),
       borderRadius: borderRadius.pill,

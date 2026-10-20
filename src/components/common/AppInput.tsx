@@ -10,9 +10,8 @@ import {
 
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
-import { useResponsive } from '@/hooks/useResponsive';
 import { makeStyles } from '@/utils/makeStyles';
-import { scaleTextStyle } from '@/utils/textStyle';
+import { textStyle as toTextStyle } from '@/utils/textStyle';
 
 const MAX_FONT_SIZE_MULTIPLIER = 1.3;
 
@@ -41,16 +40,12 @@ export interface AppInputProps extends Omit<
 export function AppInput({ ref, icon, trailing, style, ...inputProps }: AppInputProps) {
   const { colors, typography } = useAppTheme();
   const { locale, isRTL } = useLocale();
-  const { scale } = useResponsive();
   const styles = useStyles();
 
   const textStyle = useMemo(
     () =>
-      scaleTextStyle(
-        (locale === 'ar' ? typography.arabicVariants : typography.variants).input,
-        scale,
-      ),
-    [typography, locale, scale],
+      toTextStyle((locale === 'ar' ? typography.arabicVariants : typography.variants).input),
+    [typography, locale],
   );
 
   return (

@@ -208,14 +208,21 @@ export const useConstructionStyles = makeStyles(
         end: scale(d.unit.chevron.right),
       },
 
+      // Grows with its text (type is set at Parklane's sizes); padded as the design places it.
       overallCard: {
         marginTop: scale(spacing.lg),
-        height: scale(d.overall.height),
+        minHeight: scale(d.overall.height),
+        paddingTop: scale(d.overall.iconBox.top),
+        paddingBottom: scale(d.overall.iconBox.top),
+        paddingStart: scale(d.overall.iconBox.left),
+        paddingEnd: scale(d.overall.stat.right),
+      },
+      overallRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        columnGap: scale(d.overall.details.left - d.overall.iconBox.left - d.overall.iconBox.width),
       },
       overallIconBox: {
-        position: 'absolute',
-        top: scale(d.overall.iconBox.top),
-        start: scale(d.overall.iconBox.left),
         width: scale(d.overall.iconBox.width),
         height: scale(d.overall.iconBox.height),
         borderRadius: scale(d.overall.iconBox.radius),
@@ -225,9 +232,7 @@ export const useConstructionStyles = makeStyles(
         justifyContent: 'center',
       },
       overallDetails: {
-        position: 'absolute',
-        top: scale(d.overall.details.top),
-        start: scale(d.overall.details.left),
+        flex: 1,
       },
       statusPill: {
         marginTop: scale(d.overall.pill.gap),
@@ -256,19 +261,14 @@ export const useConstructionStyles = makeStyles(
         marginTop: scale(d.overall.lastUpdateGap),
       },
       overallStat: {
-        position: 'absolute',
-        top: scale(d.overall.stat.top),
-        end: scale(d.overall.stat.right),
         alignItems: 'center',
       },
       overallStatLabel: {
         marginTop: scale(d.overall.stat.labelGap),
       },
       overallBar: {
-        position: 'absolute',
-        top: scale(d.overall.bar.top),
-        start: scale(d.overall.bar.left),
-        end: scale(d.overall.bar.right),
+        marginTop: scale(spacing.md),
+        marginEnd: scale(d.overall.bar.right - d.overall.stat.right),
       },
 
       stagesHeader: {
@@ -324,6 +324,8 @@ export const useConstructionStyles = makeStyles(
         position: 'absolute',
         top: scale(d.handover.estimate.top),
         start: scale(d.handover.estimate.left),
+        // Wraps short of the divider on narrow phones (type is fixed, the card is not).
+        end: scale(d.bottomRow.handoverWidth - d.handover.divider.left + 4),
       },
       handoverEstimateStacked: {
         top: scale(d.handover.estimate.stackedTop),

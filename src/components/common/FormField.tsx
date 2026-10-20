@@ -16,7 +16,7 @@ import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
 import { useResponsive } from '@/hooks/useResponsive';
 import { makeStyles } from '@/utils/makeStyles';
-import { scaleTextStyle } from '@/utils/textStyle';
+import { textStyle as toTextStyle } from '@/utils/textStyle';
 
 /** Design dp, sized to the Construction Progress cards' type. */
 const d = {
@@ -96,11 +96,8 @@ export function TextField({
   const styles = useStyles();
   const textStyle = useMemo(
     () =>
-      scaleTextStyle(
-        (locale === 'ar' ? typography.arabicVariants : typography.variants).bodyLarge,
-        scale,
-      ),
-    [typography, locale, scale],
+      toTextStyle((locale === 'ar' ? typography.arabicVariants : typography.variants).bodyLarge),
+    [typography, locale],
   );
 
   return (

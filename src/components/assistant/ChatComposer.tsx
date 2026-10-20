@@ -19,7 +19,7 @@ import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
 import { useResponsive } from '@/hooks/useResponsive';
 import { makeStyles } from '@/utils/makeStyles';
-import { scaleTextStyle } from '@/utils/textStyle';
+import { textStyle as toTextStyle } from '@/utils/textStyle';
 
 import { isRtlText } from './RichText';
 
@@ -64,11 +64,8 @@ export function ChatComposer({ onSend, onVoice, busy, style }: ChatComposerProps
 
   const textStyle = useMemo(
     () =>
-      scaleTextStyle(
-        (locale === 'ar' ? typography.arabicVariants : typography.variants).chatBody,
-        scale,
-      ),
-    [locale, scale, typography],
+      toTextStyle((locale === 'ar' ? typography.arabicVariants : typography.variants).chatBody),
+    [locale, typography],
   );
 
   const [morph] = useState(() => new Animated.Value(0));

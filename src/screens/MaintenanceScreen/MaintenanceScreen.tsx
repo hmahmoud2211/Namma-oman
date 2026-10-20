@@ -302,7 +302,7 @@ function MaintenanceContent() {
           color={colors.chipDangerText}
         />
         <View style={styles.emergencyText}>
-          <AppText variant="panelHeading" color={colors.surfaceText}>
+          <AppText variant="panelLabel" color={colors.surfaceText}>
             {copy.emergencyTitle}
           </AppText>
           <AppText variant="label" color={colors.surfaceTextMuted}>

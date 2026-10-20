@@ -9,12 +9,15 @@ import { useAppTheme } from '@/hooks/useAppTheme';
 import { useResponsive } from '@/hooks/useResponsive';
 import { makeStyles } from '@/utils/makeStyles';
 
-/** Design dp, measured from the Home service grid (home 1.png). */
-export const SERVICE_TILE_HEIGHT = 43;
+/**
+ * Design dp. Laid out as Parklane's Home tiles are, two to a row: the icon box beside a
+ * title that may take two lines at Parklane's type size, then a chevron.
+ */
+export const SERVICE_TILE_HEIGHT = 42;
 const RADIUS = 7;
-const ICON_BOX = { top: 5.1, left: 5.6, width: 18, height: 20, radius: 5, borderWidth: 0.5 };
-// `right` leaves the chevron glyph 4.2 dp from the edge (its box has side bearing).
-const FOOTER = { top: 29.3, left: 6.6, right: 2.1 };
+const ICON_BOX = { width: 22, height: 24, radius: 5, borderWidth: 0.5 };
+const PADDING = 7;
+const GAP = 7;
 const CHEVRON_SIZE = 7.2;
 
 interface ServiceTileProps {
@@ -24,7 +27,7 @@ interface ServiceTileProps {
   style?: StyleProp<ViewStyle>;
 }
 
-/** Shortcut tile: icon in a small inset box, label and chevron along the bottom. */
+/** Shortcut tile: icon in a small inset box, then the label and a chevron. */
 export function ServiceTile({ label, icon, onPress, style }: ServiceTileProps) {
   const { colors } = useAppTheme();
   const { scale } = useResponsive();
@@ -38,19 +41,22 @@ export function ServiceTile({ label, icon, onPress, style }: ServiceTileProps) {
       style={({ pressed }) => [styles.wrapper, pressed && styles.pressed, style]}
     >
       <SurfaceCard radius={RADIUS} style={styles.tile}>
-        <LinearGradient colors={colors.surfaceIconTileGradient} style={styles.iconBox}>
-          {icon}
-        </LinearGradient>
-        <View style={styles.footer}>
+        <View style={styles.row}>
+          <LinearGradient colors={colors.surfaceIconTileGradient} style={styles.iconBox}>
+            {icon}
+          </LinearGradient>
           <AppText
             variant="tileLabel"
             color={colors.surfaceText}
-            numberOfLines={1}
+            numberOfLines={2}
             style={styles.label}
           >
             {label}
           </AppText>
-          <ChevronIcon size={scale(CHEVRON_SIZE)} color={colors.surfaceText} strokeWidth={2.2} />
+          {/* Wrapped: a bare SVG would paint under the card's glass on web. */}
+          <View>
+            <ChevronIcon size={scale(CHEVRON_SIZE)} color={colors.surfaceText} strokeWidth={2.2} />
+          </View>
         </View>
       </SurfaceCard>
     </Pressable>
@@ -64,10 +70,14 @@ const useStyles = makeStyles(({ colors }, { scale }) => ({
   tile: {
     flex: 1,
   },
+  row: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: scale(GAP),
+    paddingHorizontal: scale(PADDING),
+  },
   iconBox: {
-    position: 'absolute',
-    top: scale(ICON_BOX.top),
-    start: scale(ICON_BOX.left),
     width: scale(ICON_BOX.width),
     height: scale(ICON_BOX.height),
     borderRadius: scale(ICON_BOX.radius),
@@ -75,14 +85,6 @@ const useStyles = makeStyles(({ colors }, { scale }) => ({
     borderColor: colors.surfaceIconTileBorder,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  footer: {
-    position: 'absolute',
-    top: scale(FOOTER.top),
-    start: scale(FOOTER.left),
-    end: scale(FOOTER.right),
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   label: {
     flex: 1,

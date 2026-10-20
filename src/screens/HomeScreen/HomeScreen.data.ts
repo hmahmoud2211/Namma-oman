@@ -97,7 +97,7 @@ export interface HomeService {
   iconSize: number;
 }
 
-/** The 4 × 2 shortcut grid, in reading order. */
+/** The shortcut grid (two to a row), in reading order. */
 export const homeServices: readonly HomeService[] = [
   {
     id: 'financial-overview',

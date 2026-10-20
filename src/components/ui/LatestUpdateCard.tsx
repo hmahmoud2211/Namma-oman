@@ -32,16 +32,17 @@ interface LatestUpdateCardProps {
  * Design dp, from the Latest Update card in construction.png (73.4 high). The photo is
  * narrower than in the export so the copy keeps its width in Home's 296.8-dp column.
  */
-export const LATEST_UPDATE_CARD_HEIGHT = 73.4;
+// 80 rather than the export's 73.4: room for three lines of body at Parklane's type size.
+export const LATEST_UPDATE_CARD_HEIGHT = 80;
 const d = {
   radius: 11,
-  photo: { top: 4.7, left: 7.5, width: 112, height: 63.6, radius: 7.5, borderWidth: 0.5 },
+  photo: { top: 4.7, left: 7.5, width: 112, height: 70.6, radius: 7.5, borderWidth: 0.5 },
   copy: { top: 7.5, left: 130.5, right: 24 },
   date: { top: 10, right: 12.2 },
   title: { marginTop: 3.4 },
   body: { marginTop: 2.6 },
   pager: { bottom: 5.4, left: 132.9, dot: 4.7, gap: 4.65, hitSlop: 6 },
-  chevron: { size: 10.4, top: 37.8, right: 9.8 },
+  chevron: { size: 10.4, top: 34.8, right: 9.8 },
   /** Horizontal travel (dp) that claims the touch, and that counts as a swipe. */
   swipe: { claim: 10, page: 32 },
 } as const;

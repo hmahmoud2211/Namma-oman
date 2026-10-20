@@ -280,7 +280,7 @@ function Option({
           <AppIcon {...icon} size={scale(d.badgeIcon)} color={colors.surfaceIcon} />
         </LinearGradient>
         <View style={styles.optionText}>
-          <AppText variant="panelHeading" color={colors.surfaceText} accessibilityRole="header">
+          <AppText variant="panelLabel" color={colors.surfaceText} accessibilityRole="header">
             {title}
           </AppText>
           <AppText variant="label" color={colors.surfaceTextMuted}>
