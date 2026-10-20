@@ -9,7 +9,10 @@ type ImageKey =
   | 'brandLogoOnLight'
   | 'myUnitPhoto'
   | 'featuredCommunityOpal'
-  | 'constructionUpdateFacade';
+  | 'constructionUpdateFacade'
+  | 'parkingHero'
+  | 'parkingSlot'
+  | 'registeredVehicle';
 
 /**
  * Every bundled image is referenced from here, never by path inside components.
@@ -40,7 +43,19 @@ export const images: Readonly<Record<ImageKey, number>> = {
   // TEMPORARY: cut out of the Construction Progress Figma export at 2x (no source photo was
   // supplied). Replace this file with the original photo — no code changes needed.
   constructionUpdateFacade: require('../assets/images/photos/construction-update-facade.webp'),
+  // Parking's photos, from the Parklane app (src/assets/images/illustrations there). The hero is
+  // cropped to its left 200 px, leaving out the Parklane sign; the vehicle is a cut-out.
+  parkingHero: require('../assets/images/photos/parking-hero.webp'),
+  parkingSlot: require('../assets/images/photos/parking-slot.webp'),
+  registeredVehicle: require('../assets/images/photos/registered-vehicle.webp'),
 };
+
+/** Width ÷ height of the parking photos, for sizing them without stretching. */
+export const imageAspects = {
+  parkingHero: 200 / 149,
+  parkingSlot: 306 / 136,
+  registeredVehicle: 207 / 99,
+} as const;
 
 /** A bundled image (the `require()` id) or a remote one, as expo-image's `source` takes. */
 export type AppImageSource = number | ImageSource;

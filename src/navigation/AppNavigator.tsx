@@ -1,6 +1,13 @@
-import { DarkTheme, DefaultTheme, NavigationContainer, type Theme } from '@react-navigation/native';
+import {
+  DarkTheme,
+  DefaultTheme,
+  NavigationContainer,
+  type LinkingOptions,
+  type Theme,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useMemo, type ReactNode } from 'react';
+import { Platform } from 'react-native';
 
 import { ThemeContext } from '@/context/ThemeContext';
 
@@ -8,11 +15,19 @@ import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
 import { AmenitiesBookingScreen } from '@/screens/AmenitiesBookingScreen';
 import { AssistantScreen } from '@/screens/AssistantScreen';
+import { ChargingSessionScreen } from '@/screens/ChargingSessionScreen';
 import { CommunityScreen } from '@/screens/CommunityScreen';
 import { ConstructionProgressScreen } from '@/screens/ConstructionProgressScreen';
+import { DemoControlsScreen } from '@/screens/DemoControlsScreen';
+import { GuestPassScreen } from '@/screens/GuestPassScreen';
 import { HomeScreen } from '@/screens/HomeScreen';
 import { MaintenanceScreen } from '@/screens/MaintenanceScreen';
+import { ParkingMapScreen } from '@/screens/ParkingMapScreen';
 import { ParkingScreen } from '@/screens/ParkingScreen';
+import { ReservationDetailsScreen } from '@/screens/ReservationDetailsScreen';
+import { ReservationHistoryScreen } from '@/screens/ReservationHistoryScreen';
+import { ReserveParkingScreen } from '@/screens/ReserveParkingScreen';
+import { SecurityConsoleScreen } from '@/screens/SecurityConsoleScreen';
 import { ServicesScreen } from '@/screens/ServicesScreen';
 import { SettingsScreen } from '@/screens/SettingsScreen';
 import { SignInScreen } from '@/screens/SignInScreen';
@@ -43,7 +58,41 @@ const ROUTE_NAMES: readonly (keyof RootStackParamList)[] = [
   'Settings',
   'Assistant',
   'VideoCall',
+  'ReservationHistory',
+  'SecurityConsole',
+  'DemoControls',
 ];
+
+/**
+ * Web only: the visitor's invitation gets its own address, /pass/<token>, so the link shared on
+ * WhatsApp opens the pass without signing in, and the parking pages get addresses that survive
+ * a refresh (their demo data does too, see services/parking). `/` is left unmapped so the app
+ * still opens on its first screen (or EXPO_PUBLIC_INITIAL_ROUTE). Native deep links would need
+ * an app scheme.
+ */
+const linking: LinkingOptions<RootStackParamList> = {
+  enabled: Platform.OS === 'web',
+  prefixes: [],
+  config: {
+    screens: {
+      Parking: 'parking',
+      ReserveParking: 'parking/reserve',
+      ReservationDetails: {
+        path: 'parking/reservation/:reservationId',
+        parse: {
+          justBooked: (value: string) => value === 'true',
+          justEdited: (value: string) => value === 'true',
+        },
+      },
+      ReservationHistory: 'parking/history',
+      ParkingMap: 'parking/map',
+      ChargingSession: 'parking/charging/:reservationId',
+      SecurityConsole: 'parking/security',
+      DemoControls: 'parking/demo',
+      GuestPass: 'pass/:invite',
+    },
+  },
+};
 
 /**
  * Welcome and Sign In sit on dark artwork in both modes (mode 2 changes only the screens after
@@ -74,6 +123,7 @@ export function AppNavigator() {
   return (
     <NavigationContainer
       theme={navigationTheme}
+      linking={linking}
       direction={isRTL ? 'rtl' : 'ltr'}
       // Web: the browser tab shows the app name, not internal route names like "SignIn".
       documentTitle={{ formatter: () => DOCUMENT_TITLE }}
@@ -105,6 +155,15 @@ export function AppNavigator() {
           component={VideoCallRoomScreen}
           options={{ gestureEnabled: false }}
         />
+        {/* Visitor parking and EV charging (Parking's flows). */}
+        <Stack.Screen name="ReserveParking" component={ReserveParkingScreen} />
+        <Stack.Screen name="ReservationDetails" component={ReservationDetailsScreen} />
+        <Stack.Screen name="ReservationHistory" component={ReservationHistoryScreen} />
+        <Stack.Screen name="ParkingMap" component={ParkingMapScreen} />
+        <Stack.Screen name="ChargingSession" component={ChargingSessionScreen} />
+        <Stack.Screen name="GuestPass" component={GuestPassScreen} />
+        <Stack.Screen name="SecurityConsole" component={SecurityConsoleScreen} />
+        <Stack.Screen name="DemoControls" component={DemoControlsScreen} />
         {/* Register further screens here as their designs are implemented. */}
       </Stack.Navigator>
     </NavigationContainer>

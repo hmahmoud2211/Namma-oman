@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useCallback, type Ref } from 'react';
+import { useCallback, type ReactNode, type Ref } from 'react';
 import { View, type ViewInstance } from 'react-native';
 
 import { AppText } from '@/components/common/AppText';
@@ -14,6 +14,7 @@ import { useLocale } from '@/hooks/useLocale';
 import { useResponsive } from '@/hooks/useResponsive';
 import type { RootStackParamList } from '@/types/navigation.types';
 import { makeStyles } from '@/utils/makeStyles';
+import { DESIGN_FRAME } from '@/utils/responsive';
 
 /**
  * Design dp, from the Construction Progress header (construction.png): back button, logo and
@@ -41,10 +42,23 @@ interface PageHeaderProps {
   onProfilePress: () => void;
   /** The avatar, so a menu can be anchored under it. */
   avatarRef?: Ref<ViewInstance>;
+  /** Replaces the default "back" (e.g. a flow stepping back a step). */
+  onBackPress?: () => void;
+  /** False on pages with nowhere to go back to, e.g. a visitor's pass; the logo takes its place. */
+  showBack?: boolean;
+  /** Drawn at the end in place of the language switch and avatar, e.g. a visitor's own switch. */
+  trailing?: ReactNode;
 }
 
 /** The inner screens' header row: back, logo, language and the profile avatar. */
-export function PageHeader({ initials, onProfilePress, avatarRef }: PageHeaderProps) {
+export function PageHeader({
+  initials,
+  onProfilePress,
+  avatarRef,
+  onBackPress,
+  showBack = true,
+  trailing,
+}: PageHeaderProps) {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { colors } = useAppTheme();
   const { locale } = useLocale();
@@ -63,36 +77,44 @@ export function PageHeader({ initials, onProfilePress, avatarRef }: PageHeaderPr
 
   return (
     <View style={styles.header}>
-      <CircleButton
-        size={d.button.size}
-        borderColor={colors.headerButtonBorder}
-        accessibilityLabel={labels.back}
-        onPress={handleBack}
-        style={styles.back}
-      >
-        <View style={styles.backChevron}>
-          <ChevronIcon
-            size={scale(d.back.chevron)}
-            color={colors.headerIcon}
-            direction="left"
-            strokeWidth={2.4}
-          />
-        </View>
-      </CircleButton>
-      <BrandLogo width={scale(d.logo.width)} style={styles.logo} />
-      <LanguageToggle style={styles.languageToggle} />
-      <CircleButton
-        ref={avatarRef}
-        size={d.button.size}
-        borderColor={colors.headerAvatarBorder}
-        accessibilityLabel={labels.profile}
-        onPress={onProfilePress}
-        style={styles.avatar}
-      >
-        <AppText variant="initials" color={colors.headerIcon}>
-          {initials}
-        </AppText>
-      </CircleButton>
+      {showBack && (
+        <CircleButton
+          size={d.button.size}
+          borderColor={colors.headerButtonBorder}
+          accessibilityLabel={labels.back}
+          onPress={onBackPress ?? handleBack}
+          style={styles.back}
+        >
+          <View style={styles.backChevron}>
+            <ChevronIcon
+              size={scale(d.back.chevron)}
+              color={colors.headerIcon}
+              direction="left"
+              strokeWidth={2.4}
+            />
+          </View>
+        </CircleButton>
+      )}
+      <BrandLogo width={scale(d.logo.width)} style={showBack ? styles.logo : styles.logoAlone} />
+      {trailing ? (
+        <View style={styles.trailing}>{trailing}</View>
+      ) : (
+        <>
+          <LanguageToggle style={styles.languageToggle} />
+          <CircleButton
+            ref={avatarRef}
+            size={d.button.size}
+            borderColor={colors.headerAvatarBorder}
+            accessibilityLabel={labels.profile}
+            onPress={onProfilePress}
+            style={styles.avatar}
+          >
+            <AppText variant="initials" color={colors.headerIcon}>
+              {initials}
+            </AppText>
+          </CircleButton>
+        </>
+      )}
     </View>
   );
 }
@@ -141,6 +163,18 @@ const useStyles = makeStyles(({ spacing }, { scale }) => {
       position: 'absolute',
       start: scale(d.logo.left),
       top: 0,
+    },
+    logoAlone: {
+      position: 'absolute',
+      start: scale(d.back.left),
+      top: 0,
+    },
+    trailing: {
+      position: 'absolute',
+      end: scale(DESIGN_FRAME.width - d.avatar.left - d.button.size),
+      top: scale(d.button.top),
+      height: scale(d.button.size),
+      justifyContent: 'center',
     },
     languageToggle: {
       position: 'absolute',

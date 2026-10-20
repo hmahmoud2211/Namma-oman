@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { deferredImages, startupImages } from '@/constants/images';
 import { AppProvider } from '@/context/AppContext';
 import { LocaleProvider, loadArabicFonts, type Locale } from '@/context/LocaleContext';
+import { ParkingDemoProvider } from '@/context/ParkingDemoContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { ToastProvider } from '@/context/ToastContext';
 import { AppNavigator } from '@/navigation/AppNavigator';
@@ -63,7 +64,9 @@ export default function App() {
         <ThemeProvider>
           <AppProvider>
             <ToastProvider>
-              <AppNavigator />
+              <ParkingDemoProvider>
+                <AppNavigator />
+              </ParkingDemoProvider>
             </ToastProvider>
           </AppProvider>
         </ThemeProvider>

@@ -1,5 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
+import type { Lang } from '@/services/parking/i18n';
+
 /**
  * Every route in the root stack and its params.
  * Add a route here only together with its implemented screen.
@@ -23,6 +25,26 @@ export type RootStackParamList = {
   VideoCall: undefined;
   /** In a call: `code` is canonical (no dashes); `name` is how others see the resident. */
   VideoCallRoom: { code: string; name: string };
+
+  /* Visitor parking and EV charging, ported from Parklane's parking demo (docs/PARKING_DEMO.md there). */
+  /** `reservationId` edits an upcoming booking. */
+  ReserveParking: { mode: 'guest' | 'ev'; reservationId?: string };
+  ReservationDetails: { reservationId: string; justBooked?: boolean; justEdited?: boolean };
+  ReservationHistory: undefined;
+  /** The page a visitor opens from their invitation link; no account needed. `lang` picks English or Arabic. */
+  GuestPass: {
+    invite: string;
+    lang?: Lang;
+    /** Demo only: the booking carried in the link (services/parking/passLink). */
+    d?: string;
+  };
+  /** Gate-to-bay directions for a booking, a visitor's pass, or the resident's own bay. Arabic only from a pass. */
+  ParkingMap: { reservationId?: string; invite?: string; spaceId?: string; lang?: Lang };
+  ChargingSession: { reservationId: string };
+  /** Demo only: the security desk's gate console. */
+  SecurityConsole: undefined;
+  /** Demo only: clock, simulated events and data reset. */
+  DemoControls: undefined;
 };
 
 /** Routes that open without params, e.g. from data-driven tiles, tabs and assistant links. */
