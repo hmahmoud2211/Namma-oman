@@ -86,7 +86,7 @@ export const useFinanceStyles = makeStyles(
       overflow: 'hidden',
     },
     unitGround: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       borderRadius: scale(d.radius),
       backgroundColor: colors.cameraFill,
     },
@@ -129,7 +129,9 @@ export const useFinanceStyles = makeStyles(
     card: {
       padding: scale(d.padding),
     },
+    // flexGrow: a row's cards share the taller one's height.
     priceCard: {
+      flexGrow: 1,
       minHeight: scale(d.price.height),
       rowGap: scale(7),
     },
@@ -168,6 +170,7 @@ export const useFinanceStyles = makeStyles(
     },
 
     amountCard: {
+      flexGrow: 1,
       minHeight: scale(d.amountCard.height),
       flexDirection: 'row',
       alignItems: 'center',
