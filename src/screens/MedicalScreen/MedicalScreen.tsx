@@ -4,7 +4,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
-import { AppButton } from '@/components/common/AppButton';
 import { AppIcon } from '@/components/common/AppIcon';
 import { AppText } from '@/components/common/AppText';
 import { CheckIcon } from '@/components/icons/CheckIcon';
@@ -20,10 +19,8 @@ import { useUnderDevelopment } from '@/hooks/useUnderDevelopment';
 import type { PickedDocument } from '@/services/medical/medical.types';
 import { pickDocument } from '@/services/medical/pickDocument';
 import { analyzeDocument, PrescriptionApiError } from '@/services/medical/prescriptionApi';
-import { copyText } from '@/utils/share';
 
 import {
-  analysisText,
   CATEGORY_SEPARATOR,
   createUpload,
   medicalContent,
@@ -34,6 +31,7 @@ import {
   type MedicalFile,
   type MedicalShortcut,
 } from './MedicalScreen.data';
+import { DocumentReport } from './DocumentReport';
 import { medicalDesign as d, useMedicalStyles } from './MedicalScreen.styles';
 
 export function MedicalScreen() {
@@ -102,10 +100,10 @@ function MedicalContent() {
       showToast({ title: file.name[locale], body: copy.sampleNoText });
       return;
     }
-    const text = analysisText(file.analysis, locale);
+    const analysis = file.analysis;
     openSheet({
       title: file.name[locale],
-      render: () => <DocumentText text={text} />,
+      render: () => <DocumentReport analysis={analysis} />,
     });
   };
 
@@ -427,28 +425,6 @@ function FileCard({ file, onOpen, onOptions }: FileCardProps) {
           color={colors.surfaceText}
         />
       </Pressable>
-    </View>
-  );
-}
-
-/** The text the workflow read, selectable, with a button to copy it all. */
-function DocumentText({ text }: { text: string }) {
-  const styles = useMedicalStyles();
-  const { colors } = useAppTheme();
-  const { locale } = useLocale();
-  const { showToast } = useToast();
-  const copy = medicalContent[locale];
-
-  const copyAll = async () => {
-    if (await copyText(text)) showToast({ title: copy.copied });
-  };
-
-  return (
-    <View style={styles.documentText}>
-      <AppText variant="chatBody" color={colors.surfaceText} selectable>
-        {text}
-      </AppText>
-      <AppButton title={copy.copyText} variant="surface" size="medium" onPress={copyAll} />
     </View>
   );
 }

@@ -233,10 +233,6 @@ export const useMedicalStyles = makeStyles(({ colors, borderRadius }, { scale })
       transform: [{ scale: 0.5 }],
       marginStart: -scale(5),
     },
-    documentText: {
-      rowGap: scale(14),
-      paddingBottom: scale(6),
-    },
     check: {
       alignItems: 'center',
       justifyContent: 'center',

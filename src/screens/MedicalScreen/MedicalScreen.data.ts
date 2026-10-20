@@ -245,7 +245,8 @@ export function createUpload(
   };
 }
 
-const REPORT_LABELS: Localized<{
+/** Headings and labels of a read document's report (the sheet and its copied text). */
+export const reportLabels: Localized<{
   doctor: string;
   facility: string;
   diagnosis: string;
@@ -258,6 +259,12 @@ const REPORT_LABELS: Localized<{
   confidence: string;
   flags: Record<'high' | 'low' | 'normal', string>;
   nothingFound: string;
+  reference: string;
+  outOfRange: (count: number) => string;
+  allNormal: string;
+  dose: string;
+  frequency: string;
+  duration: string;
 }> = {
   en: {
     doctor: 'Doctor',
@@ -272,6 +279,12 @@ const REPORT_LABELS: Localized<{
     confidence: 'Reading confidence',
     flags: { high: 'High', low: 'Low', normal: 'Normal' },
     nothingFound: 'Nothing could be read from this document.',
+    reference: 'Ref',
+    outOfRange: (count) => (count === 1 ? '1 out of range' : `${count} out of range`),
+    allNormal: 'All within range',
+    dose: 'Dose',
+    frequency: 'Frequency',
+    duration: 'Duration',
   },
   ar: {
     doctor: 'الطبيب',
@@ -286,6 +299,12 @@ const REPORT_LABELS: Localized<{
     confidence: 'دقة القراءة',
     flags: { high: 'مرتفع', low: 'منخفض', normal: 'طبيعي' },
     nothingFound: 'تعذّرت قراءة أي محتوى من هذا المستند.',
+    reference: 'المرجع',
+    outOfRange: (count) => (count === 1 ? 'نتيجة خارج النطاق' : `${count} نتائج خارج النطاق`),
+    allNormal: 'كلها ضمن النطاق',
+    dose: 'الجرعة',
+    frequency: 'التكرار',
+    duration: 'المدة',
   },
 };
 
@@ -296,7 +315,7 @@ function joinPresent(parts: readonly (string | null | undefined)[], separator = 
 
 /** The workflow's report as readable text, in the app's language, leaving out empty sections. */
 export function formatReport(report: PrescriptionReport, locale: Locale): string {
-  const l = REPORT_LABELS[locale];
+  const l = reportLabels[locale];
   const sections: string[] = [];
 
   const header = [
