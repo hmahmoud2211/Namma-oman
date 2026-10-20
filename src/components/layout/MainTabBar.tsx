@@ -7,30 +7,35 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AssistantIcon } from '@/components/icons/AssistantIcon';
 import { GearIcon } from '@/components/icons/GearIcon';
+import { MedicalIcon } from '@/components/icons/MedicalIcon';
 import { ServicesIcon } from '@/components/icons/ServicesIcon';
+import { TrackerIcon } from '@/components/icons/TrackerIcon';
 import { VideoCallIcon } from '@/components/icons/VideoCallIcon';
 import type { Localized } from '@/context/LocaleContext';
 import { useLocale } from '@/hooks/useLocale';
-import { spacing } from '@/theme/spacing';
+import { useUnderDevelopment } from '@/hooks/useUnderDevelopment';
 import type { ParamlessRoute, RootStackParamList } from '@/types/navigation.types';
 import { makeStyles } from '@/utils/makeStyles';
-import { createResponsive, DESIGN_FRAME, designFrameFromExport } from '@/utils/responsive';
+import { DESIGN_FRAME } from '@/utils/responsive';
 
-import {
-  BOTTOM_TAB_BAR_HEIGHT,
-  BOTTOM_TAB_BAR_OVERHANG,
-  BottomTabBar,
-  type BottomTabItem,
-} from './BottomTabBar';
+import { BottomTabBar, type BottomTabItem } from './BottomTabBar';
+import { DOCK, getDockLayout, getMainTabBarInset } from './mainTabBarLayout';
 
-export type MainTabKey = 'assistant' | 'videoCall' | 'services' | 'settings';
+export type MainTabKey =
+  | 'assistant'
+  | 'videoCall'
+  | 'tracker'
+  | 'medical'
+  | 'services'
+  | 'settings';
 
 interface MainTab extends Omit<BottomTabItem<MainTabKey>, 'label'> {
   label: Localized<string>;
-  route: ParamlessRoute;
+  /** Left out while the tab's screen isn't built: it shows the "under development" notice. */
+  route?: ParamlessRoute;
 }
 
-/** Two tabs either side of the raised Home disc, as in Parklane's bar. */
+/** Three tabs either side of the raised Home disc (Parklane's bar had two). */
 const LEADING_TABS: readonly MainTab[] = [
   {
     key: 'assistant',
@@ -45,8 +50,20 @@ const LEADING_TABS: readonly MainTab[] = [
     Icon: VideoCallIcon,
     route: 'VideoCall',
   },
+  // TODO: give it `route: 'Tracker'` once the Tracker screen is designed and built.
+  {
+    key: 'tracker',
+    label: { en: 'Tracker', ar: 'المتابعة' },
+    Icon: TrackerIcon,
+  },
 ];
 const TRAILING_TABS: readonly MainTab[] = [
+  {
+    key: 'medical',
+    label: { en: 'Medical', ar: 'طبي' },
+    Icon: MedicalIcon,
+    route: 'Medical',
+  },
   {
     key: 'services',
     label: { en: 'Services', ar: 'الخدمات' },
@@ -62,34 +79,8 @@ const TRAILING_TABS: readonly MainTab[] = [
 ];
 const HOME_LABEL: Localized<string> = { en: 'Home', ar: 'الرئيسية' };
 
-/**
- * The bar's placement, measured once from Home (home 1.png, 774×1385 px) and shared, so the
- * bar sits in exactly the same place on every screen whatever that screen's own export.
- */
-const DOCK_FRAME = designFrameFromExport(774, 1385);
-// Centred, and a little wider than home 1.png's 297.2 dp so five labels have room.
-const DOCK = { width: 320, bottom: 31.6, gapAbove: 20.9 } as const;
-
-function getDockLayout(width: number, height: number, insets: EdgeInsets) {
-  const { scale, verticalScale } = createResponsive(width, height, DOCK_FRAME);
-  const bottom = Math.max(verticalScale(DOCK.bottom), insets.bottom + spacing.sm);
-  // Content ends clear of the bar and of the Home disc rising out of it.
-  const gapAbove = Math.max(
-    verticalScale(DOCK.gapAbove),
-    scale(BOTTOM_TAB_BAR_OVERHANG) + spacing.sm,
-    spacing.lg,
-  );
-  const contentInset = bottom + scale(BOTTOM_TAB_BAR_HEIGHT) + gapAbove;
-  return { bottom, contentInset };
-}
-
-/**
- * Distance from the bottom of the screen that scrolling content must end above, so its
- * last section clears the floating bar. Use it as the content's bottom padding.
- */
-export function getMainTabBarInset(width: number, height: number, insets: EdgeInsets) {
-  return getDockLayout(width, height, insets).contentInset;
-}
+// Kept in its own module (the toast reads it too); re-exported for the screens.
+export { getMainTabBarInset };
 
 interface MainTabBarProps {
   /** Tapping the tab of the screen already showing, e.g. to scroll back to the top. */
@@ -107,6 +98,7 @@ export function MainTabBar({ onReselect }: MainTabBarProps) {
   const insets = useSafeAreaInsets();
   const styles = useStyles(insets);
   const { locale } = useLocale();
+  const showUnderDevelopment = useUnderDevelopment();
 
   const tabs = useMemo(() => [...LEADING_TABS, ...TRAILING_TABS], []);
   const activeTab = tabs.find((tab) => tab.route === route.name);
@@ -127,9 +119,13 @@ export function MainTabBar({ onReselect }: MainTabBarProps) {
         onReselect?.();
         return;
       }
+      if (!tab.route) {
+        showUnderDevelopment();
+        return;
+      }
       navigation.navigate(tab.route);
     },
-    [activeKey, navigation, onReselect, tabs],
+    [activeKey, navigation, onReselect, showUnderDevelopment, tabs],
   );
 
   const handleHomePress = useCallback(() => {

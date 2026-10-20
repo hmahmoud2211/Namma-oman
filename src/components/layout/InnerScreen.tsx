@@ -57,10 +57,15 @@ export function useInnerScreen(): InnerScreenState {
   return state;
 }
 
-interface InnerScreenProps {
-  overline: string;
-  title: string;
-  subtitle?: string;
+/**
+ * The page intro under the header. Left out, the column starts right under the header, for a
+ * screen that opens on its own titled banner or panel (e.g. Medical).
+ */
+type InnerScreenIntro =
+  | { overline: string; title: string; subtitle?: string }
+  | { overline?: undefined; title?: undefined; subtitle?: undefined };
+
+type InnerScreenProps = InnerScreenIntro & {
   children: ReactNode;
   /** Keeps focused fields above the keyboard (screens with forms). */
   keyboardAvoiding?: boolean;
@@ -68,7 +73,7 @@ interface InnerScreenProps {
   overlay?: ReactNode;
   /** Opens the column with the resident's property card. */
   showPropertyCard?: boolean;
-}
+};
 
 /**
  * The shell every service screen shares (after Construction Progress): background, header with
@@ -162,7 +167,9 @@ export function InnerScreen({
             onProfilePress={account.open}
             avatarRef={account.avatarRef}
           />
-          <PageIntro overline={overline} title={title} subtitle={subtitle} />
+          {overline !== undefined && title !== undefined ? (
+            <PageIntro overline={overline} title={title} subtitle={subtitle} />
+          ) : null}
           <View style={styles.column} onLayout={handleColumnLayout}>
             {showPropertyCard && <ResidentPropertyCard />}
             {children}

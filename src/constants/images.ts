@@ -12,7 +12,22 @@ type ImageKey =
   | 'constructionUpdateFacade'
   | 'parkingHero'
   | 'parkingSlot'
-  | 'registeredVehicle';
+  | 'registeredVehicle'
+  | 'medicalHero'
+  | 'medicalUploadPrescription'
+  | 'medicalUploadXray'
+  | 'medicalUploadLab'
+  | 'medicalFilePrescription'
+  | 'medicalFileXray'
+  | 'medicalFileLab'
+  | 'medicalCardPrescriptions'
+  | 'medicalCardProgress'
+  | 'medicalCardRecords'
+  | 'medicalCardAppointments'
+  | 'medicalPillParacetamol'
+  | 'medicalPillAmoxicillin'
+  | 'medicalPillIbuprofen'
+  | 'medicalPillVitaminD3';
 
 /**
  * Every bundled image is referenced from here, never by path inside components.
@@ -49,6 +64,24 @@ export const images: Readonly<Record<ImageKey, number>> = {
   parkingHero: require('../assets/images/photos/parking-hero.webp'),
   parkingSlot: require('../assets/images/photos/parking-slot.webp'),
   registeredVehicle: require('../assets/images/photos/registered-vehicle.webp'),
+  // TEMPORARY: Medical's illustrations, cut out of the Medical and Medication Schedule Figma
+  // exports at 2x (no separate artwork was supplied) with soft transparent edges so they sit on
+  // the app's own cards. Replace each file with the original export — no code changes needed.
+  medicalHero: require('../assets/images/illustrations/medical-hero.webp'),
+  medicalUploadPrescription: require('../assets/images/illustrations/medical-upload-prescription.webp'),
+  medicalUploadXray: require('../assets/images/illustrations/medical-upload-xray.webp'),
+  medicalUploadLab: require('../assets/images/illustrations/medical-upload-lab.webp'),
+  medicalFilePrescription: require('../assets/images/illustrations/medical-file-prescription.webp'),
+  medicalFileXray: require('../assets/images/illustrations/medical-file-xray.webp'),
+  medicalFileLab: require('../assets/images/illustrations/medical-file-lab.webp'),
+  medicalCardPrescriptions: require('../assets/images/illustrations/medical-card-prescriptions.webp'),
+  medicalCardProgress: require('../assets/images/illustrations/medical-card-progress.webp'),
+  medicalCardRecords: require('../assets/images/illustrations/medical-card-records.webp'),
+  medicalCardAppointments: require('../assets/images/illustrations/medical-card-appointments.webp'),
+  medicalPillParacetamol: require('../assets/images/illustrations/medical-pill-paracetamol.webp'),
+  medicalPillAmoxicillin: require('../assets/images/illustrations/medical-pill-amoxicillin.webp'),
+  medicalPillIbuprofen: require('../assets/images/illustrations/medical-pill-ibuprofen.webp'),
+  medicalPillVitaminD3: require('../assets/images/illustrations/medical-pill-vitamin-d3.webp'),
 };
 
 /** Width ÷ height of the parking photos, for sizing them without stretching. */
@@ -56,6 +89,8 @@ export const imageAspects = {
   parkingHero: 200 / 149,
   parkingSlot: 306 / 136,
   registeredVehicle: 207 / 99,
+  medicalHero: 168 / 147,
+  medicalFile: 54 / 63,
 } as const;
 
 /** A bundled image (the `require()` id) or a remote one, as expo-image's `source` takes. */

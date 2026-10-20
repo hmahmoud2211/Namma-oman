@@ -27,6 +27,10 @@ export type RootStackParamList = {
   VideoCall: undefined;
   /** In a call: `code` is canonical (no dashes); `name` is how others see the resident. */
   VideoCallRoom: { code: string; name: string };
+  /** Medical documents and health shortcuts (main tab bar). */
+  Medical: undefined;
+  /** Today's doses from the uploaded prescriptions (Medical's "Prescriptions" card). */
+  MedicationSchedule: undefined;
 
   /* Visitor parking and EV charging, ported from Parklane's parking demo (docs/PARKING_DEMO.md there). */
   /** `reservationId` edits an upcoming booking. */

@@ -20,7 +20,7 @@ export interface BottomTabItem<K extends string> {
 }
 
 interface BottomTabBarProps<K extends string> {
-  /** The two tabs before the Home disc, and the two after it. */
+  /** The tabs before the Home disc, and those after it (three each in the main bar). */
   leadingItems: readonly BottomTabItem<K>[];
   trailingItems: readonly BottomTabItem<K>[];
   homeLabel: string;
@@ -43,8 +43,11 @@ const LABEL_GAP = 2.4;
 /** The label's line: Arabic lines are 1.4 × the font size (typography.ts), taller than Latin. */
 const LABEL_LINE = 13.3;
 const BOTTOM_PADDING = 6.3;
-/** Light theme: rounded box around the active tab (mode 2.png). */
-const ACTIVE_BOX = { inset: 3.5, width: 56, radius: 10, borderWidth: 0.6 };
+/**
+ * Light theme: rounded box around the active tab (mode 2.png), inset from its cell so it
+ * fits however many tabs share the bar (56 dp wide with five cells).
+ */
+const ACTIVE_BOX = { inset: 3.5, insetX: 3, radius: 10, borderWidth: 0.6 };
 /** The raised Home disc: it sits in a dark seat inside a faint halo, just above its label. */
 const HOME = { size: 30, seat: 2.6, halo: 3.4, labelGap: 1.8, icon: 15, borderWidth: 0.6 };
 
@@ -59,7 +62,7 @@ const HALO_TOP = LABEL_TOP - HOME.labelGap - HALO_SIZE;
 export const BOTTOM_TAB_BAR_OVERHANG = Math.max(0, -HALO_TOP);
 
 /**
- * Floating frosted-glass tab bar after Parklane's navigation: two tabs either side of a
+ * Floating frosted-glass tab bar after Parklane's navigation: tabs either side of a
  * raised Home disc. Purely presentational: the caller decides what a press does.
  */
 export function BottomTabBar<K extends string>({
@@ -109,7 +112,7 @@ export function BottomTabBar<K extends string>({
         />
         {leadingItems.map(renderTab)}
         {/* The disc floats above this cell; only its label sits in the bar. */}
-        <View style={styles.tab} pointerEvents="none">
+        <View style={styles.homeTab} pointerEvents="none">
           <View style={styles.homeSpacer} />
           <TabLabel label={homeLabel} active={homeActive} />
         </View>
@@ -193,6 +196,11 @@ const useStyles = makeStyles(({ colors, borderRadius, shadows }, { scale }) => {
       marginTop: scale(ICON_TOP),
       marginBottom: scale(LABEL_GAP),
     },
+    // Only as wide as the disc's halo, leaving the rest of the bar to the labelled tabs.
+    homeTab: {
+      width: halo,
+      alignItems: 'center',
+    },
     homeSpacer: {
       height: scale(LABEL_TOP),
     },
@@ -208,7 +216,8 @@ const useStyles = makeStyles(({ colors, borderRadius, shadows }, { scale }) => {
       position: 'absolute',
       top: scale(ACTIVE_BOX.inset),
       bottom: scale(ACTIVE_BOX.inset),
-      width: scale(ACTIVE_BOX.width),
+      start: scale(ACTIVE_BOX.insetX),
+      end: scale(ACTIVE_BOX.insetX),
       borderRadius: scale(ACTIVE_BOX.radius),
       borderWidth: scale(ACTIVE_BOX.borderWidth),
       borderColor: colors.tabActiveBorder,

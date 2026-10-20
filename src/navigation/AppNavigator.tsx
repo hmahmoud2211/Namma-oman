@@ -23,6 +23,8 @@ import { FinancialOverviewScreen } from '@/screens/FinancialOverviewScreen';
 import { GuestPassScreen } from '@/screens/GuestPassScreen';
 import { HomeScreen } from '@/screens/HomeScreen';
 import { MaintenanceScreen } from '@/screens/MaintenanceScreen';
+import { MedicalScreen } from '@/screens/MedicalScreen';
+import { MedicationScheduleScreen } from '@/screens/MedicationScheduleScreen';
 import { ParkingMapScreen } from '@/screens/ParkingMapScreen';
 import { ParkingScreen } from '@/screens/ParkingScreen';
 import { ReservationDetailsScreen } from '@/screens/ReservationDetailsScreen';
@@ -60,6 +62,8 @@ const ROUTE_NAMES: readonly (keyof RootStackParamList)[] = [
   'Assistant',
   'VideoCall',
   'FinancialOverview',
+  'Medical',
+  'MedicationSchedule',
   'ReservationHistory',
   'SecurityConsole',
   'DemoControls',
@@ -152,6 +156,8 @@ export function AppNavigator() {
         <Stack.Screen name="Services" component={ServicesScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen name="VideoCall" component={VideoCallScreen} />
+        <Stack.Screen name="Medical" component={MedicalScreen} />
+        <Stack.Screen name="MedicationSchedule" component={MedicationScheduleScreen} />
         {/* A call holds the camera: no swipe-back, so it ends only on purpose. */}
         <Stack.Screen
           name="VideoCallRoom"

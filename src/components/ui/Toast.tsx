@@ -5,7 +5,7 @@ import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-conte
 
 import { AppText } from '@/components/common/AppText';
 import type { IconProps } from '@/components/icons/types';
-import { getMainTabBarInset } from '@/components/layout/MainTabBar';
+import { getMainTabBarInset } from '@/components/layout/mainTabBarLayout';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
 import { useResponsive } from '@/hooks/useResponsive';

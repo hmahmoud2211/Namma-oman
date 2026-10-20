@@ -58,6 +58,9 @@ const palette = {
   umber: '#3B3830',
   /** The light theme's cream artwork (Assets/bg/bg home mode 2.png), sampled from its plain area. */
   parchment: '#F4ECDF',
+  // Medical: the uploaded tick and the "Taken" pill (medical.png, schedule.png).
+  jade: '#5DDD93',
+  seafoam: '#49DEB7',
   white: '#FFFFFF',
   black: '#000000',
 
@@ -223,6 +226,17 @@ export interface ColorTokens {
   surfaceDivider: string;
   pagerActive: string;
   pagerInactive: string;
+
+  /* Medical */
+  /** The filled circle behind an uploaded file's tick, and the tick itself. */
+  uploadedCheck: string;
+  uploadedCheckGlyph: string;
+  /** The gold-washed "Upload Files" pill. */
+  uploadButtonFill: string;
+  /** A dose marked as taken: its label and tick, and the pill around them. */
+  medicationTakenText: string;
+  medicationTakenFill: string;
+  medicationTakenBorder: string;
 
   /**
    * Bottom navigation (after Parklane's bar): the raised Home disc in the middle, its seat,
@@ -463,6 +477,13 @@ export const darkColors: ColorTokens = {
   pagerActive: palette.aqua,
   pagerInactive: 'rgba(110, 140, 132, 0.55)',
 
+  uploadedCheck: palette.jade,
+  uploadedCheckGlyph: palette.abyssGreen,
+  uploadButtonFill: 'rgba(249, 210, 116, 0.15)',
+  medicationTakenText: palette.seafoam,
+  medicationTakenFill: 'rgba(0, 96, 66, 0.45)',
+  medicationTakenBorder: 'rgba(73, 222, 183, 0.3)',
+
   homeDiscGradient: [palette.richGold, palette.bronze],
   homeDiscGlyph: palette.abyssGreen,
   homeDiscGloss: ['rgba(255, 255, 255, 0.42)', 'rgba(255, 255, 255, 0)'],
@@ -659,6 +680,13 @@ export const lightColors: ColorTokens = {
   surfaceDivider: 'rgba(18, 61, 43, 0.16)',
   pagerActive: palette.forestInk,
   pagerInactive: 'rgba(18, 61, 43, 0.22)',
+
+  uploadedCheck: palette.leaf,
+  uploadedCheckGlyph: palette.cream,
+  uploadButtonFill: 'rgba(138, 104, 47, 0.1)',
+  medicationTakenText: palette.leaf,
+  medicationTakenFill: 'rgba(36, 149, 90, 0.1)',
+  medicationTakenBorder: 'rgba(36, 149, 90, 0.45)',
 
   // Forms and controls on the cream cards take the deep-green ink.
   fieldFill: 'rgba(255, 255, 255, 0.5)',

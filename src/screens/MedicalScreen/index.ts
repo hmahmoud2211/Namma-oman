@@ -1,0 +1,1 @@
+export { MedicalScreen } from './MedicalScreen';

@@ -239,16 +239,16 @@ export const textVariants: Record<TextVariant, TextStyle> = {
     fontSize: 7,
     lineHeight: 10,
   },
-  // A size up from home 1.png's 8.5 so the labels read comfortably (see BottomTabBar).
+  // home 1.png's 8.5, so seven labels ("Video Call") fit the bar on a 360 dp phone.
   tabLabel: {
     fontFamily: fontFamilies.regular,
-    fontSize: 9.5,
+    fontSize: 8.5,
     lineHeight: 12.5,
     letterSpacing: 0.3,
   },
   tabLabelActive: {
     fontFamily: fontFamilies.semiBold,
-    fontSize: 9.5,
+    fontSize: 8.5,
     lineHeight: 12.5,
     letterSpacing: 0.3,
   },
