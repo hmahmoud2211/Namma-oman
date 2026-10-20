@@ -6,9 +6,9 @@ import type { EdgeInsets } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AssistantIcon } from '@/components/icons/AssistantIcon';
-import { CommunityIcon } from '@/components/icons/CommunityIcon';
 import { GearIcon } from '@/components/icons/GearIcon';
 import { ServicesIcon } from '@/components/icons/ServicesIcon';
+import { VideoCallIcon } from '@/components/icons/VideoCallIcon';
 import type { Localized } from '@/context/LocaleContext';
 import { useLocale } from '@/hooks/useLocale';
 import { spacing } from '@/theme/spacing';
@@ -23,7 +23,7 @@ import {
   type BottomTabItem,
 } from './BottomTabBar';
 
-export type MainTabKey = 'assistant' | 'community' | 'services' | 'settings';
+export type MainTabKey = 'assistant' | 'videoCall' | 'services' | 'settings';
 
 interface MainTab extends Omit<BottomTabItem<MainTabKey>, 'label'> {
   label: Localized<string>;
@@ -38,11 +38,12 @@ const LEADING_TABS: readonly MainTab[] = [
     Icon: AssistantIcon,
     route: 'Assistant',
   },
+  // Community is still one tap away on Home's shortcuts.
   {
-    key: 'community',
-    label: { en: 'Community', ar: 'المجتمع' },
-    Icon: CommunityIcon,
-    route: 'Community',
+    key: 'videoCall',
+    label: { en: 'Video Call', ar: 'اتصال مرئي' },
+    Icon: VideoCallIcon,
+    route: 'VideoCall',
   },
 ];
 const TRAILING_TABS: readonly MainTab[] = [
@@ -66,7 +67,8 @@ const HOME_LABEL: Localized<string> = { en: 'Home', ar: 'الرئيسية' };
  * bar sits in exactly the same place on every screen whatever that screen's own export.
  */
 const DOCK_FRAME = designFrameFromExport(774, 1385);
-const DOCK = { left: 25.1, width: 297.2, bottom: 31.6, gapAbove: 20.9 } as const;
+// Centred in the column (home 1.png draws it ~6 dp left of centre).
+const DOCK = { width: 297.2, bottom: 31.6, gapAbove: 20.9 } as const;
 
 function getDockLayout(width: number, height: number, insets: EdgeInsets) {
   const { scale, verticalScale } = createResponsive(width, height, DOCK_FRAME);
@@ -170,6 +172,6 @@ const useStyles = makeStyles((_theme, { width, height, scale }, insets: EdgeInse
   },
   bar: {
     width: scale(DOCK.width),
-    marginStart: scale(DOCK.left),
+    alignSelf: 'center',
   },
 }));

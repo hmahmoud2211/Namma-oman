@@ -1,5 +1,6 @@
 // Learn more https://docs.expo.dev/guides/customizing-metro
 const http = require('http');
+const https = require('https');
 const { getDefaultConfig } = require('expo/metro-config');
 
 const config = getDefaultConfig(__dirname);
@@ -36,13 +37,47 @@ function proxyToCube(req, res) {
   req.pipe(upstream);
 }
 
+/**
+ * The video call server sends no CORS headers either, so the browser calls its REST API as
+ * `/meet/api/...` and this forwards it (src/constants/meetConfig.ts). In production Vercel
+ * does the same (vercel.json). Its presence WebSocket connects directly; native builds call
+ * the server directly.
+ */
+const MEET_PREFIX = '/meet/';
+const meetUrl = new URL(process.env.EXPO_PUBLIC_MEET_URL || 'https://meet.ems-iot.com');
+
+function proxyToMeet(req, res) {
+  const client = meetUrl.protocol === 'https:' ? https : http;
+  const upstream = client.request(
+    {
+      hostname: meetUrl.hostname,
+      port: meetUrl.port || (meetUrl.protocol === 'https:' ? 443 : 80),
+      method: req.method,
+      path: req.url.slice(MEET_PREFIX.length - 1),
+      headers: { ...req.headers, host: meetUrl.host, origin: meetUrl.origin },
+    },
+    (meetResponse) => {
+      res.writeHead(meetResponse.statusCode || 502, meetResponse.headers);
+      meetResponse.pipe(res);
+    },
+  );
+  upstream.on('error', () => {
+    if (!res.headersSent) {
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+    }
+    res.end(JSON.stringify({ error: 'Video call server unreachable' }));
+  });
+  req.pipe(upstream);
+}
+
 const enhanceMiddleware = config.server.enhanceMiddleware;
 config.server.enhanceMiddleware = (middleware, server) => {
   const next = enhanceMiddleware ? enhanceMiddleware(middleware, server) : middleware;
-  return (req, res, fallthrough) =>
-    req.url && req.url.startsWith(CUBE_PREFIX)
-      ? proxyToCube(req, res)
-      : next(req, res, fallthrough);
+  return (req, res, fallthrough) => {
+    if (req.url && req.url.startsWith(CUBE_PREFIX)) return proxyToCube(req, res);
+    if (req.url && req.url.startsWith(MEET_PREFIX)) return proxyToMeet(req, res);
+    return next(req, res, fallthrough);
+  };
 };
 
 module.exports = config;

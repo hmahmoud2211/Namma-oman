@@ -10,34 +10,54 @@ import { DESIGN_FRAME, designFrameFromExport } from '@/utils/responsive';
 export const HOME_FRAME = designFrameFromExport(774, 1385);
 
 /**
- * Layout measured from Assets/screens/home 1.png, in design dp (360-wide frame).
+ * The cards' column, centred in the 360-dp frame. home 1.png draws everything about 4 dp
+ * left of centre (27.4 dp in from the left, 35.8 dp from the right); the layout below keeps
+ * the design's sizes and inner offsets but centres them, so both margins match.
+ */
+const COLUMN_WIDTH = 296.8;
+const COLUMN_LEFT = (DESIGN_FRAME.width - COLUMN_WIDTH) / 2;
+/** How far right of the design's positions the centred column sits. */
+const CENTRE_SHIFT = COLUMN_LEFT - 27.4;
+const LOGO_WIDTH = 90.2;
+
+/**
+ * Layout measured from Assets/screens/home 1.png, in design dp (360-wide frame), with
+ * horizontal positions centred as described above.
  * `top` values are screen positions and scale with screen height so the content keeps
  * its place over the background; everything inside a section scales with width.
  * Icon boxes are placed so their glyphs land where the design draws them.
  */
 export const homeDesign = {
   header: { top: 62.3, height: 35.3 },
-  logo: { left: 129.3, width: 90.2 },
-  menu: { left: 38.75, top: 15.85, size: 21.5 },
+  logo: { left: (DESIGN_FRAME.width - LOGO_WIDTH) / 2, width: LOGO_WIDTH },
+  menu: { left: 38.75 + CENTRE_SHIFT, top: 15.85, size: 21.5 },
   /** Drop-down under the menu button: left edge just left of the icon, small gap below. */
   menuPopover: { offsetX: -4, gap: 6 },
-  bell: { left: 295.4, top: 7.45, size: 19 },
+  bell: { left: 295.4 + CENTRE_SHIFT, top: 7.45, size: 19 },
   /** EN | AR switch between the logo and the bell, centred on the bell glyph. */
-  languageToggle: { left: 243, top: 6.95 },
+  languageToggle: { left: 243 + CENTRE_SHIFT, top: 6.95 },
   // `height` is the greeting text block, which ends below the weather card.
-  greeting: { top: 127.4, height: 53, left: 27.9, textTop: 8.5, taglineGap: 1.5 },
+  greeting: { top: 127.4, height: 53, left: 27.9 + CENTRE_SHIFT, textTop: 8.5, taglineGap: 1.5 },
   weather: {
     width: 81.9,
     height: 47.9,
-    right: 35.3,
+    right: 35.3 - CENTRE_SHIFT,
     radius: 9,
     moon: { left: 11.4, top: 11.7, size: 21.5 },
     text: { top: 13.85, left: 30.2, right: 1.9, conditionGap: 0.95 },
   },
-  unit: { top: 200.5, left: 27.4, width: 296.8 },
+  unit: { top: 200.5, left: COLUMN_LEFT, width: COLUMN_WIDTH },
   // Two to a row, as Parklane's Home lays its tiles out at its type size.
-  services: { top: 307.4, left: 27.4, width: 296.8, columns: 2, columnGap: 7.3, rowGap: 7.3 },
-  featured: { top: 432.6, left: 25.6, width: 295.3, height: 123.3 },
+  services: {
+    top: 307.4,
+    left: COLUMN_LEFT,
+    width: COLUMN_WIDTH,
+    columns: 2,
+    columnGap: 7.3,
+    rowGap: 7.3,
+  },
+  // Same edges as the unit card and tiles above it.
+  featured: { top: 432.6, left: COLUMN_LEFT, width: COLUMN_WIDTH, height: 123.3 },
   hitSlop: 12,
 } as const;
 

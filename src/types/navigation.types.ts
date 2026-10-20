@@ -19,6 +19,10 @@ export type RootStackParamList = {
   Settings: undefined;
   /** Opens in chat unless `mode` asks for voice. */
   Assistant: { mode?: 'chat' | 'voice' } | undefined;
+  /** Start a call or join one with a code. */
+  VideoCall: undefined;
+  /** In a call: `code` is canonical (no dashes); `name` is how others see the resident. */
+  VideoCallRoom: { code: string; name: string };
 };
 
 /** Routes that open without params, e.g. from data-driven tiles, tabs and assistant links. */

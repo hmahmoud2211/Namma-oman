@@ -17,6 +17,10 @@
   ],
   "rewrites": [
     {
+      "source": "/meet/api/:path*",
+      "destination": "https://meet.ems-iot.com/api/:path*"
+    },
+    {
       "source": "/:path*",
       "destination": "/"
     }

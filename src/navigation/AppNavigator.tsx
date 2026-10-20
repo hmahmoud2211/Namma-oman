@@ -17,6 +17,8 @@ import { ServicesScreen } from '@/screens/ServicesScreen';
 import { SettingsScreen } from '@/screens/SettingsScreen';
 import { SignInScreen } from '@/screens/SignInScreen';
 import { SmartHomeScreen } from '@/screens/SmartHomeScreen';
+import { VideoCallRoomScreen } from '@/screens/VideoCallRoomScreen';
+import { VideoCallScreen } from '@/screens/VideoCallScreen';
 import { VisitorAccessScreen } from '@/screens/VisitorAccessScreen';
 import { WelcomeScreen } from '@/screens/WelcomeScreen';
 import { darkTheme } from '@/theme';
@@ -40,6 +42,7 @@ const ROUTE_NAMES: readonly (keyof RootStackParamList)[] = [
   'Services',
   'Settings',
   'Assistant',
+  'VideoCall',
 ];
 
 /**
@@ -95,6 +98,13 @@ export function AppNavigator() {
         <Stack.Screen name="Assistant" component={AssistantScreen} />
         <Stack.Screen name="Services" component={ServicesScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="VideoCall" component={VideoCallScreen} />
+        {/* A call holds the camera: no swipe-back, so it ends only on purpose. */}
+        <Stack.Screen
+          name="VideoCallRoom"
+          component={VideoCallRoomScreen}
+          options={{ gestureEnabled: false }}
+        />
         {/* Register further screens here as their designs are implemented. */}
       </Stack.Navigator>
     </NavigationContainer>
