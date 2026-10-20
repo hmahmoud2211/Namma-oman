@@ -13,7 +13,6 @@ import { useUnderDevelopment } from '@/hooks/useUnderDevelopment';
 
 import {
   everydayServices,
-  residentServices,
   servicesContent,
   type ServiceLink,
 } from './ServicesScreen.data';
@@ -49,8 +48,12 @@ export function ServicesScreen() {
   );
 
   return (
-    <InnerScreen overline={copy.overline} title={copy.title} subtitle={copy.subtitle}>
-      {section(copy.residentTitle, 'grid-outline', residentServices)}
+    <InnerScreen
+      overline={copy.overline}
+      title={copy.title}
+      subtitle={copy.subtitle}
+      showPropertyCard={false}
+    >
       {section(copy.everydayTitle, 'sparkles-outline', everydayServices)}
     </InnerScreen>
   );

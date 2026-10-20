@@ -1,9 +1,12 @@
 import { makeStyles } from '@/utils/makeStyles';
 
 /** Design dp. Sections share the inner screens' column (Home's, 296.8 dp). */
-const d = { listTop: 6, badge: 30, gap: 9, emptyY: 10 } as const;
+const d = { listTop: 6, badge: 30, gap: 9, emptyY: 10, indicatorWidth: 30.5 } as const;
 
 export const useVisitorStyles = makeStyles(({ colors }, { scale }) => ({
+  bannerIndicator: {
+    width: scale(d.indicatorWidth),
+  },
   // Fields share their form row equally.
   field: {
     flex: 1,

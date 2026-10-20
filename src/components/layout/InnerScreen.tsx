@@ -5,6 +5,7 @@ import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-conte
 import { useAccountMenu } from '@/components/layout/AccountMenu';
 import { getMainTabBarInset, MainTabBar } from '@/components/layout/MainTabBar';
 import { PageHeader, PageIntro, pageHeaderDesign } from '@/components/layout/PageHeader';
+import { ResidentPropertyCard } from '@/components/layout/ResidentPropertyCard';
 import { getScreenHeaderTop } from '@/components/layout/screenHeader';
 import { ScreenWrapper } from '@/components/layout/ScreenWrapper';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -65,12 +66,14 @@ interface InnerScreenProps {
   keyboardAvoiding?: boolean;
   /** Drawn over everything, e.g. a screen's own sheets. */
   overlay?: ReactNode;
+  /** Opens the column with the resident's property card. */
+  showPropertyCard?: boolean;
 }
 
 /**
  * The shell every service screen shares (after Construction Progress): background, header with
- * back / logo / language / profile, the page intro, a scrolling column of sections, the main tab
- * bar, the profile menu, and a sheet host for pickers.
+ * back / logo / language / profile, the page intro, the property card, a scrolling column of
+ * sections, the main tab bar, the profile menu, and a sheet host for pickers.
  */
 export function InnerScreen({
   overline,
@@ -79,6 +82,7 @@ export function InnerScreen({
   children,
   keyboardAvoiding = false,
   overlay,
+  showPropertyCard = true,
 }: InnerScreenProps) {
   const insets = useSafeAreaInsets();
   const styles = useStyles(insets);
@@ -160,6 +164,7 @@ export function InnerScreen({
           />
           <PageIntro overline={overline} title={title} subtitle={subtitle} />
           <View style={styles.column} onLayout={handleColumnLayout}>
+            {showPropertyCard && <ResidentPropertyCard />}
             {children}
           </View>
         </View>

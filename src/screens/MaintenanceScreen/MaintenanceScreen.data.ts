@@ -16,6 +16,8 @@ export const maintenanceContent: Localized<{
   overline: string;
   title: string;
   subtitle: string;
+  bannerTitle: string;
+  bannerBody: string;
   categoriesTitle: string;
   activeTitle: string;
   viewAll: string;
@@ -44,6 +46,8 @@ export const maintenanceContent: Localized<{
     overline: 'HOME CARE',
     title: 'Maintenance',
     subtitle: 'Home maintenance made simple: reliable support for a more comfortable home.',
+    bannerTitle: 'Home maintenance, made simple',
+    bannerBody: 'Reliable support for a more comfortable home.',
     categoriesTitle: 'Service Categories',
     activeTitle: 'Active Request',
     viewAll: 'View All',
@@ -72,6 +76,8 @@ export const maintenanceContent: Localized<{
     overline: 'العناية بالمنزل',
     title: 'الصيانة',
     subtitle: 'صيانة منزلك ببساطة: دعم موثوق لمنزل أكثر راحة.',
+    bannerTitle: 'صيانة منزلك، ببساطة',
+    bannerBody: 'دعم موثوق لمنزل أكثر راحة.',
     categoriesTitle: 'فئات الخدمة',
     activeTitle: 'الطلب الحالي',
     viewAll: 'عرض الكل',

@@ -1,12 +1,10 @@
 import type Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useMemo, type ReactNode } from 'react';
+import { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppIcon } from '@/components/common/AppIcon';
-import { GoldRim } from '@/components/common/GoldRim';
 import { SurfaceCard } from '@/components/common/SurfaceCard';
 import { AppText } from '@/components/parking/compat/AppText';
 import { StatusChip } from '@/components/parking/compat/StatusChip';
@@ -17,8 +15,8 @@ import { reservationIcon, reservationLines } from '@/components/parking/presente
 import { ListRow } from '@/components/parking/Rows';
 import { useParkingLang } from '@/components/parking/useParkingLang';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { IMAGE_TRANSITION_MS, imageAspects, images } from '@/constants/images';
-import { ThemeContext } from '@/context/ThemeContext';
+import { SummaryCard } from '@/components/ui/SummaryCard';
+import { images } from '@/constants/images';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useParking } from '@/hooks/useParking';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -31,7 +29,6 @@ import {
   type ActivityItem,
 } from '@/services/parking/selectors';
 import { dateTimeIn, nameIn, timeIn } from '@/services/parking/i18n';
-import { darkTheme } from '@/theme';
 
 import {
   SEPARATOR,
@@ -43,8 +40,11 @@ import {
 } from './ParkingScreen.data';
 import { BANNER_RADIUS, useParkingStyles } from './ParkingScreen.styles';
 
-const SCRIM_START = { x: 0, y: 0.5 };
-const SCRIM_END = { x: 1, y: 0.5 };
+/** Design dp. */
+const META_ICON = 11;
+
+/** The banner's copy is broken for a wide banner; the summary card sets it as one run. */
+const oneLine = (text: string) => text.replace(/\n/g, ' ');
 
 /** Upcoming and active guest bookings shown before "View All". */
 const GUEST_LIMIT = 3;
@@ -119,61 +119,36 @@ export function ParkingScreen() {
 
   return (
     <ParkingFrame title={copy.title} subtitle={copy.subtitle}>
-      <View style={styles.banner}>
-        <Image
-          source={images.parkingHero}
-          contentFit="cover"
-          transition={IMAGE_TRANSITION_MS}
-          style={[styles.bannerPhoto, { aspectRatio: imageAspects.parkingHero }]}
-        />
-        <LinearGradient
-          colors={colors.heroScrimGradient}
-          locations={[0, 0.3, 0.48, 0.7]}
-          // Darkest behind the copy, which starts on the right in Arabic.
-          start={lang === 'ar' ? SCRIM_END : SCRIM_START}
-          end={lang === 'ar' ? SCRIM_START : SCRIM_END}
-          style={StyleSheet.absoluteFill}
-        />
-        <View style={styles.bannerCopy}>
-          <AppText variant="subheading" color={colors.heroText}>
-            {copy.bannerTitle}
-          </AppText>
-          <AppText variant="label" color={colors.heroText} style={styles.bannerBody}>
-            {copy.bannerBody}
-          </AppText>
-        </View>
-        <GoldRim radius={scale(BANNER_RADIUS)} width={scale(0.9)} />
-      </View>
+      <SummaryCard
+        photo={images.parkingHero}
+        title={oneLine(copy.bannerTitle)}
+        meta={oneLine(copy.bannerBody)}
+        metaLines={2}
+      />
 
       {mySpace ? (
-        <PhotoCard
-          title={copy.myParkingTitle}
-          icon={{ set: 'material', name: 'alpha-p-box-outline' }}
-          headline={copy.slot(mySpace.label)}
-          meta={`${mine.building ? nameIn(mine.building.name, lang) : ''}${SEPARATOR}${mine.zone ? nameIn(mine.zone.level, lang) : ''}`}
+        <SummaryCard
           photo={images.parkingSlot}
-          aspect={imageAspects.parkingSlot}
-          rtl={lang === 'ar'}
+          title={copy.slot(mySpace.label)}
+          subtitle={copy.myParkingTitle}
+          badge={<StatusChip label={parked ? copy.carParked : copy.bayFree} tone={parked ? 'teal' : 'slate'} />}
+          meta={`${mine.building ? nameIn(mine.building.name, lang) : ''}${SEPARATOR}${mine.zone ? nameIn(mine.zone.level, lang) : ''}`}
+          metaIcon={<AppIcon set="material" name="alpha-p-box-outline" size={scale(META_ICON)} color={colors.surfaceIcon} />}
           onPress={() => navigation.navigate('ParkingMap', { spaceId: mySpace.id })}
           accessibilityHint={copy.myParkingHint}
-        >
-          <StatusChip label={parked ? copy.carParked : copy.bayFree} tone={parked ? 'teal' : 'slate'} />
-        </PhotoCard>
+        />
       ) : null}
 
       {myCar ? (
-        <PhotoCard
-          title={copy.vehicleTitle}
-          icon={{ set: 'ionicons', name: 'car-outline' }}
-          headline={`${myCar.make} ${myCar.model}`}
-          meta={`${nameIn(myCar.colour, lang)}${SEPARATOR}${copy.plate(myCar.plateCountry, myCar.plate)}`}
+        <SummaryCard
           photo={images.registeredVehicle}
-          aspect={imageAspects.registeredVehicle}
-          rtl={lang === 'ar'}
-          cutout
-        >
-          {evCount > 0 ? <StatusChip label={copy.evRegistered(evCount)} tone="indigo" /> : null}
-        </PhotoCard>
+          photoFit="contain"
+          title={`${myCar.make} ${myCar.model}`}
+          subtitle={copy.vehicleTitle}
+          badge={evCount > 0 ? <StatusChip label={copy.evRegistered(evCount)} tone="indigo" /> : undefined}
+          meta={`${nameIn(myCar.colour, lang)}${SEPARATOR}${copy.plate(myCar.plateCountry, myCar.plate)}`}
+          metaIcon={<AppIcon set="ionicons" name="car-outline" size={scale(META_ICON)} color={colors.surfaceIcon} />}
+        />
       ) : null}
 
       <View style={styles.stats}>
@@ -313,122 +288,5 @@ export function ParkingScreen() {
         </AppText>
       </Pressable>
     </ParkingFrame>
-  );
-}
-
-interface PhotoCardProps {
-  title: string;
-  icon: { set: 'ionicons' | 'material'; name: string };
-  headline: string;
-  meta: string;
-  photo: number;
-  aspect: number;
-  /** A cut-out on transparency (the car), drawn whole rather than as a faded photo. */
-  cutout?: boolean;
-  /** Arabic: the copy starts on the right, so the scrim and chevron turn round. */
-  rtl?: boolean;
-  onPress?: () => void;
-  accessibilityHint?: string;
-  children?: ReactNode;
-}
-
-/**
- * A glass card with its heading and figures at the start and a photo at the end. Parking's
- * photos are night shots made for a dark ground (the car cut-out's edges included), so these
- * cards stay dark in both themes, as the banner and the Featured Community card do.
- */
-function PhotoCard(props: PhotoCardProps) {
-  return (
-    <ThemeContext value={darkTheme}>
-      <PhotoCardBody {...props} />
-    </ThemeContext>
-  );
-}
-
-function PhotoCardBody({
-  title,
-  icon,
-  headline,
-  meta,
-  photo,
-  aspect,
-  cutout = false,
-  rtl = false,
-  onPress,
-  accessibilityHint,
-  children,
-}: PhotoCardProps) {
-  const styles = useParkingStyles();
-  const { colors } = useAppTheme();
-  const { scale } = useResponsive();
-
-  const card = (
-    <SurfaceCard radius={BANNER_RADIUS} rim="feature" style={styles.photoCard}>
-      {cutout ? (
-        <>
-          {/* A solid night ground: over the light theme's cream the glass alone turns grey. */}
-          <View style={styles.photoClip} pointerEvents="none" />
-          <Image
-            source={photo}
-            contentFit="contain"
-            transition={IMAGE_TRANSITION_MS}
-            style={[styles.cutout, { aspectRatio: aspect }]}
-          />
-        </>
-      ) : (
-        <View style={styles.photoClip} pointerEvents="none">
-          <Image
-            source={photo}
-            contentFit="cover"
-            transition={IMAGE_TRANSITION_MS}
-            style={[styles.photo, { aspectRatio: aspect }]}
-          />
-          <LinearGradient
-            colors={colors.heroScrimGradient}
-            locations={[0, 0.3, 0.55, 0.85]}
-            start={rtl ? SCRIM_END : SCRIM_START}
-            end={rtl ? SCRIM_START : SCRIM_END}
-            style={StyleSheet.absoluteFill}
-          />
-        </View>
-      )}
-      <View style={styles.photoText}>
-        <View style={styles.photoHeading}>
-          <AppIcon set={icon.set} name={icon.name} size={scale(16)} color={colors.surfaceIcon} />
-          <AppText variant="bodyStrong" color={cutout ? colors.surfaceText : colors.heroText}>
-            {title}
-          </AppText>
-        </View>
-        <AppText variant="subheading" color={cutout ? colors.surfaceText : colors.heroText} numberOfLines={1}>
-          {headline}
-        </AppText>
-        <AppText
-          variant="label"
-          color={cutout ? colors.surfaceTextMuted : colors.heroText}
-          numberOfLines={1}
-        >
-          {meta}
-        </AppText>
-        {children ? <View style={styles.photoChip}>{children}</View> : null}
-      </View>
-      {onPress ? (
-        <View style={styles.chevron}>
-          <AppIcon set="ionicons" name={rtl ? 'chevron-back' : 'chevron-forward'} size={scale(14)} color={cutout ? colors.surfaceText : colors.heroText} />
-        </View>
-      ) : null}
-    </SurfaceCard>
-  );
-
-  if (!onPress) return card;
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`${title}: ${headline}`}
-      accessibilityHint={accessibilityHint}
-      style={({ pressed }) => pressed && styles.pressed}
-    >
-      {card}
-    </Pressable>
   );
 }

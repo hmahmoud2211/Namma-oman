@@ -1,7 +1,6 @@
-import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useState, type ReactNode } from 'react';
-import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { AppIcon, type Glyph } from '@/components/common/AppIcon';
 import { AppText } from '@/components/common/AppText';
@@ -11,15 +10,14 @@ import { InnerScreen } from '@/components/layout/InnerScreen';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { ProgressRing } from '@/components/ui/ProgressRing';
 import { ServiceTile } from '@/components/ui/ServiceTile';
-import { IMAGE_TRANSITION_MS, images } from '@/constants/images';
-import { ThemeContext } from '@/context/ThemeContext';
+import { SummaryCard } from '@/components/ui/SummaryCard';
+import { images } from '@/constants/images';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useToast } from '@/hooks/useToast';
 import { useUnderDevelopment } from '@/hooks/useUnderDevelopment';
 import { downloadPdf } from '@/services/documents/exportPdf';
-import { darkTheme } from '@/theme';
 
 import {
   SCHEDULE_PREVIEW,
@@ -34,8 +32,6 @@ import {
 import { buildStatementDocument } from './FinancialOverviewScreen.documents';
 import { financeDesign as d, useFinanceStyles } from './FinancialOverviewScreen.styles';
 
-const SCRIM_START = { x: 0, y: 0.5 };
-const SCRIM_END = { x: 1, y: 0.5 };
 
 /**
  * Financial Overview (Assets/screens/financial overview 1.png and 2.png), in this app's frame:
@@ -79,12 +75,8 @@ export function FinancialOverviewScreen() {
   ];
 
   return (
-    <InnerScreen overline={copy.overline} title={copy.title}>
-      {/* My Unit: a night photo, so the card stays dark in both themes (as the Featured
-          Community card does). */}
-      <ThemeContext value={darkTheme}>
-        <UnitCard onPress={showUnderDevelopment} />
-      </ThemeContext>
+    <InnerScreen overline={copy.overline} title={copy.title} showPropertyCard={false}>
+      <UnitCard onPress={showUnderDevelopment} />
 
       {/* Unit price, and how much of it is paid */}
       <View style={styles.row}>
@@ -300,63 +292,23 @@ export function FinancialOverviewScreen() {
   );
 }
 
-/** The unit with its building photo. Rendered inside the dark theme (see the screen). */
+/** The unit with its building photo, in the property card's design (SummaryCard). */
 function UnitCard({ onPress }: { onPress: () => void }) {
-  const styles = useFinanceStyles();
   const { colors } = useAppTheme();
-  const { locale, isRTL } = useLocale();
+  const { scale } = useResponsive();
+  const { locale } = useLocale();
   const copy = financeContent[locale];
   const finance = unitFinance;
   return (
-    <Pressable
+    <SummaryCard
+      photo={images.featuredCommunityOpal}
+      title={finance.unitName}
+      subtitle={copy.myUnit}
+      badge={finance.usage[locale]}
+      meta={finance.building[locale]}
+      metaIcon={<AppIcon {...financeIcons.unit} size={scale(d.unit.metaIcon)} color={colors.progressText} />}
       onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`${copy.myUnit}: ${finance.unitName}`}
-      style={({ pressed }) => pressed && styles.pressed}
-    >
-      <SurfaceCard radius={d.radius} rim="feature" style={styles.unitCard}>
-        {/* A solid night ground the photo fades into; over the light theme's cream the glass
-            alone turns grey. */}
-        <View style={styles.unitGround} pointerEvents="none" />
-        <View style={styles.unitPhotoClip} pointerEvents="none">
-          <Image
-            source={images.featuredCommunityOpal}
-            contentFit="cover"
-            contentPosition="right center"
-            transition={IMAGE_TRANSITION_MS}
-            style={styles.unitPhoto}
-          />
-          {/* Fades the photo into the glass behind the details. */}
-          <LinearGradient
-            colors={[colors.cameraFill, colors.transparent]}
-            locations={[0, 0.55]}
-            start={isRTL ? SCRIM_END : SCRIM_START}
-            end={isRTL ? SCRIM_START : SCRIM_END}
-            style={StyleSheet.absoluteFill}
-          />
-        </View>
-        <View style={styles.unitDetails}>
-          <IconBox icon={financeIcons.unit} />
-          <View>
-            <AppText variant="tileLabel" color={colors.surfaceText}>
-              {copy.myUnit}
-            </AppText>
-            <AppText variant="statMedium" color={colors.surfaceText} style={styles.unitName}>
-              {finance.unitName}
-            </AppText>
-            <View style={styles.unitMeta}>
-              <AppText variant="tileLabel" color={colors.surfaceText}>
-                {finance.usage[locale]}
-              </AppText>
-              <View style={styles.unitMetaRule} />
-              <AppText variant="tileLabel" color={colors.surfaceText}>
-                {finance.building[locale]}
-              </AppText>
-            </View>
-          </View>
-        </View>
-      </SurfaceCard>
-    </Pressable>
+    />
   );
 }
 

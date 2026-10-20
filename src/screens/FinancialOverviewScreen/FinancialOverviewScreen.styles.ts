@@ -1,5 +1,3 @@
-import { StyleSheet } from 'react-native';
-
 import { makeStyles } from '@/utils/makeStyles';
 import { designFrameFromExport } from '@/utils/responsive';
 
@@ -18,7 +16,7 @@ export const financeDesign = {
   iconBox: { size: 36, small: 32, radius: 8, icon: 19 },
   smallIcon: 13,
   chevron: 9,
-  unit: { height: 80, photoWidth: 0.6 },
+  unit: { metaIcon: 11 },
   price: { height: 82, boxHeight: 40 },
   ring: { size: 62, stroke: 6.5, dot: 6 },
   amountCard: { height: 56 },
@@ -76,54 +74,6 @@ export const useFinanceStyles = makeStyles(
     amountLarge: {
       fontSize: 18,
       lineHeight: 23,
-    },
-
-    // My Unit: details at the start, the building photo filling the end under a scrim.
-    unitCard: {
-      height: scale(d.unit.height),
-      flexDirection: 'row',
-      alignItems: 'center',
-      overflow: 'hidden',
-    },
-    unitGround: {
-      ...StyleSheet.absoluteFill,
-      borderRadius: scale(d.radius),
-      backgroundColor: colors.cameraFill,
-    },
-    unitPhotoClip: {
-      position: 'absolute',
-      top: 0,
-      bottom: 0,
-      end: 0,
-      width: `${d.unit.photoWidth * 100}%`,
-      borderTopEndRadius: scale(d.radius),
-      borderBottomEndRadius: scale(d.radius),
-      overflow: 'hidden',
-    },
-    unitPhoto: {
-      width: '100%',
-      height: '100%',
-    },
-    unitDetails: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      columnGap: scale(9),
-      paddingHorizontal: scale(d.padding),
-    },
-    unitName: {
-      fontSize: 20,
-      lineHeight: 25,
-      marginVertical: scale(1),
-    },
-    unitMeta: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      columnGap: scale(5),
-    },
-    unitMetaRule: {
-      width: scale(0.8),
-      height: scale(10),
-      backgroundColor: colors.surfaceText,
     },
 
     card: {

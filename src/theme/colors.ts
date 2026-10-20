@@ -149,7 +149,7 @@ export interface ColorTokens {
   surfaceIconTileBorder: string;
   /**
    * Every frame's edge (cards, panels, the featured community, the sign-in card): this gold at
-   * two opposite corners, fading to nothing at the frame's centre (GoldRim).
+   * two opposite corners, fading to nothing well before the frame's centre (GoldRim).
    */
   frameRim: string;
   featureCardGlow: string;
@@ -399,7 +399,7 @@ export const darkColors: ColorTokens = {
   surfaceIcon: palette.gold,
   surfaceIconTileGradient: ['rgba(30, 100, 84, 0.26)', 'rgba(4, 42, 36, 0.26)'],
   surfaceIconTileBorder: 'rgba(110, 190, 160, 0.3)',
-  frameRim: palette.richGold,
+  frameRim: palette.paleGold,
   featureCardGlow: 'rgba(245, 213, 148, 0.28)',
   photoBorder: 'rgba(245, 213, 148, 0.85)',
   badgeFill: 'rgba(0, 72, 62, 0.75)',

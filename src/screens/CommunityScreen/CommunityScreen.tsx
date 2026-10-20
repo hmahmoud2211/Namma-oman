@@ -11,6 +11,8 @@ import { Panel } from '@/components/ui/Panel';
 import { PanelHeading } from '@/components/ui/PanelHeading';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { StatusChip } from '@/components/ui/StatusChip';
+import { SummaryCard } from '@/components/ui/SummaryCard';
+import { images } from '@/constants/images';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -35,6 +37,9 @@ import { useCommunityStyles } from './CommunityScreen.styles';
 /** The panels whose "View All" opens the full list in place. */
 type ExpandablePanel = 'announcements' | 'events' | 'alerts' | 'polls';
 
+/** Parklane's banner indicator: the first of its slides, filled 18 of 30.5 dp. */
+const BANNER_INDICATOR = 18 / 30.5;
+
 export function CommunityScreen() {
   const { locale } = useLocale();
   const copy = communityContent[locale];
@@ -44,6 +49,7 @@ export function CommunityScreen() {
       title={copy.title}
       subtitle={copy.subtitle}
       keyboardAvoiding
+      showPropertyCard={false}
     >
       <CommunityContent />
     </InnerScreen>
@@ -164,6 +170,13 @@ function CommunityContent() {
 
   return (
     <>
+      <SummaryCard
+        photo={images.featuredCommunityOpal}
+        title={copy.bannerTitle}
+        meta={copy.bannerBody}
+        metaLines={3}
+        footer={<ProgressBar progress={BANNER_INDICATOR} height={2.5} style={styles.bannerIndicator} />}
+      />
       <Panel>
         <PanelHeading
           title={copy.announcementsTitle}

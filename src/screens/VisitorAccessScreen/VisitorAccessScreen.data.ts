@@ -31,6 +31,8 @@ export const visitorContent: Localized<{
   overline: string;
   title: string;
   subtitle: string;
+  bannerTitle: string;
+  bannerBody: string;
   formTitle: string;
   formSubtitle: string;
   generate: string;
@@ -55,6 +57,8 @@ export const visitorContent: Localized<{
     overline: 'GUESTS',
     title: 'Visitor Access',
     subtitle: 'Create secure guest entry for a safer, smarter community.',
+    bannerTitle: 'Create secure guest entry',
+    bannerBody: 'A safer, smarter community for you and your guests.',
     formTitle: 'New Visitor Pass',
     formSubtitle: 'Fill in the details to generate a QR pass',
     generate: 'Generate QR Pass',
@@ -79,6 +83,8 @@ export const visitorContent: Localized<{
     overline: 'الضيوف',
     title: 'دخول الزوّار',
     subtitle: 'أنشئ دخولاً آمناً لضيوفك من أجل مجتمع أكثر أماناً وذكاءً.',
+    bannerTitle: 'أنشئ دخولاً آمناً لضيوفك',
+    bannerBody: 'مجتمع أكثر أماناً وذكاءً لك ولضيوفك.',
     formTitle: 'تصريح زائر جديد',
     formSubtitle: 'املأ البيانات لإنشاء تصريح برمز QR',
     generate: 'إنشاء تصريح QR',

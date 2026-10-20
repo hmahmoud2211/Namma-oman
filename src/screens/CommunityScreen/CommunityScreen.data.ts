@@ -16,6 +16,8 @@ export const communityContent: Localized<{
   overline: string;
   title: string;
   subtitle: string;
+  bannerTitle: string;
+  bannerBody: string;
   announcementsTitle: string;
   eventsTitle: string;
   alertsTitle: string;
@@ -50,6 +52,8 @@ export const communityContent: Localized<{
     overline: 'NAMA COMMUNITY',
     title: 'Community',
     subtitle: 'More than a residence: a connected community for a better tomorrow.',
+    bannerTitle: 'Opal Residence Community',
+    bannerBody: 'More than a residence. A connected community for a better tomorrow.',
     announcementsTitle: 'Announcements',
     eventsTitle: 'Upcoming Events',
     alertsTitle: 'Community Alerts',
@@ -85,6 +89,8 @@ export const communityContent: Localized<{
     overline: 'مجتمع نماء',
     title: 'المجتمع',
     subtitle: 'أكثر من مجرد سكن: مجتمع مترابط من أجل غدٍ أفضل.',
+    bannerTitle: 'مجتمع أوبال ريزيدنس',
+    bannerBody: 'أكثر من مجرد سكن. مجتمع مترابط من أجل غدٍ أفضل.',
     announcementsTitle: 'الإعلانات',
     eventsTitle: 'الفعاليات القادمة',
     alertsTitle: 'تنبيهات المجتمع',

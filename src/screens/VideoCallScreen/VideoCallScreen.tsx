@@ -140,6 +140,7 @@ export function VideoCallScreen() {
       title={copy.title}
       subtitle={copy.subtitle}
       keyboardAvoiding
+      showPropertyCard={false}
     >
       {!hasNativeCalls && (
         <Panel rim="plain" style={styles.notice}>

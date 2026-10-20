@@ -18,7 +18,8 @@ interface GoldRimProps {
 
 /**
  * The frames' gold edge: full gold at two opposite corners, fading along every side until it
- * vanishes at the frame's centre line. Draw it after the frame's content; it ignores touches.
+ * vanishes well short of the frame's centre line. Draw it after the frame's content; it
+ * ignores touches.
  */
 export function GoldRim({ radius, width, inset = 0 }: GoldRimProps) {
   const { colors } = useAppTheme();
@@ -43,7 +44,8 @@ export function GoldRim({ radius, width, inset = 0 }: GoldRimProps) {
           <Defs>
             <SvgLinearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
               <Stop offset="0" stopColor={colors.frameRim} stopOpacity={1} />
-              <Stop offset="0.5" stopColor={colors.frameRim} stopOpacity={0} />
+              <Stop offset="0.3" stopColor={colors.frameRim} stopOpacity={0} />
+              <Stop offset="0.7" stopColor={colors.frameRim} stopOpacity={0} />
               <Stop offset="1" stopColor={colors.frameRim} stopOpacity={1} />
             </SvgLinearGradient>
           </Defs>

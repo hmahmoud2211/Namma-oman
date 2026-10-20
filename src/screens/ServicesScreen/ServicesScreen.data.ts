@@ -8,21 +8,18 @@ export const servicesContent: Localized<{
   overline: string;
   title: string;
   subtitle: string;
-  residentTitle: string;
   everydayTitle: string;
 }> = {
   en: {
     overline: 'SERVICES',
     title: 'Services',
     subtitle: 'Everyday services, made easier.',
-    residentTitle: 'Resident Services',
     everydayTitle: 'Everyday Services',
   },
   ar: {
     overline: 'الخدمات',
     title: 'الخدمات',
     subtitle: 'خدمات يومية بسهولة أكبر.',
-    residentTitle: 'خدمات السكان',
     everydayTitle: 'خدمات يومية',
   },
 };
@@ -35,58 +32,6 @@ export interface ServiceLink {
   /** Screen the row opens; rows without one show the "under development" notice. */
   route?: ParamlessRoute;
 }
-
-/** The modules with their own screens. */
-export const residentServices: readonly ServiceLink[] = [
-  {
-    id: 'smart-home',
-    title: { en: 'Smart Home', ar: 'المنزل الذكي' },
-    description: {
-      en: 'Lights, climate, scenes and devices.',
-      ar: 'الإضاءة والتكييف والأجواء والأجهزة.',
-    },
-    icon: { set: 'material', name: 'home-automation' },
-    route: 'SmartHome',
-  },
-  {
-    id: 'visitor-access',
-    title: { en: 'Visitor Access', ar: 'دخول الزوّار' },
-    description: { en: 'Invite guests with a QR pass.', ar: 'ادعُ ضيوفك بتصريح QR.' },
-    icon: { set: 'material', name: 'account-check-outline' },
-    route: 'VisitorAccess',
-  },
-  {
-    id: 'parking',
-    title: { en: 'Parking', ar: 'المواقف' },
-    description: { en: 'Your bay, vehicle and guest parking.', ar: 'موقفك ومركبتك ومواقف الضيوف.' },
-    icon: { set: 'ionicons', name: 'car-outline' },
-    route: 'Parking',
-  },
-  {
-    id: 'maintenance',
-    title: { en: 'Maintenance', ar: 'الصيانة' },
-    description: { en: 'Request repairs and track them.', ar: 'اطلب الإصلاحات وتابعها.' },
-    icon: { set: 'material', name: 'tools' },
-    route: 'Maintenance',
-  },
-  {
-    id: 'amenities',
-    title: { en: 'Amenities Booking', ar: 'حجز المرافق' },
-    description: {
-      en: 'Book the pool, gym, hall and more.',
-      ar: 'احجز المسبح والنادي والقاعة وغيرها.',
-    },
-    icon: { set: 'material', name: 'calendar-check-outline' },
-    route: 'AmenitiesBooking',
-  },
-  {
-    id: 'construction',
-    title: { en: 'Construction Progress', ar: 'تقدّم البناء' },
-    description: { en: 'Site progress and your handover.', ar: 'تقدّم الموقع وموعد التسليم.' },
-    icon: { set: 'material', name: 'crane' },
-    route: 'ConstructionProgress',
-  },
-];
 
 /** Parklane's everyday services; none has a screen yet (in Parklane either). */
 export const everydayServices: readonly ServiceLink[] = [

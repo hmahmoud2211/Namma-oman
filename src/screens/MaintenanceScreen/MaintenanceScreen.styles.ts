@@ -9,9 +9,13 @@ const d = {
   request: { badge: 26, gap: 7, paddingY: 6 },
   detailsGap: 6,
   actionGap: 7,
+  indicatorWidth: 30.5,
 } as const;
 
 export const useMaintenanceStyles = makeStyles(({ colors, borderRadius }, { scale }) => ({
+  bannerIndicator: {
+    width: scale(d.indicatorWidth),
+  },
   pressed: {
     opacity: 0.7,
   },

@@ -6,7 +6,7 @@ import { KeyIcon } from '@/components/icons/KeyIcon';
 import { LeafIcon } from '@/components/icons/LeafIcon';
 import { PaintRollerIcon } from '@/components/icons/PaintRollerIcon';
 import type { IconProps } from '@/components/icons/types';
-import type { BarChartPoint } from '@/components/ui/BarChart';
+import type { LineChartPoint } from '@/components/ui/LineChart';
 import type { SiteUpdate } from '@/components/ui/LatestUpdateCard';
 import type { ConstructionStage } from '@/components/ui/StageTile';
 import type { TimelineStep } from '@/components/ui/StatusTimeline';
@@ -178,7 +178,7 @@ export interface UnitConstruction {
   };
   /** Value at the chart's axis; the design's axis starts above zero. */
   monthlyAxisMin: number;
-  monthly: readonly BarChartPoint[];
+  monthly: readonly LineChartPoint[];
 }
 
 export interface DemoNotification {

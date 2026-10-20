@@ -2,7 +2,6 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useRef, useState } from 'react';
-import { Image } from 'expo-image';
 import { Pressable, View, type ScrollViewInstance, type ViewInstance } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -20,16 +19,16 @@ import { LogoutIcon } from '@/components/icons/LogoutIcon';
 import { MapPinIcon } from '@/components/icons/MapPinIcon';
 import { MainTabBar } from '@/components/layout/MainTabBar';
 import { ScreenWrapper } from '@/components/layout/ScreenWrapper';
-import { BarChart } from '@/components/ui/BarChart';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { LatestUpdateCard, type SiteUpdate } from '@/components/ui/LatestUpdateCard';
+import { LineChart } from '@/components/ui/LineChart';
 import { POPOVER_MENU_WIDTH, PopoverMenu, type PopoverAnchor } from '@/components/ui/PopoverMenu';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { SummaryCard } from '@/components/ui/SummaryCard';
 import { StageTile, type ConstructionStage } from '@/components/ui/StageTile';
 import { StatusTimeline } from '@/components/ui/StatusTimeline';
 import { appearanceMenu } from '@/constants/appearance';
 import type { Locale } from '@/context/LocaleContext';
-import { IMAGE_TRANSITION_MS } from '@/constants/images';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
 import { useLogout } from '@/hooks/useLogout';
@@ -251,52 +250,17 @@ export function ConstructionProgressScreen() {
         </View>
 
         <View style={styles.column}>
-          <Pressable
+          <SummaryCard
+            photo={unit.photo}
+            title={unit.projectName}
+            subtitle={unit.unitName}
+            badge={unit.role}
+            meta={unit.location}
+            metaIcon={<MapPinIcon size={scale(d.unitPin)} color={colors.progressText} />}
             onPress={() => setSheet({ kind: 'unit' })}
-            accessibilityRole="button"
-            accessibilityLabel={`${unit.projectName}, ${unit.unitName}, ${unit.role}. ${unit.location}`}
             accessibilityHint={content.unitCardHint}
-            style={({ pressed }) => [styles.unitCard, pressed && styles.pressed]}
-          >
-            <SurfaceCard radius={d.unit.radius} rim="feature" style={styles.cardFill}>
-              <Image
-                source={unit.photo}
-                contentFit="cover"
-                transition={IMAGE_TRANSITION_MS}
-                style={styles.unitPhoto}
-              />
-              <View style={styles.unitDetails}>
-                <AppText variant="panelTitle" color={colors.surfaceText}>
-                  {unit.projectName}
-                </AppText>
-                <View style={styles.unitRow}>
-                  <AppText variant="bodyLarge" color={colors.surfaceText}>
-                    {unit.unitName}
-                  </AppText>
-                  <View style={styles.badge}>
-                    <AppText variant="labelLarge" color={colors.badgeText}>
-                      {unit.role}
-                    </AppText>
-                  </View>
-                </View>
-                <View style={styles.locationRow}>
-                  <View style={styles.locationPin}>
-                    <MapPinIcon size={scale(d.unit.location.pin)} color={colors.progressText} />
-                  </View>
-                  <AppText variant="labelLarge" color={colors.surfaceTextMuted}>
-                    {unit.location}
-                  </AppText>
-                </View>
-              </View>
-              <View style={styles.unitChevron} pointerEvents="none">
-                <ChevronIcon
-                  size={scale(d.unit.chevron.size)}
-                  color={colors.surfaceText}
-                  strokeWidth={3}
-                />
-              </View>
-            </SurfaceCard>
-          </Pressable>
+            style={styles.unitCard}
+          />
 
           <SurfaceCard radius={d.overall.radius} rim="feature" style={styles.overallCard}>
             {/* Icon, text and figure share a row, so a long title wraps instead of colliding. */}
@@ -419,10 +383,10 @@ export function ConstructionProgressScreen() {
               <AppText variant="panelLabel" color={colors.surfaceText} style={styles.monthlyTitle}>
                 {content.monthlyTitle}
               </AppText>
-              <BarChart
+              <LineChart
                 points={unit.monthly}
                 axisMin={unit.monthlyAxisMin}
-                maxBarHeight={d.monthly.chart.maxBarHeight}
+                plotHeight={d.monthly.chart.plotHeight}
                 selectedIndex={selectedMonth}
                 onSelect={handleSelectMonth}
                 style={styles.monthlyChart}

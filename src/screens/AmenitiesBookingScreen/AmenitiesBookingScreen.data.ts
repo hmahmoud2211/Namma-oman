@@ -17,6 +17,8 @@ export const amenitiesContent: Localized<{
   overline: string;
   title: string;
   subtitle: string;
+  bannerTitle: string;
+  bannerBody: string;
   bookNow: string;
   viewMore: string;
   showLess: string;
@@ -42,6 +44,8 @@ export const amenitiesContent: Localized<{
     overline: 'LIFESTYLE',
     title: 'Amenities Booking',
     subtitle: 'Premium amenities for a healthier, happier lifestyle.',
+    bannerTitle: 'Premium Amenities',
+    bannerBody: 'For a healthier, happier lifestyle.',
     bookNow: 'Book Now',
     viewMore: 'View More Amenities',
     showLess: 'Show Less',
@@ -67,6 +71,8 @@ export const amenitiesContent: Localized<{
     overline: 'أسلوب الحياة',
     title: 'حجز المرافق',
     subtitle: 'مرافق مميزة لأسلوب حياة أكثر صحة وسعادة.',
+    bannerTitle: 'مرافق مميزة',
+    bannerBody: 'لأسلوب حياة أكثر صحة وسعادة.',
     bookNow: 'احجز الآن',
     viewMore: 'عرض المزيد من المرافق',
     showLess: 'عرض أقل',

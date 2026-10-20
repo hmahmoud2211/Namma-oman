@@ -26,7 +26,12 @@ export function SettingsScreen() {
   const { locale } = useLocale();
   const copy = settingsContent[locale];
   return (
-    <InnerScreen overline={copy.overline} title={copy.title} subtitle={copy.subtitle}>
+    <InnerScreen
+      overline={copy.overline}
+      title={copy.title}
+      subtitle={copy.subtitle}
+      showPropertyCard={false}
+    >
       <SettingsContent />
     </InnerScreen>
   );

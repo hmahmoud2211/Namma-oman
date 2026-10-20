@@ -12,6 +12,9 @@ import { initialsOf } from '@/components/ui/Avatar';
 import { FormPanel, FormRow } from '@/components/ui/FormPanel';
 import { Panel } from '@/components/ui/Panel';
 import { PanelHeading } from '@/components/ui/PanelHeading';
+import { ProgressBar } from '@/components/ui/ProgressBar';
+import { SummaryCard } from '@/components/ui/SummaryCard';
+import { images } from '@/constants/images';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -46,6 +49,9 @@ import {
 import { buildPassDocument } from './VisitorAccessScreen.documents';
 import { useVisitorStyles } from './VisitorAccessScreen.styles';
 
+/** Parklane's banner indicator: the first of its slides, filled 18 of 30.5 dp. */
+const BANNER_INDICATOR = 18 / 30.5;
+
 /** The fields in two-column rows. */
 const fieldRows: readonly (readonly FormFieldConfig[])[] = Array.from(
   { length: Math.ceil(formFields.length / 2) },
@@ -61,6 +67,7 @@ export function VisitorAccessScreen() {
       title={copy.title}
       subtitle={copy.subtitle}
       keyboardAvoiding
+      showPropertyCard={false}
     >
       <VisitorAccessContent />
     </InnerScreen>
@@ -227,6 +234,13 @@ function VisitorAccessContent() {
 
   return (
     <>
+      <SummaryCard
+        photo={images.featuredCommunityOpal}
+        title={copy.bannerTitle}
+        meta={copy.bannerBody}
+        metaLines={2}
+        footer={<ProgressBar progress={BANNER_INDICATOR} height={2.5} style={styles.bannerIndicator} />}
+      />
       <FormPanel
         icon={{ set: 'ionicons', name: 'person-add-outline' }}
         title={copy.formTitle}

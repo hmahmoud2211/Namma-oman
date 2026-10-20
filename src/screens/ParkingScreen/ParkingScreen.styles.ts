@@ -1,14 +1,11 @@
 import { makeStyles } from '@/utils/makeStyles';
 
 /**
- * Design dp. Parking runs in the parking flows' 320 dp column (ParkingFrame). The banner and
- * photo cards follow Parklane's (assets/Screens/screen7.png there): copy at the start, the
- * photo filling the end under a scrim.
+ * Design dp. Parking runs in the parking flows' 320 dp column (ParkingFrame). The banner,
+ * bay and car are SummaryCards, as the property card above them is.
  */
 export const BANNER_RADIUS = 11;
 const d = {
-  banner: { height: 128, copyWidth: 0.56, photoWidth: 0.68 },
-  photoCard: { height: 104, photoWidth: 0.6, cutoutWidth: 0.44, padding: 12 },
   statGap: 6,
   statPadding: 8,
   action: { height: 64, gap: 6, radius: 10, paddingX: 9, paddingY: 8 },
@@ -20,78 +17,6 @@ export const useParkingStyles = makeStyles(({ colors }, { scale }) => ({
   },
   pressed: {
     opacity: 0.8,
-  },
-
-  banner: {
-    height: scale(d.banner.height),
-    borderRadius: scale(BANNER_RADIUS),
-    overflow: 'hidden',
-    backgroundColor: colors.cameraFill,
-  },
-  bannerPhoto: {
-    position: 'absolute',
-    end: 0,
-    top: 0,
-    bottom: 0,
-    width: `${d.banner.photoWidth * 100}%`,
-    height: '100%',
-  },
-  bannerCopy: {
-    flex: 1,
-    width: `${d.banner.copyWidth * 100}%`,
-    justifyContent: 'center',
-    paddingHorizontal: scale(14),
-  },
-  bannerBody: {
-    marginTop: scale(6),
-  },
-
-  photoCard: {
-    minHeight: scale(d.photoCard.height),
-    flexDirection: 'row',
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
-  photoClip: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    start: 0,
-    end: 0,
-    borderRadius: scale(BANNER_RADIUS),
-    overflow: 'hidden',
-    backgroundColor: colors.cameraFill,
-  },
-  photo: {
-    position: 'absolute',
-    end: 0,
-    top: 0,
-    bottom: 0,
-    width: `${d.photoCard.photoWidth * 100}%`,
-    height: '100%',
-  },
-  cutout: {
-    position: 'absolute',
-    end: scale(26),
-    width: `${d.photoCard.cutoutWidth * 100}%`,
-  },
-  photoText: {
-    flex: 1,
-    padding: scale(d.photoCard.padding),
-    rowGap: scale(2),
-  },
-  photoHeading: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    columnGap: scale(6),
-    marginBottom: scale(4),
-  },
-  photoChip: {
-    flexDirection: 'row',
-    marginTop: scale(6),
-  },
-  chevron: {
-    paddingEnd: scale(10),
   },
 
   stats: {

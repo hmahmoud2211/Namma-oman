@@ -1,9 +1,12 @@
 import { makeStyles } from '@/utils/makeStyles';
 
 /** Design dp. Sections share the inner screens' column (Home's, 296.8 dp). */
-const d = { dateColumn: 28, badge: 12, sectionTop: 10, feedbackIcon: 32 } as const;
+const d = { dateColumn: 28, badge: 12, sectionTop: 10, feedbackIcon: 32, indicatorWidth: 30.5 } as const;
 
 export const useCommunityStyles = makeStyles(({ colors, borderRadius }, { scale }) => ({
+  bannerIndicator: {
+    width: scale(d.indicatorWidth),
+  },
   pressed: {
     opacity: 0.7,
   },

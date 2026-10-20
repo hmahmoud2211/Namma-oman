@@ -27,16 +27,7 @@ export const constructionDesign = {
   intro: { left: 27.4, titleGap: -1.5, subtitleGap: 1.9 },
   // Home's card column (HomeScreen.styles.ts: unit / services).
   column: { left: 27.4, width: 296.8 },
-  unit: {
-    height: 68.7,
-    radius: 11,
-    photo: { top: 6.1, left: 7.5, width: 118.8, height: 57, radius: 7.5, borderWidth: 0.5 },
-    details: { top: 10.4, left: 138.9 },
-    unitRowGap: 4.5,
-    badge: { marginLeft: 9.3, width: 41.6, height: 14.5, borderWidth: 0.6 },
-    location: { gap: 1.5, pin: 11.3, pinShiftX: -0.4, textGap: 3.1 },
-    chevron: { size: 10.4, top: 31.3, right: 7.9 },
-  },
+  unitPin: 11.3,
   overall: {
     height: 77.6,
     radius: 11,
@@ -50,7 +41,7 @@ export const constructionDesign = {
       icon: 37,
     },
     details: { top: 9.96, left: 63.1 },
-    pill: { gap: 2.2, height: 11.7, paddingLeft: 2.3, paddingRight: 6.7, dot: 5.6, textGap: 6.6 },
+    pill: { gap: 2.2, height: 11.7, borderWidth: 0.6, paddingLeft: 2.3, paddingRight: 6.7, dot: 5.6, textGap: 6.6 },
     lastUpdateGap: 3.9,
     stat: { top: 16.5, right: 14, labelGap: -4.5 },
     bar: { top: 58.9, left: 11.2, right: 12.2, height: 9.35 },
@@ -71,7 +62,7 @@ export const constructionDesign = {
   monthly: {
     icon: { size: 14.6, top: 6.1, left: 8 },
     titleLeft: 30.4,
-    chart: { top: 24.6, left: 7.5, right: 7.5, maxBarHeight: 29.2 },
+    chart: { top: 24.6, left: 7.5, right: 7.5, plotHeight: 29.2 },
   },
 } as const;
 
@@ -157,55 +148,9 @@ export const useConstructionStyles = makeStyles(
 
       unitCard: {
         marginTop: scale(spacing.xl),
-        height: scale(d.unit.height),
       },
       cardFill: {
         flex: 1,
-      },
-      unitPhoto: {
-        position: 'absolute',
-        top: scale(d.unit.photo.top),
-        start: scale(d.unit.photo.left),
-        width: scale(d.unit.photo.width),
-        height: scale(d.unit.photo.height),
-        borderRadius: scale(d.unit.photo.radius),
-        borderWidth: scale(d.unit.photo.borderWidth),
-        borderColor: colors.photoBorder,
-      },
-      unitDetails: {
-        position: 'absolute',
-        top: scale(d.unit.details.top),
-        start: scale(d.unit.details.left),
-      },
-      unitRow: {
-        marginTop: scale(d.unit.unitRowGap),
-        flexDirection: 'row',
-        alignItems: 'center',
-      },
-      badge: {
-        marginStart: scale(d.unit.badge.marginLeft),
-        width: scale(d.unit.badge.width),
-        height: scale(d.unit.badge.height),
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: borderRadius.pill,
-        borderWidth: scale(d.unit.badge.borderWidth),
-        borderColor: colors.badgeBorder,
-        backgroundColor: colors.badgeFill,
-      },
-      locationRow: {
-        marginTop: scale(d.unit.location.gap),
-        flexDirection: 'row',
-        alignItems: 'center',
-      },
-      locationPin: {
-        marginStart: scale(d.unit.location.pinShiftX),
-        marginEnd: scale(d.unit.location.textGap),
-      },
-      unitChevron: {
-        position: 'absolute',
-        top: scale(d.unit.chevron.top),
-        end: scale(d.unit.chevron.right),
       },
 
       // Grows with its text (type is set at Parklane's sizes); padded as the design places it.
@@ -243,7 +188,7 @@ export const useConstructionStyles = makeStyles(
         paddingStart: scale(d.overall.pill.paddingLeft),
         paddingEnd: scale(d.overall.pill.paddingRight),
         borderRadius: borderRadius.pill,
-        borderWidth: scale(d.unit.badge.borderWidth),
+        borderWidth: scale(d.overall.pill.borderWidth),
         borderColor: colors.badgeBorder,
         backgroundColor: colors.badgeFill,
       },

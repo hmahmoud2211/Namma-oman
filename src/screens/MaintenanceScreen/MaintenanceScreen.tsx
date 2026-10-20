@@ -9,8 +9,11 @@ import { ChevronIcon } from '@/components/icons/ChevronIcon';
 import { InnerScreen, useInnerScreen } from '@/components/layout/InnerScreen';
 import { Panel } from '@/components/ui/Panel';
 import { PanelHeading } from '@/components/ui/PanelHeading';
+import { ProgressBar } from '@/components/ui/ProgressBar';
 import { ProgressStepper, type ProgressStep } from '@/components/ui/ProgressStepper';
 import { StatusChip } from '@/components/ui/StatusChip';
+import { SummaryCard } from '@/components/ui/SummaryCard';
+import { images } from '@/constants/images';
 import { resident } from '@/constants/resident';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
@@ -38,6 +41,9 @@ function dial(phone: string | null) {
   Linking.openURL(telLink(phone)).catch(() => undefined);
 }
 
+/** Parklane's banner indicator: the first of its slides, filled 18 of 30.5 dp. */
+const BANNER_INDICATOR = 18 / 30.5;
+
 export function MaintenanceScreen() {
   const { locale } = useLocale();
   const copy = maintenanceContent[locale];
@@ -47,6 +53,7 @@ export function MaintenanceScreen() {
       title={copy.title}
       subtitle={copy.subtitle}
       keyboardAvoiding
+      showPropertyCard={false}
     >
       <MaintenanceContent />
     </InnerScreen>
@@ -139,6 +146,13 @@ function MaintenanceContent() {
 
   return (
     <>
+      <SummaryCard
+        photo={images.myUnitPhoto}
+        title={copy.bannerTitle}
+        meta={copy.bannerBody}
+        metaLines={2}
+        footer={<ProgressBar progress={BANNER_INDICATOR} height={2.5} style={styles.bannerIndicator} />}
+      />
       <Panel>
         <PanelHeading
           title={copy.categoriesTitle}

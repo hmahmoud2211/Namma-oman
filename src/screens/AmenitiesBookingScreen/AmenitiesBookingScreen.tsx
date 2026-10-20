@@ -10,6 +10,8 @@ import { FilterChip } from '@/components/ui/FilterChip';
 import { ListRow } from '@/components/ui/ListRow';
 import { Panel } from '@/components/ui/Panel';
 import { PanelHeading } from '@/components/ui/PanelHeading';
+import { SummaryCard } from '@/components/ui/SummaryCard';
+import { images } from '@/constants/images';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useLocale } from '@/hooks/useLocale';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -38,7 +40,12 @@ export function AmenitiesBookingScreen() {
   const { locale } = useLocale();
   const copy = amenitiesContent[locale];
   return (
-    <InnerScreen overline={copy.overline} title={copy.title} subtitle={copy.subtitle}>
+    <InnerScreen
+      overline={copy.overline}
+      title={copy.title}
+      subtitle={copy.subtitle}
+      showPropertyCard={false}
+    >
       <AmenitiesContent />
     </InnerScreen>
   );
@@ -113,6 +120,7 @@ function AmenitiesContent() {
 
   return (
     <>
+      <SummaryCard photo={images.myUnitPhoto} title={copy.bannerTitle} meta={copy.bannerBody} metaLines={2} />
       <View style={styles.chips} accessibilityRole="radiogroup">
         {categoryChips.map((chip) => (
           <FilterChip
