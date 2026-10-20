@@ -3,8 +3,10 @@ import { use, useId, type ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from 'react-native-svg';
 
+import { GoldRim } from '@/components/common/GoldRim';
 import { BlurTargetContext } from '@/context/BlurTargetContext';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useResponsive } from '@/hooks/useResponsive';
 import type { ColorTokens } from '@/theme/colors';
 import { toBoxShadow } from '@/theme/shadows';
 import { makeStyles } from '@/utils/makeStyles';
@@ -67,12 +69,15 @@ const LIGHTS: readonly GlassLight[] = [
 
 /**
  * Semi-transparent frosted-glass panel (Sign In card): the background shows through,
- * blurred, under a translucent cool tint with soft lights, framed by a gold rim with an
- * inner white highlight.
+ * blurred, under a translucent cool tint with soft lights, framed by the fading gold rim
+ * (GoldRim) with an inner white highlight.
  */
 export function GlassCard({ children, style }: GlassCardProps) {
-  const { colors } = useAppTheme();
+  const { colors, borderRadius } = useAppTheme();
   const styles = useStyles();
+  const { scale } = useResponsive();
+  const radius = scale(borderRadius.card);
+  const borderWidth = scale(BORDER_WIDTH);
   const id = useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const blurTarget = use(BlurTargetContext);
 
@@ -117,6 +122,7 @@ export function GlassCard({ children, style }: GlassCardProps) {
         <View style={[styles.layer, styles.innerBorder]} />
       </View>
       {children}
+      <GoldRim radius={radius} width={borderWidth} inset={borderWidth} />
     </View>
   );
 }
@@ -128,8 +134,9 @@ const useStyles = makeStyles(({ colors, borderRadius, shadows }, { scale }) => {
   return {
     card: {
       borderRadius: radius,
+      // Kept for the layout; the visible edge is the GoldRim drawn over it.
       borderWidth,
-      borderColor: colors.glassCardBorder,
+      borderColor: colors.transparent,
       boxShadow: toBoxShadow(shadows.glassCardGlow, scale),
     },
     layer: {

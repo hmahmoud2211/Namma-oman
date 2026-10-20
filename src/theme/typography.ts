@@ -237,17 +237,18 @@ export const textVariants: Record<TextVariant, TextStyle> = {
     fontSize: 7,
     lineHeight: 10,
   },
+  // A size up from home 1.png's 8.5 so the labels read comfortably (see BottomTabBar).
   tabLabel: {
     fontFamily: fontFamilies.regular,
-    fontSize: 8.5,
-    lineHeight: 11,
-    letterSpacing: 0.4,
+    fontSize: 9.5,
+    lineHeight: 12.5,
+    letterSpacing: 0.3,
   },
   tabLabelActive: {
     fontFamily: fontFamilies.semiBold,
-    fontSize: 8.5,
-    lineHeight: 11,
-    letterSpacing: 0.4,
+    fontSize: 9.5,
+    lineHeight: 12.5,
+    letterSpacing: 0.3,
   },
 
   // Construction Progress (construction.png). Sizes match the export's text widths:

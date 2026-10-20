@@ -31,21 +31,28 @@ interface BottomTabBarProps<K extends string> {
   style?: StyleProp<ViewStyle>;
 }
 
-/** Design dp. The bar keeps Home's measurements (home 1.png); the disc follows Parklane's bar. */
-export const BOTTOM_TAB_BAR_HEIGHT = 35.9;
+/**
+ * Design dp. Taller than Home's export (35.9 dp there) so the labels read comfortably and the
+ * longer ones ("Video Call", "اتصال مرئي") fit; the disc follows Parklane's bar.
+ */
 const BORDER_WIDTH = 0.6;
-const SIDE_PADDING = 2.9;
-const ICON_SIZE = 14.4;
-const ICON_TOP = 5.6;
-const LABEL_GAP = 1.8;
-const INDICATOR = { width: 19.1, height: 1.4, top: 31.7 };
+const SIDE_PADDING = 4;
+const ICON_SIZE = 16;
+const ICON_TOP = 7;
+const LABEL_GAP = 2.4;
+/** The label's line: Arabic lines are 1.4 × the font size (typography.ts), taller than Latin. */
+const LABEL_LINE = 13.3;
+const BOTTOM_PADDING = 6.3;
 /** Light theme: rounded box around the active tab (mode 2.png). */
-const ACTIVE_BOX = { inset: 3, width: 46, radius: 9, borderWidth: 0.6 };
+const ACTIVE_BOX = { inset: 3.5, width: 56, radius: 10, borderWidth: 0.6 };
 /** The raised Home disc: it sits in a dark seat inside a faint halo, just above its label. */
-const HOME = { size: 26, seat: 2.4, halo: 3.2, labelGap: 1.5, icon: 13, borderWidth: 0.6 };
+const HOME = { size: 30, seat: 2.6, halo: 3.4, labelGap: 1.8, icon: 15, borderWidth: 0.6 };
 
 const HALO_SIZE = HOME.size + HOME.seat * 2 + HOME.halo * 2;
 const LABEL_TOP = ICON_TOP + ICON_SIZE + LABEL_GAP;
+export const BOTTOM_TAB_BAR_HEIGHT = LABEL_TOP + LABEL_LINE + BOTTOM_PADDING;
+/** Dark theme's underline, just under the label. */
+const INDICATOR = { width: 22, height: 1.5, top: LABEL_TOP + LABEL_LINE + 0.6 };
 const HALO_TOP = LABEL_TOP - HOME.labelGap - HALO_SIZE;
 
 /** How far the Home halo rises above the bar, in design dp. */
@@ -152,6 +159,9 @@ function TabLabel({ label, active }: { label: string; active: boolean }) {
         variant={active ? 'tabLabelActive' : 'tabLabel'}
         color={active ? colors.tabActive : colors.tabInactive}
         numberOfLines={1}
+        // Native only: on the narrowest phones a long label shrinks a little rather than clip.
+        adjustsFontSizeToFit
+        minimumFontScale={0.85}
       >
         {label}
       </AppText>

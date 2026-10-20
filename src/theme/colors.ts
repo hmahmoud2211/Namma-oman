@@ -104,7 +104,6 @@ export interface ColorTokens {
   glassCardWarmLight: string;
   glassCardGoldLight: string;
   glassCardShade: string;
-  glassCardBorder: string;
   glassCardInnerBorder: string;
   glassCardGlow: string;
   glassFieldFill: string;
@@ -149,8 +148,11 @@ export interface ColorTokens {
   surfaceIcon: string;
   surfaceIconTileGradient: Gradient2;
   surfaceIconTileBorder: string;
-  /** My Unit card: diagonal rim (top-left → bottom-right) and the photo's thin frame. */
-  featureCardBorderGradient: Gradient4;
+  /**
+   * Every frame's edge (cards, panels, the featured community, the sign-in card): this gold at
+   * two opposite corners, fading to nothing at the frame's centre (GoldRim).
+   */
+  frameRim: string;
   featureCardGlow: string;
   photoBorder: string;
   badgeFill: string;
@@ -165,7 +167,6 @@ export interface ColorTokens {
   /** Left-to-right fade that keeps the copy readable, and a light bottom shade. */
   heroScrimGradient: Gradient4;
   heroScrimBottomGradient: Gradient2;
-  heroBorder: string;
   heroText: string;
   heroOverline: string;
   heroAccent: string;
@@ -357,7 +358,6 @@ export const darkColors: ColorTokens = {
   glassCardWarmLight: palette.warmLight,
   glassCardGoldLight: palette.goldLight,
   glassCardShade: palette.frostShadow,
-  glassCardBorder: palette.rimGold,
   glassCardInnerBorder: 'rgba(255, 255, 255, 0.85)',
   glassCardGlow: 'rgba(250, 210, 130, 0.35)',
   glassFieldFill: 'rgba(255, 255, 255, 0.12)',
@@ -397,7 +397,7 @@ export const darkColors: ColorTokens = {
   surfaceIcon: palette.gold,
   surfaceIconTileGradient: ['rgba(30, 100, 84, 0.26)', 'rgba(4, 42, 36, 0.26)'],
   surfaceIconTileBorder: 'rgba(110, 190, 160, 0.3)',
-  featureCardBorderGradient: [palette.paleGold, palette.rimGold, palette.pineGlow, palette.rimGold],
+  frameRim: palette.richGold,
   featureCardGlow: 'rgba(245, 213, 148, 0.28)',
   photoBorder: 'rgba(245, 213, 148, 0.85)',
   badgeFill: 'rgba(0, 72, 62, 0.75)',
@@ -416,7 +416,6 @@ export const darkColors: ColorTokens = {
   ],
   heroScrimBottomGradient: ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.45)'],
   heroGlassGradient: ['rgba(10, 46, 40, 0.18)', 'rgba(0, 16, 14, 0.3)'],
-  heroBorder: 'rgba(245, 213, 148, 0.8)',
   heroText: palette.white,
   heroOverline: palette.paleGold,
   heroAccent: palette.aqua,
@@ -608,8 +607,8 @@ export const lightColors: ColorTokens = {
   surfaceIcon: palette.forestInk,
   surfaceIconTileGradient: ['rgba(255, 255, 255, 0.24)', 'rgba(233, 223, 200, 0.32)'],
   surfaceIconTileBorder: 'rgba(176, 138, 62, 0.4)',
-  // Feature cards (My Unit, stages): a white catch-light at the top-left running into gold.
-  featureCardBorderGradient: [palette.white, palette.goldLight, palette.bronze, palette.goldLight],
+  // Bronze rather than gold: a pale gold edge vanishes on the cream cards.
+  frameRim: palette.bronze,
   featureCardGlow: 'rgba(110, 82, 36, 0.26)',
   photoBorder: 'rgba(196, 160, 90, 0.9)',
   badgeFill: 'rgba(18, 61, 43, 0.08)',

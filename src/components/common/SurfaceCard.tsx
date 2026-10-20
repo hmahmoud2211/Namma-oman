@@ -1,22 +1,17 @@
-import { useCallback, useId, useState, type ReactNode } from 'react';
-import {
-  StyleSheet,
-  View,
-  type LayoutChangeEvent,
-  type StyleProp,
-  type ViewStyle,
-} from 'react-native';
-import Svg, { Defs, Rect, Stop, LinearGradient as SvgLinearGradient } from 'react-native-svg';
+import type { ReactNode } from 'react';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { GlassLayer } from '@/components/common/GlassLayer';
+import { GoldRim } from '@/components/common/GoldRim';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useResponsive } from '@/hooks/useResponsive';
 import { toBoxShadow } from '@/theme/shadows';
 import { makeStyles } from '@/utils/makeStyles';
 
 /**
- * - `plain`: single-colour hairline rim (weather card, service tiles)
- * - `feature`: diagonal gold-to-green rim with a soft glow (My Unit card)
+ * Both rims are the gold edge that fades out towards the frame's centre (GoldRim).
+ * - `plain`: a hairline (weather card, service tiles)
+ * - `feature`: a slightly heavier line with a soft glow (My Unit card, panels)
  */
 export type SurfaceCardRim = 'plain' | 'feature';
 
@@ -29,9 +24,8 @@ interface SurfaceCardProps {
 }
 
 /** Design dp. */
-const PLAIN_BORDER_WIDTH = 0.5;
-const FEATURE_BORDER_WIDTH = 0.75;
-const RIM_STOPS = [0, 0.35, 0.7, 1] as const;
+const PLAIN_BORDER_WIDTH = 0.7;
+const FEATURE_BORDER_WIDTH = 0.9;
 
 /**
  * Themed frosted-glass card from the Home screen: the background shows through, blurred,
@@ -42,30 +36,12 @@ export function SurfaceCard({ children, radius, rim = 'plain', style }: SurfaceC
   const { colors } = useAppTheme();
   const { scale } = useResponsive();
   const styles = useStyles();
-  const gradientId = `rim${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
-  const [size, setSize] = useState<{ width: number; height: number } | null>(null);
 
   const borderRadius = scale(radius);
   const borderWidth = scale(rim === 'feature' ? FEATURE_BORDER_WIDTH : PLAIN_BORDER_WIDTH);
 
-  const handleLayout = useCallback(
-    ({ nativeEvent }: LayoutChangeEvent) => {
-      if (rim !== 'feature') return;
-      const { width, height } = nativeEvent.layout;
-      // A screen hidden under another in the stack lays out at 0 × 0: keep the last rim.
-      if (width <= 0 || height <= 0) return;
-      setSize((current) =>
-        current?.width === width && current.height === height ? current : { width, height },
-      );
-    },
-    [rim],
-  );
-
   return (
-    <View
-      onLayout={handleLayout}
-      style={[styles.card, rim === 'feature' && styles.featureGlow, { borderRadius }, style]}
-    >
+    <View style={[styles.card, rim === 'feature' && styles.featureGlow, { borderRadius }, style]}>
       <GlassLayer borderRadius={borderRadius} colors={colors.surfaceGradient} />
       {/* Faint light along the inside of the top edge. */}
       <View
@@ -76,38 +52,7 @@ export function SurfaceCard({ children, radius, rim = 'plain', style }: SurfaceC
         ]}
         pointerEvents="none"
       />
-      {rim === 'plain' && (
-        <View
-          style={[StyleSheet.absoluteFill, styles.plainRim, { borderRadius, borderWidth }]}
-          pointerEvents="none"
-        />
-      )}
-      {rim === 'feature' && size && (
-        <Svg
-          width={size.width}
-          height={size.height}
-          style={StyleSheet.absoluteFill}
-          pointerEvents="none"
-        >
-          <Defs>
-            <SvgLinearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
-              {colors.featureCardBorderGradient.map((color, index) => (
-                <Stop key={RIM_STOPS[index]} offset={RIM_STOPS[index]} stopColor={color} />
-              ))}
-            </SvgLinearGradient>
-          </Defs>
-          <Rect
-            x={borderWidth / 2}
-            y={borderWidth / 2}
-            width={size.width - borderWidth}
-            height={size.height - borderWidth}
-            rx={borderRadius - borderWidth / 2}
-            stroke={`url(#${gradientId})`}
-            strokeWidth={borderWidth}
-            fill="none"
-          />
-        </Svg>
-      )}
+      <GoldRim radius={borderRadius} width={borderWidth} />
       {children}
     </View>
   );
@@ -119,9 +64,6 @@ const useStyles = makeStyles(({ colors, shadows }, { scale }) => ({
   },
   featureGlow: {
     boxShadow: toBoxShadow(shadows.featureCardGlow, scale),
-  },
-  plainRim: {
-    borderColor: colors.surfaceBorder,
   },
   innerHighlight: {
     borderColor: colors.transparent,

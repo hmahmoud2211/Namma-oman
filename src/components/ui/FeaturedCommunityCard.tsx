@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'rea
 import { AppButton } from '@/components/common/AppButton';
 import { AppText } from '@/components/common/AppText';
 import { GlassLayer } from '@/components/common/GlassLayer';
+import { GoldRim } from '@/components/common/GoldRim';
 import { ArrowRightIcon } from '@/components/icons/ArrowRightIcon';
 import { ChevronIcon } from '@/components/icons/ChevronIcon';
 import { useAppTheme } from '@/hooks/useAppTheme';
@@ -211,6 +212,7 @@ export function FeaturedCommunityCard({
           color={canGoForward ? colors.carouselActive : colors.heroAccent}
         />
       </Pressable>
+      <GoldRim radius={scale(d.radius)} width={scale(d.borderWidth)} inset={scale(d.borderWidth)} />
     </View>
   );
 }
@@ -224,8 +226,9 @@ const useStyles = makeStyles(({ colors, borderRadius, shadows }, { scale }) => {
     card: {
       minHeight: scale(d.height),
       borderRadius: radius,
+      // Kept for the layout; the visible edge is the GoldRim drawn over it.
       borderWidth,
-      borderColor: colors.heroBorder,
+      borderColor: colors.transparent,
       boxShadow: toBoxShadow(shadows.featureCardGlow, scale),
     },
     clip: {

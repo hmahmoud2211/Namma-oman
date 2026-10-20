@@ -67,8 +67,8 @@ const HOME_LABEL: Localized<string> = { en: 'Home', ar: 'الرئيسية' };
  * bar sits in exactly the same place on every screen whatever that screen's own export.
  */
 const DOCK_FRAME = designFrameFromExport(774, 1385);
-// Centred in the column (home 1.png draws it ~6 dp left of centre).
-const DOCK = { width: 297.2, bottom: 31.6, gapAbove: 20.9 } as const;
+// Centred, and a little wider than home 1.png's 297.2 dp so five labels have room.
+const DOCK = { width: 320, bottom: 31.6, gapAbove: 20.9 } as const;
 
 function getDockLayout(width: number, height: number, insets: EdgeInsets) {
   const { scale, verticalScale } = createResponsive(width, height, DOCK_FRAME);
