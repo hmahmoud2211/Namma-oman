@@ -6,7 +6,8 @@
 import { chargerFreeNow, isAvailableNow, isOverdue } from './availability';
 import { projectSession, type SessionProjection } from './charging';
 import { siteInfo } from './policy';
-import { formatDateTime, formatRange, ms } from './time';
+import { dateTimeIn, rangeIn, statusLabelIn, type Lang } from './i18n';
+import { ms } from './time';
 import type {
   AppNotification,
   Charger,
@@ -89,7 +90,13 @@ export interface DisplayStatus {
   tone: DisplayTone;
 }
 
-export function displayStatus(r: Reservation, now: number): DisplayStatus {
+/** A booking's status chip; `label` is in `lang` (English by default, as the rules read it). */
+export function displayStatus(r: Reservation, now: number, lang: Lang = 'en'): DisplayStatus {
+  const status = displayStatusEn(r, now);
+  return { ...status, label: statusLabelIn(status.key, status.label, lang) };
+}
+
+function displayStatusEn(r: Reservation, now: number): DisplayStatus {
   switch (r.status) {
     case 'confirmed':
       return r.needsReassignment
@@ -129,7 +136,7 @@ export interface ReservationView {
   overdue: boolean;
 }
 
-export function reservationView(db: ParkingDb, r: Reservation, now: number): ReservationView {
+export function reservationView(db: ParkingDb, r: Reservation, now: number, lang: Lang = 'en'): ReservationView {
   const space = db.spaces.find((s) => s.id === r.spaceId)!;
   const allocation = db.allocations.find((a) => a.id === r.chargingAllocationId);
   const connector = db.connectors.find((c) => c.id === allocation?.connectorId);
@@ -137,8 +144,8 @@ export function reservationView(db: ParkingDb, r: Reservation, now: number): Res
   const vehicle = db.vehicles.find((v) => v.id === r.vehicleId);
   return {
     reservation: r,
-    status: displayStatus(r, now),
-    title: r.guest?.name ?? (vehicle ? `My ${vehicle.make} ${vehicle.model}` : 'My vehicle'),
+    status: displayStatus(r, now, lang),
+    title: r.guest?.name ?? ownVehicleIn(vehicle, lang),
     property: db.properties.find((p) => p.id === r.propertyId)!,
     space,
     zone: db.zones.find((z) => z.id === space.zoneId)!,
@@ -154,6 +161,12 @@ export function reservationView(db: ParkingDb, r: Reservation, now: number): Res
     chargingProjection: charging ? projectSession(db, charging, now) : undefined,
     overdue: isOverdue(r, now),
   };
+}
+
+/** "My Hyundai Ioniq 5", or "سيارتي Hyundai Ioniq 5". */
+function ownVehicleIn(vehicle: Vehicle | undefined, lang: Lang): string {
+  if (lang === 'ar') return vehicle ? `سيارتي ${vehicle.make} ${vehicle.model}` : 'سيارتي';
+  return vehicle ? `My ${vehicle.make} ${vehicle.model}` : 'My vehicle';
 }
 
 export function findReservation(db: ParkingDb, id: string | undefined) {
@@ -225,8 +238,10 @@ export interface ActivityItem {
   timeLabel: string;
 }
 
-/** Gate and booking events for the resident's own bookings, newest first. */
-export function residentActivity(db: ParkingDb, residentId: string, limit = 6): ActivityItem[] {
+/** Gate and booking events for the resident's own bookings, newest first, worded in `lang`. */
+export function residentActivity(db: ParkingDb, residentId: string, limit = 6, lang: Lang = 'en'): ActivityItem[] {
+  const ar = lang === 'ar';
+  const myVehicle = ar ? 'سيارتي' : 'My vehicle';
   const mine = new Map(db.reservations.filter((r) => r.residentId === residentId).map((r) => [r.id, r]));
   const items: ActivityItem[] = [];
   for (const e of db.scanEvents) {
@@ -237,20 +252,32 @@ export function residentActivity(db: ParkingDb, residentId: string, limit = 6): 
       id: e.id,
       at: e.at,
       kind: e.direction,
-      title: e.direction === 'entry' ? 'Car entered' : 'Car left',
-      detail: `${r.guest?.name ?? 'My vehicle'} · ${space?.label ?? ''}`,
-      timeLabel: formatDateTime(e.at),
+      title: e.direction === 'entry' ? (ar ? 'دخلت السيارة' : 'Car entered') : ar ? 'غادرت السيارة' : 'Car left',
+      detail: `${r.guest?.name ?? myVehicle} · ${space?.label ?? ''}`,
+      timeLabel: dateTimeIn(e.at, lang),
     });
   }
   for (const a of db.audit) {
     const r = mine.get(a.entityId);
     if (!r) continue;
-    const booked = r.parkingType === 'ev' ? 'EV charging booked' : 'Guest parking booked';
-    const label: Partial<Record<string, [ActivityItem['kind'], string, string]>> = {
-      'reservation.created': ['booked', booked, 'Booked'],
-      'reservation.cancelled': ['cancelled', 'Booking cancelled', 'Cancelled'],
-      'reservation.no-show': ['no-show', 'Guest did not arrive', 'Expired'],
-    };
+    const booked = ar
+      ? r.parkingType === 'ev'
+        ? 'تم حجز شحن السيارة'
+        : 'تم حجز موقف للضيف'
+      : r.parkingType === 'ev'
+        ? 'EV charging booked'
+        : 'Guest parking booked';
+    const label: Partial<Record<string, [ActivityItem['kind'], string, string]>> = ar
+      ? {
+          'reservation.created': ['booked', booked, 'حُجز'],
+          'reservation.cancelled': ['cancelled', 'أُلغي الحجز', 'أُلغي'],
+          'reservation.no-show': ['no-show', 'لم يحضر الضيف', 'انتهى'],
+        }
+      : {
+          'reservation.created': ['booked', booked, 'Booked'],
+          'reservation.cancelled': ['cancelled', 'Booking cancelled', 'Cancelled'],
+          'reservation.no-show': ['no-show', 'Guest did not arrive', 'Expired'],
+        };
     const match = label[a.action];
     if (!match) continue;
     const space = db.spaces.find((s) => s.id === r.spaceId);
@@ -259,8 +286,8 @@ export function residentActivity(db: ParkingDb, residentId: string, limit = 6): 
       at: a.at,
       kind: match[0],
       title: match[1],
-      detail: `${r.guest?.name ?? 'My vehicle'} · ${space?.label ?? ''} · ${formatRange(r.scheduledStart, r.scheduledEnd)}`,
-      timeLabel: `${match[2]} ${formatDateTime(a.at)}`,
+      detail: `${r.guest?.name ?? myVehicle} · ${space?.label ?? ''} · ${rangeIn(r.scheduledStart, r.scheduledEnd, lang)}`,
+      timeLabel: `${match[2]} ${dateTimeIn(a.at, lang)}`,
     });
   }
   return items.sort((a, b) => ms(b.at) - ms(a.at)).slice(0, limit);

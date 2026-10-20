@@ -12,6 +12,8 @@ import { ScreenWrapper } from '@/components/layout/ScreenWrapper';
 import { resident } from '@/constants/resident';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { makeStyles } from '@/utils/makeStyles';
+
+import { useParkingLang } from './useParkingLang';
 import { DESIGN_FRAME } from '@/utils/responsive';
 
 export interface ParkingFrameProps {
@@ -24,7 +26,10 @@ export interface ParkingFrameProps {
   /** In place of the language switch and avatar, e.g. the pass's own language switch. */
   headerTrailing?: ReactNode;
   scrollRef?: Ref<ScrollViewInstance>;
-  /** Lays the page out right to left, for Arabic. The header keeps its place. */
+  /**
+   * Lays the page out right to left, for Arabic. Left out, it follows the app's language; a
+   * visitor's pass sets it from the pass's own language.
+   */
   rtl?: boolean;
   /** A quieter line under the title, e.g. "Step 2 of 2". */
   subtitle?: string;
@@ -44,8 +49,8 @@ const d = { gutter: 20, introGap: 16, sectionGap: 14, endGap: 28, footerTop: 8, 
 /**
  * The page shell for the parking flows (ported from Parklane): this app's background, header
  * and page title, a keyboard-aware column, and room at the end for the tab bar and the home
- * indicator. The content's own direction is always set, so the English resident pages read
- * left to right even in the Arabic app, and a visitor's Arabic pass reads right to left.
+ * indicator. The content's direction is always set: the app's language decides it, except on
+ * a visitor's pass, which reads in the pass's own language.
  */
 export function ParkingFrame({
   title,
@@ -54,7 +59,7 @@ export function ParkingFrame({
   showBack = true,
   headerTrailing,
   scrollRef,
-  rtl = false,
+  rtl,
   subtitle,
   onBack,
   footer,
@@ -63,7 +68,8 @@ export function ParkingFrame({
   const styles = useStyles(insets);
   const { colors, artwork } = useAppTheme();
   const account = useAccountMenu();
-  const direction = rtl ? 'rtl' : 'ltr';
+  const appLang = useParkingLang();
+  const direction = (rtl ?? appLang === 'ar') ? 'rtl' : 'ltr';
 
   return (
     <ScreenWrapper

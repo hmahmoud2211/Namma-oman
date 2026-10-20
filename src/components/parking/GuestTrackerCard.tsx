@@ -7,21 +7,17 @@ import type { GuestTracker, TrackState, TrackStep } from '../../services/parking
 import type { AppTheme } from './compat/theme';
 import { AppText } from './compat/AppText';
 import { toneLook } from './Notice';
+import { useParkingLang } from './useParkingLang';
+import type { Lang } from '../../services/parking/i18n';
 
-const SHORT: Record<TrackStep['key'], string> = {
-  booked: 'Booked',
-  shared: 'Shared',
-  arrived: 'Arrived',
-  parked: 'Parked',
-  left: 'Left',
-  ended: '',
+const SHORT: Record<Lang, Record<TrackStep['key'], string>> = {
+  en: { booked: 'Booked', shared: 'Shared', arrived: 'Arrived', parked: 'Parked', left: 'Left', ended: '' },
+  ar: { booked: 'الحجز', shared: 'المشاركة', arrived: 'الوصول', parked: 'الوقوف', left: 'المغادرة', ended: '' },
 };
 
-const STATE_WORDS: Record<TrackState, string> = {
-  done: 'done',
-  current: 'now',
-  upcoming: 'not yet',
-  problem: 'needs attention',
+const STATE_WORDS: Record<Lang, Record<TrackState, string>> = {
+  en: { done: 'done', current: 'now', upcoming: 'not yet', problem: 'needs attention' },
+  ar: { done: 'تم', current: 'الآن', upcoming: 'لم يحدث بعد', problem: 'يحتاج انتباهًا' },
 };
 
 function stepLook(theme: AppTheme, state: TrackState) {
@@ -46,6 +42,7 @@ function stepLook(theme: AppTheme, state: TrackState) {
 export function GuestTrackerStrip({ tracker }: { tracker: GuestTracker }) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const lang = useParkingLang();
   const headline = toneLook(theme, tracker.tone);
   const focus =
     tracker.steps.find((s) => s.state === 'problem' || s.state === 'current') ??
@@ -69,7 +66,7 @@ export function GuestTrackerStrip({ tracker }: { tracker: GuestTracker }) {
               key={step.key}
               style={styles.step}
               accessible
-              accessibilityLabel={[step.title, step.detail, STATE_WORDS[step.state]].filter(Boolean).join(', ')}
+              accessibilityLabel={[step.title, step.detail, STATE_WORDS[lang][step.state]].filter(Boolean).join(lang === 'ar' ? '، ' : ', ')}
             >
               <View style={styles.track}>
                 <View style={[styles.node, { backgroundColor: look.fill, borderColor: look.stroke }]}>
@@ -84,7 +81,7 @@ export function GuestTrackerStrip({ tracker }: { tracker: GuestTracker }) {
                 numberOfLines={1}
                 color={step.state === 'upcoming' ? theme.colors.textMuted : theme.colors.textPrimary}
               >
-                {SHORT[step.key] || step.title}
+                {SHORT[lang][step.key] || step.title}
               </AppText>
             </View>
           );

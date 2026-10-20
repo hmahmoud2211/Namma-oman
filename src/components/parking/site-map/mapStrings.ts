@@ -137,7 +137,7 @@ const ar: MapStrings = {
   levelShort: (id) => levelNameIn(id, 'ar', true),
   gate: (id) => gateNameIn(id, 'ar', true),
   exitOnly: 'خروج فقط',
-  rampDown: (to) => (to === 'b1' ? ['منحدر البدروم ١', 'محطة الشحن'] : ['منحدر البدروم ٢', 'مواقف السكان']),
+  rampDown: (to) => (to === 'b1' ? ['منحدر السفلي ١', 'محطة الشحن'] : ['منحدر السفلي ٢', 'مواقف السكان']),
   rampUp: 'المنحدر إلى الطريق الجنوبي',
   lobby: 'إلى البهو',
   aisle: (label) => nameIn(label.replace(/[←→↓↑]/g, '').trim(), 'ar'),

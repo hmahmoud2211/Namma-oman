@@ -46,7 +46,19 @@ export async function copyText(text: string): Promise<boolean> {
   }
 }
 
-export function shareOutcomeMessage(outcome: ShareOutcome, what: string): string {
+export function shareOutcomeMessage(outcome: ShareOutcome, what: string, lang: 'en' | 'ar' = 'en'): string {
+  if (lang === 'ar') {
+    switch (outcome) {
+      case 'shared':
+        return `تم تسليم ${what} إلى قائمة المشاركة. الاستلام يعتمد على التطبيق الذي اخترته.`;
+      case 'dismissed':
+        return 'أُلغيت المشاركة. لم تتم مشاركة شيء.';
+      case 'copied':
+        return `تم نسخ ${what}. الصقه في رسالة لمشاركته.`;
+      case 'failed':
+        return `تعذّرت مشاركة ${what} أو نسخه على هذا الجهاز.`;
+    }
+  }
   switch (outcome) {
     case 'shared':
       return `${what} handed to your share menu. Delivery depends on the app you chose.`;

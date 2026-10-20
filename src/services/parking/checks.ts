@@ -434,7 +434,7 @@ const checks: Check[] = [
       const steps = [...route.steps, route.walk!];
       const ar = steps.map((s) => stepText(s, 'ar'));
       const en = steps.map((s) => stepText(s, 'en'));
-      const ok = ar.length === en.length && ar.every((t) => /[\u0600-\u06FF]/.test(t)) && ar.some((t) => t.includes('على يمينك')) && ar.some((t) => t.includes('البدروم'));
+      const ok = ar.length === en.length && ar.every((t) => /[\u0600-\u06FF]/.test(t)) && ar.some((t) => t.includes('على يمينك')) && ar.some((t) => t.includes('الطابق السفلي'));
       if (!ok || en[en.length - 2] !== 'Park in EV-03, the third bay on your right') throw new Error(ar.join(' | '));
       return ar[ar.length - 2];
     },

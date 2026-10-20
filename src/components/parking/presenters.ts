@@ -1,7 +1,8 @@
 import type Ionicons from '@expo/vector-icons/Ionicons';
 
+import { chargingStateIn, nameIn, rangeIn, relativeDayIn, timeIn, type Lang } from '../../services/parking/i18n';
 import type { ReservationView } from '../../services/parking/selectors';
-import { siteDateKey, formatRange, formatTime, relativeDayLabel } from '../../services/parking/time';
+import { siteDateKey } from '../../services/parking/time';
 import type { AppNotification, ChargingState } from '../../services/parking/types';
 
 /**
@@ -9,14 +10,8 @@ import type { AppNotification, ChargingState } from '../../services/parking/type
  * read "Charging" and "Space V-023", never record states or codes.
  */
 
-export const chargingStateLabel: Record<ChargingState, string> = {
-  reserved: 'Charging booked',
-  'waiting-for-plug-in': 'Ready to plug in',
-  charging: 'Charging',
-  completed: 'Charging finished',
-  interrupted: 'Charging stopped',
-  faulted: 'Charger fault',
-};
+/** A charging session's state as people say it, in the reader's language. */
+export const chargingStateLabel = (state: ChargingState, lang: Lang = 'en') => chargingStateIn(state, lang);
 
 export function reservationIcon(view: ReservationView): keyof typeof Ionicons.glyphMap {
   if (view.reservation.parkingType === 'ev') return 'flash-outline';
@@ -28,22 +23,23 @@ export function reservationIcon(view: ReservationView): keyof typeof Ionicons.gl
  * "Today · 02:10 PM–05:10 PM": short enough for one line beside a status chip.
  * Without `now` (e.g. for history) it falls back to the full date.
  */
-export function shortRange(start: string, end: string, now?: number): string {
-  if (now === undefined) return formatRange(start, end);
+export function shortRange(start: string, end: string, now?: number, lang: Lang = 'en'): string {
+  if (now === undefined) return rangeIn(start, end, lang);
   const sameDay = siteDateKey(Date.parse(start)) === siteDateKey(Date.parse(end));
-  return `${relativeDayLabel(siteDateKey(Date.parse(start)), now)} · ${formatTime(start)}–${formatTime(end)}${sameDay ? '' : ' (+1 day)'}`;
+  const nextDay = sameDay ? '' : lang === 'ar' ? ' (+يوم)' : ' (+1 day)';
+  return `${relativeDayIn(siteDateKey(Date.parse(start)), now, lang)} · ${timeIn(start, lang)}–${timeIn(end, lang)}${nextDay}`;
 }
 
 /** Two summary lines for a list row. */
-export function reservationLines(view: ReservationView, now?: number): string[] {
+export function reservationLines(view: ReservationView, now?: number, lang: Lang = 'en'): string[] {
   const r = view.reservation;
-  const where = `${view.space.label} · ${view.zone.name}`;
-  const lines = [shortRange(r.scheduledStart, r.scheduledEnd, now), where];
+  const where = `${view.space.label} · ${nameIn(view.zone.name, lang)}`;
+  const lines = [shortRange(r.scheduledStart, r.scheduledEnd, now, lang), where];
   if (r.status === 'checked-in' && r.actualEntryAt) {
-    lines[1] = `${where} · in since ${formatTime(r.actualEntryAt)}`;
+    lines[1] = `${where} · ${lang === 'ar' ? 'في الداخل منذ' : 'in since'} ${timeIn(r.actualEntryAt, lang)}`;
   }
   if (view.charging && (r.status === 'confirmed' || r.status === 'checked-in')) {
-    lines.push(chargingStateLabel[view.charging.state]);
+    lines.push(chargingStateLabel(view.charging.state, lang));
   }
   return lines;
 }

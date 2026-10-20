@@ -7,6 +7,26 @@ import type { AppTheme } from './compat/theme';
 import { AppText } from './compat/AppText';
 import { Notice } from './Notice';
 import { ParkingButton } from './ParkingButton';
+import { useParkingLang } from './useParkingLang';
+
+const SCANNER_COPY = {
+  en: {
+    checking: 'Checking camera access…',
+    unavailable: 'Camera not available',
+    allow: 'Allow camera',
+    close: 'Close',
+    body: 'Allow camera access to scan passes, or paste a code or pick a demo pass below.',
+    stop: 'Stop camera',
+  },
+  ar: {
+    checking: 'جارٍ التحقق من إذن الكاميرا…',
+    unavailable: 'الكاميرا غير متاحة',
+    allow: 'السماح بالكاميرا',
+    close: 'إغلاق',
+    body: 'اسمح بالوصول إلى الكاميرا لمسح التصاريح، أو الصق رمزًا أو اختر تصريحًا تجريبيًا أدناه.',
+    stop: 'إيقاف الكاميرا',
+  },
+} as const;
 
 export interface QrScannerProps {
   /** Called once per code; the scanner ignores repeats of the same code briefly. */
@@ -23,6 +43,7 @@ const REPEAT_WINDOW_MS = 3_000;
  * pick-a-pass options still work.
  */
 export function QrScanner({ onScan, onClose }: QrScannerProps) {
+  const copy = SCANNER_COPY[useParkingLang()];
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const [permission, requestPermission] = useCameraPermissions();
@@ -41,24 +62,24 @@ export function QrScanner({ onScan, onClose }: QrScannerProps) {
   );
 
   if (!permission) {
-    return <AppText variant="caption">Checking camera access…</AppText>;
+    return <AppText variant="caption">{copy.checking}</AppText>;
   }
 
   if (!permission.granted) {
     return (
       <Notice
         tone="warning"
-        title="Camera not available"
+        title={copy.unavailable}
         actions={
           <>
             {permission.canAskAgain ? (
-              <ParkingButton compact tone="primary" label="Allow camera" onPress={() => void requestPermission()} />
+              <ParkingButton compact tone="primary" label={copy.allow} onPress={() => void requestPermission()} />
             ) : null}
-            <ParkingButton compact label="Close" onPress={onClose} />
+            <ParkingButton compact label={copy.close} onPress={onClose} />
           </>
         }
       >
-        Allow camera access to scan passes, or paste a code or pick a demo pass below.
+        {copy.body}
       </Notice>
     );
   }
@@ -74,7 +95,7 @@ export function QrScanner({ onScan, onClose }: QrScannerProps) {
         />
         <View style={styles.frame} pointerEvents="none" />
       </View>
-      <ParkingButton compact label="Stop camera" icon="close-outline" onPress={onClose} />
+      <ParkingButton compact label={copy.stop} icon="close-outline" onPress={onClose} />
     </View>
   );
 }

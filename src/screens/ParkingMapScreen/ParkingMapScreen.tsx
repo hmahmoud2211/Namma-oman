@@ -9,6 +9,7 @@ import { ParkingButton } from '../../components/parking/ParkingButton';
 import { ParkingFrame } from '../../components/parking/ParkingFrame';
 import { SiteMap } from '../../components/parking/site-map/SiteMap';
 import { useAppTheme } from '../../components/parking/compat/theme';
+import { useParkingLang } from '../../components/parking/useParkingLang';
 import { useParking } from '../../hooks/useParking';
 import { gateNameIn, isLang, nameIn, type Lang } from '../../services/parking/i18n';
 import { findInvitation, findReservation, gateMapsUrl, myParking } from '../../services/parking/selectors';
@@ -32,9 +33,10 @@ export function ParkingMapScreen() {
   const params: RootStackScreenProps<'ParkingMap'>['route']['params'] = route.params ?? {};
   const { db, now, residentId } = useParking();
 
+  const appLang = useParkingLang();
   const visitor = Boolean(params.invite);
-  // Residents and security read English; a guest keeps their pass's language.
-  const lang: Lang = visitor && isLang(params.lang) ? params.lang : 'en';
+  // Residents read the app's language; a guest keeps their pass's language.
+  const lang: Lang = visitor ? (isLang(params.lang) ? params.lang : 'en') : appLang;
   const copy = mapCopy[lang];
   const rtl = lang === 'ar';
   const reservation = visitor ? findInvitation(db, params.invite)?.reservation : findReservation(db, params.reservationId);

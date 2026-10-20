@@ -15,6 +15,7 @@ import { ParkingButton } from '@/components/parking/ParkingButton';
 import { ParkingFrame } from '@/components/parking/ParkingFrame';
 import { reservationIcon, reservationLines } from '@/components/parking/presenters';
 import { ListRow } from '@/components/parking/Rows';
+import { useParkingLang } from '@/components/parking/useParkingLang';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { IMAGE_TRANSITION_MS, imageAspects, images } from '@/constants/images';
 import { ThemeContext } from '@/context/ThemeContext';
@@ -29,18 +30,21 @@ import {
   residentReservations,
   type ActivityItem,
 } from '@/services/parking/selectors';
-import { formatDateTime, formatTime } from '@/services/parking/time';
+import { dateTimeIn, nameIn, timeIn } from '@/services/parking/i18n';
 import { darkTheme } from '@/theme';
 
 import {
   SEPARATOR,
   parkingActions,
-  parkingCopy as copy,
+  parkingCopy,
   parkingStats,
   type ActionTone,
   type ParkingAction,
 } from './ParkingScreen.data';
 import { BANNER_RADIUS, useParkingStyles } from './ParkingScreen.styles';
+
+const SCRIM_START = { x: 0, y: 0.5 };
+const SCRIM_END = { x: 1, y: 0.5 };
 
 /** Upcoming and active guest bookings shown before "View All". */
 const GUEST_LIMIT = 3;
@@ -64,9 +68,11 @@ export function ParkingScreen() {
   const { colors } = useAppTheme();
   const { scale } = useResponsive();
   const { db, now, residentId } = useParking();
+  const lang = useParkingLang();
+  const copy = parkingCopy[lang];
 
   const counts = useMemo(() => dashboardCounts(db, now), [db, now]);
-  const stats = useMemo(() => parkingStats(counts), [counts]);
+  const stats = useMemo(() => parkingStats(counts, lang), [counts, lang]);
   const mine = useMemo(() => myParking(db, residentId), [db, residentId]);
   const myCar = mine.vehicles.find((vehicle) => !vehicle.ev) ?? mine.vehicles[0];
   const evCount = mine.vehicles.filter((vehicle) => vehicle.ev).length;
@@ -74,18 +80,18 @@ export function ParkingScreen() {
   const guestBookings = useMemo(
     () =>
       residentReservations(db, residentId)
-        .map((reservation) => reservationView(db, reservation, now))
+        .map((reservation) => reservationView(db, reservation, now, lang))
         .filter(
           (view) =>
             view.reservation.bookedFor === 'guest' &&
             (view.reservation.status === 'confirmed' || view.reservation.status === 'checked-in'),
         ),
-    [db, residentId, now],
+    [db, residentId, now, lang],
   );
   // Bookings are listed above; activity keeps what happened at the gate and what changed.
   const activity = useMemo(
-    () => residentActivity(db, residentId, 20).filter((item) => item.kind !== 'booked').slice(0, 3),
-    [db, residentId],
+    () => residentActivity(db, residentId, 20, lang).filter((item) => item.kind !== 'booked').slice(0, 3),
+    [db, residentId, lang],
   );
 
   const mySpace = mine.space;
@@ -123,8 +129,9 @@ export function ParkingScreen() {
         <LinearGradient
           colors={colors.heroScrimGradient}
           locations={[0, 0.3, 0.48, 0.7]}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
+          // Darkest behind the copy, which starts on the right in Arabic.
+          start={lang === 'ar' ? SCRIM_END : SCRIM_START}
+          end={lang === 'ar' ? SCRIM_START : SCRIM_END}
           style={StyleSheet.absoluteFill}
         />
         <View style={styles.bannerCopy}>
@@ -143,9 +150,10 @@ export function ParkingScreen() {
           title={copy.myParkingTitle}
           icon={{ set: 'material', name: 'alpha-p-box-outline' }}
           headline={copy.slot(mySpace.label)}
-          meta={`${mine.building?.name ?? ''}${SEPARATOR}${mine.zone?.level ?? ''}`}
+          meta={`${mine.building ? nameIn(mine.building.name, lang) : ''}${SEPARATOR}${mine.zone ? nameIn(mine.zone.level, lang) : ''}`}
           photo={images.parkingSlot}
           aspect={imageAspects.parkingSlot}
+          rtl={lang === 'ar'}
           onPress={() => navigation.navigate('ParkingMap', { spaceId: mySpace.id })}
           accessibilityHint={copy.myParkingHint}
         >
@@ -158,9 +166,10 @@ export function ParkingScreen() {
           title={copy.vehicleTitle}
           icon={{ set: 'ionicons', name: 'car-outline' }}
           headline={`${myCar.make} ${myCar.model}`}
-          meta={`${myCar.colour}${SEPARATOR}${copy.plate(myCar.plateCountry, myCar.plate)}`}
+          meta={`${nameIn(myCar.colour, lang)}${SEPARATOR}${copy.plate(myCar.plateCountry, myCar.plate)}`}
           photo={images.registeredVehicle}
           aspect={imageAspects.registeredVehicle}
+          rtl={lang === 'ar'}
           cutout
         >
           {evCount > 0 ? <StatusChip label={copy.evRegistered(evCount)} tone="indigo" /> : null}
@@ -174,7 +183,7 @@ export function ParkingScreen() {
             <View
               style={styles.statValue}
               accessible
-              accessibilityLabel={`${stat.label}: ${stat.value}${stat.total ? ` of ${stat.total}` : ''}`}
+              accessibilityLabel={`${stat.label}: ${stat.value}${stat.total ? ` ${copy.of} ${stat.total}` : ''}`}
             >
               <AppText variant="figure" color={colors.surfaceText} style={styles.statFigure}>
                 {stat.value}
@@ -200,7 +209,7 @@ export function ParkingScreen() {
         ))}
       </View>
       <AppText variant="label" color={colors.textOnBackgroundMuted}>
-        {copy.countsNote(formatTime(now))}
+        {copy.countsNote(timeIn(now, lang))}
       </AppText>
 
       <View style={styles.actions}>
@@ -211,7 +220,7 @@ export function ParkingScreen() {
               key={action.id}
               onPress={() => openAction(action.id)}
               accessibilityRole="button"
-              accessibilityLabel={action.label.replace('\n', ' ')}
+              accessibilityLabel={action.label[lang].replace('\n', ' ')}
               style={({ pressed }) => [styles.action, look.style, pressed && styles.pressed]}
             >
               {look.gradient ? (
@@ -224,7 +233,7 @@ export function ParkingScreen() {
               ) : null}
               <AppIcon {...action.icon} size={scale(15)} color={look.text} />
               <AppText variant="bodyStrong" color={look.text} numberOfLines={2} style={styles.actionLabel}>
-                {action.label}
+                {action.label[lang]}
               </AppText>
             </Pressable>
           );
@@ -242,7 +251,7 @@ export function ParkingScreen() {
             accessibilityLabel={copy.viewAllLabel}
           >
             <AppText variant="label" color={colors.surfaceAccentText}>
-              {`${copy.viewAll} ›`}
+              {copy.viewAll}
             </AppText>
           </Pressable>
         }
@@ -258,7 +267,7 @@ export function ParkingScreen() {
               divided={index > 0}
               icon={reservationIcon(view)}
               title={view.title}
-              lines={reservationLines(view, now)}
+              lines={reservationLines(view, now, lang)}
               statusLabel={view.status.label}
               statusTone={view.status.tone}
               onPress={() => navigation.navigate('ReservationDetails', { reservationId: view.reservation.id })}
@@ -300,7 +309,7 @@ export function ParkingScreen() {
       >
         <AppIcon set="ionicons" name="construct-outline" size={scale(14)} color={colors.textOnBackgroundMuted} />
         <AppText variant="label" color={colors.textOnBackgroundMuted} style={styles.flex}>
-          {copy.demo(formatDateTime(now))}
+          {copy.demo(dateTimeIn(now, lang))}
         </AppText>
       </Pressable>
     </ParkingFrame>
@@ -316,6 +325,8 @@ interface PhotoCardProps {
   aspect: number;
   /** A cut-out on transparency (the car), drawn whole rather than as a faded photo. */
   cutout?: boolean;
+  /** Arabic: the copy starts on the right, so the scrim and chevron turn round. */
+  rtl?: boolean;
   onPress?: () => void;
   accessibilityHint?: string;
   children?: ReactNode;
@@ -342,6 +353,7 @@ function PhotoCardBody({
   photo,
   aspect,
   cutout = false,
+  rtl = false,
   onPress,
   accessibilityHint,
   children,
@@ -374,8 +386,8 @@ function PhotoCardBody({
           <LinearGradient
             colors={colors.heroScrimGradient}
             locations={[0, 0.3, 0.55, 0.85]}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
+            start={rtl ? SCRIM_END : SCRIM_START}
+            end={rtl ? SCRIM_START : SCRIM_END}
             style={StyleSheet.absoluteFill}
           />
         </View>
@@ -401,7 +413,7 @@ function PhotoCardBody({
       </View>
       {onPress ? (
         <View style={styles.chevron}>
-          <AppIcon set="ionicons" name="chevron-forward" size={scale(14)} color={cutout ? colors.surfaceText : colors.heroText} />
+          <AppIcon set="ionicons" name={rtl ? 'chevron-back' : 'chevron-forward'} size={scale(14)} color={cutout ? colors.surfaceText : colors.heroText} />
         </View>
       ) : null}
     </SurfaceCard>

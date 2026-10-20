@@ -1,4 +1,5 @@
-import { createContext, useMemo, useState, type ReactNode } from 'react';
+import * as SystemUI from 'expo-system-ui';
+import { createContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
 
 import { themes, type AppTheme, type ColorScheme } from '@/theme';
@@ -35,6 +36,14 @@ export function ThemeProvider({ initialPreference = 'system', children }: ThemeP
         ? systemScheme
         : FALLBACK_SCHEME
       : preference;
+
+  // What shows past the screens: the page behind the app on web (when a phone browser's bar
+  // collapses at the end of a scroll, or on overscroll) and the root window on native. Left
+  // white, it shows as a white band under the dark artwork.
+  const background = themes[scheme].colors.background;
+  useEffect(() => {
+    SystemUI.setBackgroundColorAsync(background).catch(() => undefined);
+  }, [background]);
 
   const preferenceState = useMemo(
     () => ({ preference, scheme, setPreference }),

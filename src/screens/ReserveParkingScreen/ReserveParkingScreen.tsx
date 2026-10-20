@@ -12,22 +12,27 @@ import { ParkingFrame } from '../../components/parking/ParkingFrame';
 import { ListRow } from '../../components/parking/Rows';
 import { SiteMap, type BayMark } from '../../components/parking/site-map/SiteMap';
 import { useAppTheme } from '../../components/parking/compat/theme';
+import { useParkingLang } from '../../components/parking/useParkingLang';
 import { useParking } from '../../hooks/useParking';
 import { searchSpaces, type SpaceOption } from '../../services/parking/availability';
 import { chargingRateKw } from '../../services/parking/charging';
 import { validateRequest, type ReservationInput } from '../../services/parking/reservations';
 import { findReservation, myParking } from '../../services/parking/selectors';
 import {
-  addDaysToKey,
-  siteDateKey,
-  siteMinuteOfDay,
-  formatDuration,
-  formatMinuteOfDay,
-  formatRange,
-  formatTime,
-  ms,
-  relativeDayLabel,
-} from '../../services/parking/time';
+  chargerNameIn,
+  digitsIn,
+  durationIn,
+  minuteOfDayIn,
+  nameIn,
+  parkingErrorIn,
+  plateIn,
+  propertyIn,
+  rangeIn,
+  reasonIn,
+  relativeDayIn,
+  timeIn,
+} from '../../services/parking/i18n';
+import { addDaysToKey, siteDateKey, siteMinuteOfDay, ms } from '../../services/parking/time';
 import { ParkingError } from '../../services/parking/tx';
 import type { RootStackScreenProps } from '../../types/navigation.types';
 import {
@@ -40,15 +45,12 @@ import {
   endOf,
   initialForm,
   nextSlot,
-  reserveCopy as copy,
+  reserveCopy,
   startOf,
-  stepTitles,
   type ReserveForm,
   type Step,
 } from './ReserveParkingScreen.data';
 import { createStyles } from './ReserveParkingScreen.styles';
-
-const ORDINAL_WORDS = ['Nearest', '2nd nearest', '3rd nearest'];
 
 /**
  * Booking in two steps: who and when on one page, then the space (list or
@@ -62,6 +64,11 @@ export function ReserveParkingScreen() {
   // Opened bare (/parking/reserve, or a refresh), it books a guest.
   const params: RootStackScreenProps<'ReserveParking'>['route']['params'] = route.params ?? { mode: 'guest' };
   const { db, now, residentId, service } = useParking();
+  const lang = useParkingLang();
+  const copy = reserveCopy[lang];
+  const time = (value: number) => timeIn(value, lang);
+  const duration = (minutes: number) => durationIn(minutes, lang);
+  const n = (value: number) => digitsIn(value, lang);
   const scrollRef = useRef<ScrollViewInstance>(null);
 
   const editing = useMemo(() => findReservation(db, params.reservationId), [db, params.reservationId]);
@@ -164,17 +171,17 @@ export function ReserveParkingScreen() {
   }, [step]);
 
   const validateDetails = (): { message: string; field?: 'name' | 'plate' } | null => {
-    if (isGuest && !form.guestName.trim()) return { message: 'Enter your guest’s name.', field: 'name' };
+    if (isGuest && !form.guestName.trim()) return { message: copy.needName, field: 'name' };
     if (isGuest && !form.visitorAddsVehicle && !form.plate.trim()) {
-      return { message: 'Enter the plate, or tick “Visitor will add vehicle details”.', field: 'plate' };
+      return { message: copy.needPlate, field: 'plate' };
     }
-    if (!isGuest && !vehicle) return { message: 'Choose the vehicle to charge.' };
-    if (isEv && !form.connectorType) return { message: 'Choose the connector the car needs.' };
+    if (!isGuest && !vehicle) return { message: copy.needVehicle };
+    if (isEv && !form.connectorType) return { message: copy.needConnector };
     try {
       validateRequest(db, toInput(form.spaceId ?? ''), now, editing?.id);
       return null;
     } catch (e) {
-      return { message: e instanceof ParkingError ? e.message : 'Check the details and try again.' };
+      return { message: e instanceof ParkingError ? parkingErrorIn(e, lang) : copy.checkDetails };
     }
   };
 
@@ -216,7 +223,7 @@ export function ReserveParkingScreen() {
       );
     } catch (e) {
       const err = e instanceof ParkingError ? e : null;
-      setError({ message: err?.message ?? 'Could not save the booking. Please try again.', code: err?.code });
+      setError({ message: err ? parkingErrorIn(err, lang) : copy.saveFailed, code: err?.code });
       setBusy(false);
     }
   };
@@ -234,7 +241,7 @@ export function ReserveParkingScreen() {
   const today = siteDateKey(now);
   const dateOptions: ChipOption<string>[] = Array.from({ length: policy.bookingHorizonDays }, (_, i) => {
     const key = addDaysToKey(today, i);
-    return { value: key, label: relativeDayLabel(key, now), disabled: earliestArrivalOn(key) >= 24 * 60 };
+    return { value: key, label: relativeDayIn(key, now, lang), disabled: earliestArrivalOn(key) >= 24 * 60 };
   });
   const slot = policy.slotMinutes;
   const maxStay = isEv ? policy.maxEvParkingDurationMinutes : policy.maxStandardDurationMinutes;
@@ -248,21 +255,21 @@ export function ReserveParkingScreen() {
 
   const renderDetails = () => (
     <>
-      <Panel title={isGuest ? 'Guest' : 'Your vehicle'} icon={isGuest ? 'person-outline' : 'car-outline'}>
+      <Panel title={isGuest ? copy.guest : copy.yourVehicle} icon={isGuest ? 'person-outline' : 'car-outline'}>
         {mine.properties.length > 1 && !editing ? (
           <ChipGroup
-            label="Property"
-            options={mine.properties.map((p) => ({ value: p.id, label: p.label }))}
+            label={copy.property}
+            options={mine.properties.map((p) => ({ value: p.id, label: propertyIn(p.label, lang) }))}
             value={form.propertyId}
             onChange={(propertyId) => update({ propertyId, spaceId: null })}
           />
         ) : null}
         {mode === 'ev' && !editing ? (
           <ChipGroup
-            label="Charging for"
+            label={copy.chargingFor}
             options={[
-              { value: 'resident', label: 'My vehicle', icon: 'person-outline' },
-              { value: 'guest', label: 'A visitor', icon: 'people-outline' },
+              { value: 'resident', label: copy.myVehicle, icon: 'person-outline' },
+              { value: 'guest', label: copy.aVisitor, icon: 'people-outline' },
             ]}
             value={form.bookedFor}
             onChange={(bookedFor) => update({ bookedFor })}
@@ -272,10 +279,10 @@ export function ReserveParkingScreen() {
         {isGuest ? (
           <>
             <Field
-              label="Guest name"
+              label={copy.guestName}
               value={form.guestName}
               onChangeText={(guestName) => update({ guestName })}
-              placeholder="Full name"
+              placeholder={copy.fullName}
               autoCapitalize="words"
               autoComplete="name"
               icon="person-outline"
@@ -284,7 +291,7 @@ export function ReserveParkingScreen() {
             {showContact ? (
               <>
                 <Field
-                  label="Mobile (optional)"
+                  label={copy.mobile}
                   value={form.guestPhone}
                   onChangeText={(guestPhone) => update({ guestPhone })}
                   placeholder="+968 9123 4567"
@@ -292,7 +299,7 @@ export function ReserveParkingScreen() {
                   icon="call-outline"
                 />
                 <Field
-                  label="Email (optional)"
+                  label={copy.email}
                   value={form.guestEmail}
                   onChangeText={(guestEmail) => update({ guestEmail })}
                   placeholder="name@example.com"
@@ -311,10 +318,10 @@ export function ReserveParkingScreen() {
             )}
             {!form.visitorAddsVehicle ? (
               <Field
-                label="Plate number"
+                label={copy.plate}
                 value={form.plate}
                 onChangeText={(plate) => update({ plate })}
-                placeholder="e.g. 1234 BK"
+                placeholder={copy.platePlaceholder}
                 autoCapitalize="characters"
                 autoCorrect={false}
                 icon="car-outline"
@@ -330,7 +337,7 @@ export function ReserveParkingScreen() {
           </>
         ) : (
           <ChipGroup
-            label="Electric vehicle"
+            label={copy.electricVehicle}
             options={evVehicles.map((v) => ({ value: v.id, label: `${v.make} ${v.model}`, detail: v.plate }))}
             value={form.vehicleId}
             onChange={(vehicleId) => {
@@ -342,10 +349,10 @@ export function ReserveParkingScreen() {
 
         {mode === 'guest' && !editing ? (
           <ChipGroup
-            label="Parking"
+            label={copy.parking}
             options={[
-              { value: 'standard', label: 'Visitor bay', icon: 'car-outline' },
-              { value: 'ev', label: 'EV bay + charging', icon: 'flash-outline' },
+              { value: 'standard', label: copy.visitorBay, icon: 'car-outline' },
+              { value: 'ev', label: copy.evBay, icon: 'flash-outline' },
             ]}
             value={form.parkingType}
             onChange={(parkingType) => update({ parkingType, spaceId: null, stayFollowsCharging: parkingType === 'ev' })}
@@ -353,12 +360,12 @@ export function ReserveParkingScreen() {
         ) : null}
       </Panel>
 
-      <Panel title="When" icon="calendar-outline" subtitle="Muscat time">
+      <Panel title={copy.when} icon="calendar-outline" subtitle={copy.siteTime}>
         <ChipGroup scroll options={dateOptions} value={form.dateKey} onChange={(dateKey) => update({ dateKey, arrivalMin: Math.max(form.arrivalMin, earliestArrivalOn(dateKey)) })} />
         <Stepper
-          label="Arrival"
-          display={formatMinuteOfDay(form.arrivalMin)}
-          detail={relativeDayLabel(form.dateKey, now)}
+          label={copy.arrival}
+          display={minuteOfDayIn(form.arrivalMin, lang)}
+          detail={relativeDayIn(form.dateKey, now, lang)}
           canDecrement={form.arrivalMin - slot >= minArrival}
           canIncrement={form.arrivalMin + slot < 24 * 60}
           onDecrement={() => update({ arrivalMin: form.arrivalMin - slot })}
@@ -366,16 +373,16 @@ export function ReserveParkingScreen() {
         />
         {!isEv ? (
           <ChipGroup
-            label="How long?"
-            options={STAY_PRESETS.filter((m) => m <= maxStay).map((m) => ({ value: String(m), label: formatDuration(m) }))}
+            label={copy.howLong}
+            options={STAY_PRESETS.filter((m) => m <= maxStay).map((m) => ({ value: String(m), label: duration(m) }))}
             value={STAY_PRESETS.some((m) => m === form.stayMin) ? String(form.stayMin) : null}
             onChange={(value) => update({ stayMin: Number(value), stayFollowsCharging: false })}
           />
         ) : null}
         <Stepper
-          label={isEv ? 'Parking until' : 'Departure'}
-          display={formatTime(end)}
-          detail={`${formatDuration(form.stayMin)} stay${crossesDay ? ' · ends next day' : ''}`}
+          label={isEv ? copy.parkingUntil : copy.departure}
+          display={time(end)}
+          detail={copy.stay(duration(form.stayMin), crossesDay)}
           canDecrement={form.stayMin - slot >= minStay}
           canIncrement={form.stayMin + slot <= maxStay}
           onDecrement={() => update({ stayMin: form.stayMin - slot, stayFollowsCharging: false })}
@@ -384,9 +391,9 @@ export function ReserveParkingScreen() {
       </Panel>
 
       {isEv ? (
-        <Panel title="Charging" icon="flash-outline" subtitle={copy.evDeparture}>
+        <Panel title={copy.charging} icon="flash-outline" subtitle={copy.evDeparture}>
           <ChipGroup
-            label="Connector"
+            label={copy.connector}
             options={CONNECTORS.map((c) => ({
               value: c,
               label: c,
@@ -396,26 +403,26 @@ export function ReserveParkingScreen() {
             onChange={(connectorType) => update({ connectorType })}
           />
           <Stepper
-            label="Charging starts"
-            display={formatTime(chargeStart)}
-            detail={form.chargeOffsetMin === 0 ? 'On arrival' : `${formatDuration(form.chargeOffsetMin)} after arrival`}
+            label={copy.chargingStarts}
+            display={time(chargeStart)}
+            detail={form.chargeOffsetMin === 0 ? copy.onArrival : copy.afterArrival(duration(form.chargeOffsetMin))}
             canDecrement={form.chargeOffsetMin - slot >= 0}
             canIncrement={form.chargeOffsetMin + slot + form.chargeMin <= maxStay}
             onDecrement={() => update({ chargeOffsetMin: form.chargeOffsetMin - slot })}
             onIncrement={() => update({ chargeOffsetMin: form.chargeOffsetMin + slot })}
           />
           <Stepper
-            label="Charging ends"
-            display={formatTime(chargeEnd)}
-            detail={`${formatDuration(form.chargeMin)} of charging`}
+            label={copy.chargingEnds}
+            display={time(chargeEnd)}
+            detail={copy.ofCharging(duration(form.chargeMin))}
             canDecrement={form.chargeMin - slot >= 30}
             canIncrement={form.chargeMin + slot <= policy.maxChargingDurationMinutes && form.chargeOffsetMin + form.chargeMin + slot <= maxStay}
             onDecrement={() => update({ chargeMin: form.chargeMin - slot })}
             onIncrement={() => update({ chargeMin: form.chargeMin + slot })}
           />
           <ChipGroup
-            label="Energy to add (optional)"
-            options={ENERGY_TARGETS.map((t) => ({ value: t, label: t === 'none' ? 'Until slot ends' : `${t} kWh` }))}
+            label={copy.energy}
+            options={ENERGY_TARGETS.map((t) => ({ value: t, label: t === 'none' ? copy.untilSlotEnds : copy.kwh(t) }))}
             value={form.targetKwh}
             onChange={(targetKwh) => update({ targetKwh })}
           />
@@ -430,12 +437,12 @@ export function ReserveParkingScreen() {
   const reasons: Record<string, string> = {};
   for (const o of options) {
     marks[o.space.id] = o.available ? 'free' : 'taken';
-    if (o.reason) reasons[o.space.id] = o.reason;
+    if (o.reason) reasons[o.space.id] = reasonIn(o.reason, lang) ?? o.reason;
   }
 
   const zoneLine = (o: SpaceOption) => {
     const zone = db.zones.find((z) => z.id === o.space.zoneId);
-    return `${zone?.name} · ${zone?.level}`;
+    return zone ? `${nameIn(zone.name, lang)} · ${nameIn(zone.level, lang)}` : '';
   };
 
   // The chosen bay first, then the nearest others; the rest behind "Show more".
@@ -450,7 +457,7 @@ export function ReserveParkingScreen() {
     const target = form.targetKwh === 'none' ? null : Number(form.targetKwh);
     return (
       <>
-        <Pressable onPress={() => goTo('details')} accessibilityRole="button" accessibilityLabel="Edit visit details">
+        <Pressable onPress={() => goTo('details')} accessibilityRole="button" accessibilityLabel={copy.editDetails}>
           <Panel>
             <View style={styles.summary}>
               <View style={styles.summaryBadge}>
@@ -458,34 +465,36 @@ export function ReserveParkingScreen() {
               </View>
               <View style={styles.summaryText}>
                 <AppText variant="bodyStrong">
-                  {isGuest ? `${form.guestName.trim()} · ${form.visitorAddsVehicle ? 'plate to follow' : form.plate.trim().toUpperCase()}` : `${vehicle?.make} ${vehicle?.model} · ${vehicle?.plate}`}
+                  {isGuest
+                    ? `${form.guestName.trim()} · ${form.visitorAddsVehicle ? copy.plateToFollow : plateIn(form.plate.trim().toUpperCase(), lang)}`
+                    : `${vehicle?.make} ${vehicle?.model} · ${vehicle ? plateIn(vehicle.plate, lang) : ''}`}
                 </AppText>
                 <AppText variant="label" color={theme.colors.textSupport}>
-                  {`${formatRange(start, end)} (${formatDuration(form.stayMin)})`}
+                  {`${rangeIn(start, end, lang)} (${duration(form.stayMin)})`}
                 </AppText>
                 {isEv ? (
                   <AppText variant="label" color={theme.colors.textSupport}>
-                    {`Charging ${formatTime(chargeStart)}–${formatTime(chargeEnd)} · ${form.connectorType}`}
+                    {copy.chargingWindow(time(chargeStart), time(chargeEnd), form.connectorType ?? '')}
                   </AppText>
                 ) : null}
               </View>
               <AppText variant="bodyStrong" color={theme.colors.accent}>
-                Edit
+                {copy.edit}
               </AppText>
             </View>
           </Panel>
         </Pressable>
 
         {pickLost && chosen ? (
-          <Notice tone="warning" title={`${pickedLabel} isn’t free for the new time`}>
-            {`${chosen.space.label} is selected instead.`}
+          <Notice tone="warning" title={copy.pickLost(pickedLabel ?? '')}>
+            {copy.pickedInstead(chosen.space.label)}
           </Notice>
         ) : null}
 
         <ChipGroup
           options={[
-            { value: 'list', label: 'List', icon: 'list-outline' },
-            { value: 'map', label: 'Map', icon: 'map-outline' },
+            { value: 'list', label: copy.list, icon: 'list-outline' },
+            { value: 'map', label: copy.map, icon: 'map-outline' },
           ]}
           value={view}
           onChange={setView}
@@ -501,12 +510,13 @@ export function ReserveParkingScreen() {
             reasons={reasons}
             targetSpaceId={chosen?.space.id}
             onSelectSpace={(spaceId) => update({ spaceId })}
+            lang={lang}
           />
         ) : (
           <Panel
-            title="Available for your visit"
+            title={copy.availableTitle}
             icon="checkmark-circle-outline"
-            subtitle={`${available.length} of ${options.length} ${isEv ? 'EV bays' : 'visitor bays'} are free the whole time`}
+            subtitle={copy.availableCount(n(available.length), n(options.length), isEv)}
           >
             {available.length === 0 ? (
               <AppText variant="caption" color={theme.colors.textSecondary}>
@@ -521,9 +531,9 @@ export function ReserveParkingScreen() {
                     key={o.space.id}
                     divided={index > 0}
                     icon={selected ? 'radio-button-on' : 'radio-button-off'}
-                    title={`${o.space.label}${o === recommended ? ' · Recommended' : ''}`}
-                    lines={[zoneLine(o), `${ORDINAL_WORDS[rank] ?? `${rank + 1}th nearest`} to ${property?.label}`]}
-                    statusLabel={selected ? 'Selected' : undefined}
+                    title={`${o.space.label}${o === recommended ? copy.recommended : ''}`}
+                    lines={[zoneLine(o), copy.nearest(rank, property ? propertyIn(property.label, lang) : '')]}
+                    statusLabel={selected ? copy.selected : undefined}
                     statusTone={selected ? 'teal' : undefined}
                     onPress={() => update({ spaceId: o.space.id })}
                   />
@@ -534,7 +544,7 @@ export function ReserveParkingScreen() {
               <ParkingButton
                 compact
                 icon={showAll ? 'chevron-up' : 'chevron-down'}
-                label={showAll ? 'Show fewer' : `Show ${ordered.length - LIST_PREVIEW} more`}
+                label={showAll ? copy.showFewer : copy.showMore(n(ordered.length - LIST_PREVIEW))}
                 onPress={() => setShowAll((v) => !v)}
               />
             ) : null}
@@ -551,13 +561,13 @@ export function ReserveParkingScreen() {
             >
               <Ionicons name={showUnavailable ? 'chevron-up' : 'chevron-down'} size={16} color={theme.colors.textSupport} />
               <AppText variant="label" color={theme.colors.textSupport}>
-                {`${unavailable.length} bays not available for this time`}
+                {copy.notAvailable(n(unavailable.length))}
               </AppText>
             </Pressable>
             {showUnavailable ? (
               <Panel>
                 {unavailable.map((o, index) => (
-                  <ListRow key={o.space.id} divided={index > 0} icon="remove-circle-outline" title={o.space.label} lines={[o.reason ?? 'Unavailable']} />
+                  <ListRow key={o.space.id} divided={index > 0} icon="remove-circle-outline" title={o.space.label} lines={[reasonIn(o.reason, lang) ?? copy.unavailable]} />
                 ))}
               </Panel>
             ) : null}
@@ -566,12 +576,16 @@ export function ReserveParkingScreen() {
 
         {chosen && isEv && charger ? (
           <Notice>
-            {`${chosen.space.label} charges on ${charger.label}${target ? `: ${target} kWh in about ${formatDuration((target / Math.max(rate, 0.1)) * 60)} at ~${rate} kW` : ''}. ${copy.estimateNote}`}
+            {`${copy.chargesOn(
+              chosen.space.label,
+              chargerNameIn(charger.label, lang),
+              target ? copy.estimate(n(target), duration((target / Math.max(rate, 0.1)) * 60), n(rate)) : '',
+            )} ${copy.estimateNote}`}
           </Notice>
         ) : null}
         {chosen ? (
           <AppText variant="label" color={theme.colors.textMuted} style={styles.note}>
-            {`${chosen.space.label} · ${zone?.name}. ${copy.autoConfirm}`}
+            {`${chosen.space.label} · ${zone ? nameIn(zone.name, lang) : ''}. ${copy.autoConfirm}`}
           </AppText>
         ) : null}
       </>
@@ -595,18 +609,23 @@ export function ReserveParkingScreen() {
           </View>
           <View style={styles.summaryText}>
             <AppText variant="label" color={theme.colors.chipVioletText}>
-              {space ? 'Selected' : copy.noSpace}
+              {space ? copy.selected : copy.noSpace}
             </AppText>
             <AppText variant="subheading">{space ? space.label : copy.noSpaceDetail}</AppText>
             {space ? (
               <AppText variant="label" color={theme.colors.textSupport}>
-                {[zone?.level, building ? `Near ${building.name}` : zone?.name].filter(Boolean).join(' · ')}
+                {[
+                  zone ? nameIn(zone.level, lang) : undefined,
+                  building ? copy.near(nameIn(building.name, lang)) : zone ? nameIn(zone.name, lang) : undefined,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
               </AppText>
             ) : null}
           </View>
         </View>
         <ParkingButton
-          label={space ? `${editing ? 'Save' : 'Confirm'} ${space.label}` : 'Change the time'}
+          label={space ? copy.confirmBay(space.label, Boolean(editing)) : copy.changeTime}
           icon={space ? 'checkmark-circle-outline' : 'time-outline'}
           tone="primary"
           loading={busy}
@@ -622,7 +641,7 @@ export function ReserveParkingScreen() {
 
   const footer =
     step === 'details' ? (
-      <ParkingButton label="Find a space" icon="search-outline" tone="primary" onPress={findSpace} />
+      <ParkingButton label={copy.findSpace} icon="search-outline" tone="primary" onPress={findSpace} />
     ) : (
       renderSelected()
     );
@@ -630,7 +649,7 @@ export function ReserveParkingScreen() {
   return (
     <ParkingFrame
       title={step === 'space' ? copy.chooseTitle : title}
-      subtitle={`Step ${stepIndex + 1} of ${STEPS.length}${step === 'details' ? ` · ${stepTitles.details}` : ''}`}
+      subtitle={`${copy.stepOf(stepIndex + 1, STEPS.length)}${step === 'details' ? ` · ${copy.steps.details}` : ''}`}
       onBack={back}
       scrollRef={scrollRef}
       bottomBar={false}
@@ -638,8 +657,8 @@ export function ReserveParkingScreen() {
     >
 
       {editing && editing.status !== 'confirmed' ? (
-        <Notice tone="warning" title="This booking can no longer be edited">
-          Only upcoming bookings can be changed.
+        <Notice tone="warning" title={copy.notEditableTitle}>
+          {copy.notEditableBody}
         </Notice>
       ) : null}
 
@@ -648,10 +667,10 @@ export function ReserveParkingScreen() {
       {error && !error.field ? (
         <Notice
           tone="error"
-          title="Not booked yet"
+          title={copy.notBookedTitle}
           actions={
             step === 'space' && (error.code === 'space-unavailable' || error.code === 'charger-unavailable') ? (
-              <ParkingButton compact label="Pick another space" onPress={() => setError(null)} />
+              <ParkingButton compact label={copy.pickAnother} onPress={() => setError(null)} />
             ) : undefined
           }
         >

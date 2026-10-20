@@ -12,22 +12,16 @@ import { QrScanner } from '../../components/parking/QrScanner';
 import { ListRow } from '../../components/parking/Rows';
 import { notificationIcon } from '../../components/parking/presenters';
 import { useAppTheme } from '../../components/parking/compat/theme';
+import { useParkingLang } from '../../components/parking/useParkingLang';
 import { useParking } from '../../hooks/useParking';
 import type { ScanResult } from '../../services/parking/gate';
 import { notificationsFor, reservationView } from '../../services/parking/selectors';
-import { formatDateTime, formatTime, ms } from '../../services/parking/time';
+import { dateTimeIn, gateNameIn, gateResultIn, parkingErrorIn, plateIn, timeIn } from '../../services/parking/i18n';
+import { ms } from '../../services/parking/time';
 import { expectedArrivals, type ExpectedArrival } from '../../services/parking/tracking';
 import { ParkingError } from '../../services/parking/tx';
 import type { OccupancyState, ScanDirection } from '../../services/parking/types';
-import {
-  arrivalChip,
-  arrivalPicked,
-  arrivalScan,
-  consoleCopy as copy,
-  keepTogether,
-  needsBayChip,
-  resultTone,
-} from './SecurityConsoleScreen.data';
+import { arrivalTone, consoleCopy, keepTogether, needsBayTone, resultTone } from './SecurityConsoleScreen.data';
 import { createStyles } from './SecurityConsoleScreen.styles';
 
 type Feedback = { tone: NoticeTone; text: string };
@@ -41,6 +35,9 @@ export function SecurityConsoleScreen() {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { db, now, service } = useParking();
+  const lang = useParkingLang();
+  const copy = consoleCopy[lang];
+  const ar = lang === 'ar';
 
   const [gateId, setGateId] = useState(db.gates[0]?.id ?? '');
   const gate = db.gates.find((g) => g.id === gateId);
@@ -61,23 +58,23 @@ export function SecurityConsoleScreen() {
   const [bayNote, setBayNote] = useState('');
 
   const reservations = useMemo(
-    () => [...db.reservations].sort((a, b) => ms(b.scheduledStart) - ms(a.scheduledStart)).map((r) => reservationView(db, r, now)),
-    [db, now],
+    () => [...db.reservations].sort((a, b) => ms(b.scheduledStart) - ms(a.scheduledStart)).map((r) => reservationView(db, r, now, lang)),
+    [db, now, lang],
   );
   const passOptions: ChipOption<string>[] = reservations.map((v) => ({
     value: v.reservation.id,
     label: `${v.title} · ${v.space.label}`,
-    detail: `${v.status.label} · ${formatTime(v.reservation.scheduledStart)}`,
+    detail: `${v.status.label} · ${timeIn(v.reservation.scheduledStart, lang)}`,
   }));
   const openOptions = passOptions.filter((o) => {
     const r = db.reservations.find((x) => x.id === o.value);
     return r?.status === 'confirmed' || r?.status === 'checked-in';
   });
   const exceptions = notificationsFor(db, 'operator').filter((n) => !n.resolvedAt);
-  const arrivals = expectedArrivals(db, now, 60);
+  const arrivals = expectedArrivals(db, now, 60, lang);
   // Gone from the list once the car is in, so its prompt goes too.
   const arrival = arrivals.find((a) => a.reservationId === arrivalId);
-  const gateShort = (id: string) => db.gates.find((g) => g.id === id)?.name.split(' · ')[0] ?? '';
+  const gateShort = (id: string) => (db.gates.some((g) => g.id === id) ? gateNameIn(id, lang, true) : '');
   const recentScans = [...db.scanEvents].sort((a, b) => ms(b.at) - ms(a.at)).slice(0, 8);
 
   const scan = async (input: string) => {
@@ -87,7 +84,7 @@ export function SecurityConsoleScreen() {
       setResult(await service.scan(input, gate.id, effectiveDirection));
     } catch (e) {
       setResult(null);
-      setFeedback({ tone: 'error', text: e instanceof ParkingError ? e.message : 'Scan failed.' });
+      setFeedback({ tone: 'error', text: e instanceof ParkingError ? parkingErrorIn(e, lang) : copy.scanFailed });
     }
   };
 
@@ -101,7 +98,7 @@ export function SecurityConsoleScreen() {
         setFeedback({ tone: 'success', text: success });
       }
     } catch (e) {
-      setFeedback({ tone: 'error', text: e instanceof ParkingError ? e.message : 'That did not work.' });
+      setFeedback({ tone: 'error', text: e instanceof ParkingError ? parkingErrorIn(e, lang) : copy.failed });
     }
   };
 
@@ -126,38 +123,39 @@ export function SecurityConsoleScreen() {
   const pickedCredentials = picked ? db.credentials.filter((c) => c.reservationId === picked.id) : [];
   const olderCredential = pickedCredentials.find((c) => c.id !== picked?.credentialId);
   const manual = db.reservations.find((r) => r.id === manualId);
-  const manualView = manual ? reservationView(db, manual, now) : null;
+  const manualView = manual ? reservationView(db, manual, now, lang) : null;
+  const said = result ? gateResultIn(result, lang) : null;
   const bay = db.spaces.find((s) => s.id === bayId);
 
   return (
     <ParkingFrame title={copy.title} bottomBar={false}>
       <Notice>{copy.roleNote}</Notice>
 
-      <Panel title="Gate" icon="git-merge-outline">
+      <Panel title={copy.gate} icon="git-merge-outline">
         <ChipGroup
-          options={db.gates.map((g) => ({ value: g.id, label: g.name, detail: g.direction === 'both' ? 'Entry and exit' : 'Exit only' }))}
+          options={db.gates.map((g) => ({ value: g.id, label: gateNameIn(g.id, lang), detail: g.direction === 'both' ? copy.entryAndExit : copy.exitOnly }))}
           value={gateId}
           onChange={setGateId}
         />
         <ChipGroup
-          label="Lane"
+          label={copy.lane}
           options={[
-            { value: 'entry', label: 'Entry', icon: 'log-in-outline', disabled: gate?.direction === 'exit' },
-            { value: 'exit', label: 'Exit', icon: 'log-out-outline', disabled: gate?.direction === 'entry' },
+            { value: 'entry', label: copy.entry, icon: 'log-in-outline', disabled: gate?.direction === 'exit' },
+            { value: 'exit', label: copy.exit, icon: 'log-out-outline', disabled: gate?.direction === 'entry' },
           ]}
           value={effectiveDirection}
           onChange={setDirection}
         />
       </Panel>
 
-      <Panel title="Scan a pass" icon="scan-outline" subtitle={`${gate?.name} · ${effectiveDirection === 'entry' ? 'entry lane' : 'exit lane'}`}>
+      <Panel title={copy.scanTitle} icon="scan-outline" subtitle={copy.laneLabel(gate ? gateNameIn(gate.id, lang) : '', effectiveDirection === 'entry')}>
         {camera ? (
           <QrScanner onScan={(data) => void scan(data)} onClose={() => setCamera(false)} />
         ) : (
-          <ParkingButton label="Scan with camera" icon="camera-outline" tone="primary" onPress={() => setCamera(true)} />
+          <ParkingButton label={copy.scanCamera} icon="camera-outline" tone="primary" onPress={() => setCamera(true)} />
         )}
         <Field
-          label="Or paste a code or link"
+          label={copy.paste}
           value={pasted}
           onChangeText={setPasted}
           placeholder="plq_…"
@@ -165,11 +163,11 @@ export function SecurityConsoleScreen() {
           autoCorrect={false}
           icon="clipboard-outline"
         />
-        <ParkingButton label="Validate pasted code" icon="checkmark-done-outline" disabled={!pasted.trim()} onPress={() => void scan(pasted.trim())} />
+        <ParkingButton label={copy.validate} icon="checkmark-done-outline" disabled={!pasted.trim()} onPress={() => void scan(pasted.trim())} />
       </Panel>
 
       {result ? (
-        <Notice tone={resultTone(result)} title={result.title}>
+        <Notice tone={resultTone(result)} title={said?.title}>
           <View style={styles.result}>
             <Ionicons
               name={result.gateOpened ? 'lock-open-outline' : result.outcome === 'already-processed' ? 'information-circle-outline' : 'lock-closed-outline'}
@@ -177,10 +175,10 @@ export function SecurityConsoleScreen() {
               color={result.gateOpened ? theme.colors.success : result.outcome === 'already-processed' ? theme.colors.warning : theme.colors.error}
             />
             <AppText variant="bodyStrong" align="center">
-              {result.gateOpened ? 'Barrier opened (simulated)' : 'Barrier stays closed'}
+              {result.gateOpened ? copy.opened : copy.closed}
             </AppText>
             <AppText variant="caption" align="center" color={theme.colors.textSecondary}>
-              {result.message}
+              {said?.message}
             </AppText>
           </View>
         </Notice>
@@ -188,38 +186,40 @@ export function SecurityConsoleScreen() {
       {feedback ? <Notice tone={feedback.tone}>{feedback.text}</Notice> : null}
       {arrival ? (
         <Notice
-          title={`${arrival.name} · ${arrival.plate ?? copy.plateToCome}`}
+          title={`${arrival.name} · ${arrival.plate ? plateIn(arrival.plate, lang) : copy.plateToCome}`}
           actions={
             <>
               <ParkingButton
                 compact
                 tone="primary"
                 icon="qr-code-outline"
-                label={arrivalScan(gateShort(arrival.gateId))}
+                label={copy.arrivalScan(gateShort(arrival.gateId))}
                 onPress={() => scanArrival(arrival)}
               />
-              <ParkingButton compact label="Not now" onPress={() => setArrivalId(null)} />
+              <ParkingButton compact label={copy.notNow} onPress={() => setArrivalId(null)} />
             </>
           }
         >
-          {arrivalPicked(gateShort(arrival.gateId))}
+          {copy.arrivalPicked(gateShort(arrival.gateId))}
         </Notice>
       ) : null}
 
-      <Panel title={`Expected arrivals (${arrivals.length})`} icon="time-outline" subtitle={copy.arrivalsNote}>
+      <Panel title={copy.arrivals(arrivals.length)} icon="time-outline" subtitle={copy.arrivalsNote}>
         {arrivals.length === 0 ? (
           <AppText variant="caption" color={theme.colors.textSecondary}>
             {copy.noArrivals}
           </AppText>
         ) : (
           arrivals.map((a, index) => {
-            const chip = a.needsBay ? needsBayChip : arrivalChip[a.phase];
+            const chip = a.needsBay
+              ? { label: copy.needsBay, tone: needsBayTone }
+              : { label: copy.arrivalChip[a.phase], tone: arrivalTone[a.phase] };
             return (
               <ListRow
                 key={a.reservationId}
                 divided={index > 0}
                 icon={a.ev ? 'flash-outline' : 'car-outline'}
-                title={`${a.name} · ${a.plate ?? copy.plateToCome}`}
+                title={`${a.name} · ${a.plate ? plateIn(a.plate, lang) : copy.plateToCome}`}
                 lines={[keepTogether(`${a.spaceLabel} · ${a.zoneName} · ${gateShort(a.gateId)}`), keepTogether(a.when)]}
                 statusLabel={chip.label}
                 statusTone={chip.tone}
@@ -231,11 +231,11 @@ export function SecurityConsoleScreen() {
         )}
       </Panel>
 
-      <Panel title="Simulate a scan" icon="phone-portrait-outline" subtitle="Pick any demo pass and scan it at the gate above.">
+      <Panel title={copy.simulateTitle} icon="phone-portrait-outline" subtitle={copy.simulateNote}>
         <ChipGroup scroll options={passOptions} value={pickedId} onChange={setPickedId} />
         <View style={styles.row}>
           <ParkingButton
-            label="Scan current QR"
+            label={copy.scanCurrent}
             icon="qr-code-outline"
             disabled={!picked}
             onPress={() => {
@@ -245,28 +245,33 @@ export function SecurityConsoleScreen() {
             style={styles.grow}
           />
           {olderCredential ? (
-            <ParkingButton label="Scan replaced QR" icon="refresh-outline" onPress={() => void scan(olderCredential.displayToken)} style={styles.grow} />
+            <ParkingButton label={copy.scanReplaced} icon="refresh-outline" onPress={() => void scan(olderCredential.displayToken)} style={styles.grow} />
           ) : null}
         </View>
       </Panel>
 
-      <Panel title={`Exceptions (${exceptions.length})`} icon="alert-circle-outline">
+      <Panel title={copy.exceptions(exceptions.length)} icon="alert-circle-outline">
         {exceptions.length === 0 ? (
           <AppText variant="caption" color={theme.colors.textSecondary}>
-            Nothing needs attention.
+            {copy.nothing}
           </AppText>
         ) : (
           exceptions.map((n, index) => {
             const r = db.reservations.find((x) => x.id === n.reservationId);
             return (
               <View key={n.id}>
-                <ListRow divided={index > 0} icon={notificationIcon[n.kind]} title={n.title} lines={[n.body, formatDateTime(n.at)]} />
+                <ListRow
+                  divided={index > 0}
+                  icon={notificationIcon[n.kind]}
+                  title={ar ? copy.notification[n.kind] : n.title}
+                  lines={ar ? [dateTimeIn(n.at, lang)] : [n.body, dateTimeIn(n.at, lang)]}
+                />
                 <View style={styles.row}>
                   {r?.needsReassignment && r.status === 'confirmed' ? (
-                    <ParkingButton compact tone="primary" label="Reassign bay" onPress={() => void act(() => service.reassign(r.id, 'operator'), 'Reassigned to the nearest free bay.')} style={styles.grow} />
+                    <ParkingButton compact tone="primary" label={copy.reassign} onPress={() => void act(() => service.reassign(r.id, 'operator'), copy.reassigned)} style={styles.grow} />
                   ) : null}
-                  {r ? <ParkingButton compact label="Resolve manually" onPress={() => setManualId(r.id)} style={styles.grow} /> : null}
-                  <ParkingButton compact label="Mark handled" onPress={() => void act(() => service.resolveNotification(n.id, 'operator', 'Handled at the desk'), 'Marked as handled.')} style={styles.grow} />
+                  {r ? <ParkingButton compact label={copy.resolveManually} onPress={() => setManualId(r.id)} style={styles.grow} /> : null}
+                  <ParkingButton compact label={copy.markHandled} onPress={() => void act(() => service.resolveNotification(n.id, 'operator', 'Handled at the desk'), copy.handled)} style={styles.grow} />
                 </View>
               </View>
             );
@@ -274,29 +279,29 @@ export function SecurityConsoleScreen() {
         )}
       </Panel>
 
-      <Panel title="Manual resolution" icon="hand-left-outline" subtitle="Lost pass, unreadable code or a stuck session. Every override is logged with its reason.">
+      <Panel title={copy.manualTitle} icon="hand-left-outline" subtitle={copy.manualNote}>
         <ChipGroup scroll options={openOptions} value={manualId} onChange={setManualId} />
         {manualView ? (
           <>
             <AppText variant="caption" color={theme.colors.textSecondary}>
-              {`${manualView.reservation.reference} · ${manualView.reservation.vehiclePlate ?? 'no plate'} · ${manualView.space.label} · ${manualView.status.label}`}
+              {`${manualView.reservation.reference} · ${manualView.reservation.vehiclePlate ? plateIn(manualView.reservation.vehiclePlate, lang) : copy.noPlate} · ${manualView.space.label} · ${manualView.status.label}`}
             </AppText>
-            <Field label="Reason (logged)" value={reason} onChangeText={setReason} placeholder="e.g. Phone battery dead, checked ID" icon="create-outline" />
+            <Field label={copy.reason} value={reason} onChangeText={setReason} placeholder={copy.reasonPlaceholder} icon="create-outline" />
             {manual?.status === 'confirmed' && !manual.vehiclePlate ? (
-              <Field label="Plate seen at the gate" value={plate} onChangeText={setPlate} autoCapitalize="characters" icon="car-outline" />
+              <Field label={copy.plateSeen} value={plate} onChangeText={setPlate} autoCapitalize="characters" icon="car-outline" />
             ) : null}
             <View style={styles.row}>
               {manual?.status === 'confirmed' ? (
-                <ParkingButton compact label={`Admit at ${gate?.name.split(' · ')[0]}`} icon="log-in-outline" onPress={() => void act(() => service.operatorEntry(manual.id, gateId, reason, plate || undefined), '')} style={styles.grow} />
+                <ParkingButton compact label={copy.admitAt(gateShort(gateId))} icon="log-in-outline" onPress={() => void act(() => service.operatorEntry(manual.id, gateId, reason, plate || undefined), '')} style={styles.grow} />
               ) : null}
               {manual?.status === 'checked-in' ? (
-                <ParkingButton compact label={`Record exit at ${gate?.name.split(' · ')[0]}`} icon="log-out-outline" onPress={() => void act(() => service.operatorExit(manual.id, gateId, reason), '')} style={styles.grow} />
+                <ParkingButton compact label={copy.exitAt(gateShort(gateId))} icon="log-out-outline" onPress={() => void act(() => service.operatorExit(manual.id, gateId, reason), '')} style={styles.grow} />
               ) : null}
               {manual?.status === 'checked-in' && manual.parkingType === 'ev' && !manual.bayVacatedAt ? (
-                <ParkingButton compact label="Moved out of EV bay" icon="swap-horizontal-outline" onPress={() => void act(() => service.markMovedOut(manual.id, 'operator', reason || undefined), 'EV bay released. The visit stays open until the car exits.')} style={styles.grow} />
+                <ParkingButton compact label={copy.movedOut} icon="swap-horizontal-outline" onPress={() => void act(() => service.markMovedOut(manual.id, 'operator', reason || undefined), copy.released)} style={styles.grow} />
               ) : null}
               {manualView.charging?.state === 'charging' ? (
-                <ParkingButton compact label="Stop charging" icon="stop-circle-outline" onPress={() => void act(() => service.stopCharging(manual!.id, 'operator'), 'Charging stopped by security.')} style={styles.grow} />
+                <ParkingButton compact label={copy.stopCharging} icon="stop-circle-outline" onPress={() => void act(() => service.stopCharging(manual!.id, 'operator'), copy.stopped)} style={styles.grow} />
               ) : null}
             </View>
             <AppText variant="label" color={theme.colors.textMuted}>
@@ -306,19 +311,31 @@ export function SecurityConsoleScreen() {
         ) : null}
       </Panel>
 
-      <Panel title="Bay status" icon="grid-outline" subtitle="Correct a bay that is reported wrongly.">
-        <ChipGroup scroll options={db.spaces.map((s) => ({ value: s.id, label: s.label, detail: s.serviceability === 'in-service' ? s.occupancy : `${s.occupancy} · ${s.serviceability.replace(/-/g, ' ')}` }))} value={bayId} onChange={setBayId} />
+      <Panel title={copy.bayTitle} icon="grid-outline" subtitle={copy.bayNote}>
+        <ChipGroup
+          scroll
+          options={db.spaces.map((s) => ({
+            value: s.id,
+            label: s.label,
+            detail:
+              s.serviceability === 'in-service'
+                ? copy.occupancy[s.occupancy]
+                : `${copy.occupancy[s.occupancy]} · ${copy.serviceability[s.serviceability]}`,
+          }))}
+          value={bayId}
+          onChange={setBayId}
+        />
         {bay ? (
           <>
-            <Field label="Note (logged)" value={bayNote} onChangeText={setBayNote} placeholder="e.g. Checked on patrol" icon="create-outline" />
+            <Field label={copy.note} value={bayNote} onChangeText={setBayNote} placeholder={copy.notePlaceholder} icon="create-outline" />
             <View style={styles.row}>
               {(['vacant', 'occupied', 'unknown'] as OccupancyState[]).map((state) => (
                 <ParkingButton
                   key={state}
                   compact
-                  label={state === bay.occupancy ? `${state} (now)` : `Mark ${state}`}
+                  label={state === bay.occupancy ? copy.nowState(copy.occupancy[state]) : copy.mark(copy.occupancy[state])}
                   disabled={state === bay.occupancy}
-                  onPress={() => void act(() => service.setOccupancy(bay.id, state, 'operator', bayNote), `${bay.label} marked ${state}.`)}
+                  onPress={() => void act(() => service.setOccupancy(bay.id, state, 'operator', bayNote), copy.marked(bay.label, copy.occupancy[state]))}
                   style={styles.grow}
                 />
               ))}
@@ -327,19 +344,24 @@ export function SecurityConsoleScreen() {
         ) : null}
       </Panel>
 
-      <Panel title="Gate log" icon="list-outline">
+      <Panel title={copy.logTitle} icon="list-outline">
         {recentScans.map((e, index) => {
-          const g = db.gates.find((x) => x.id === e.gateId);
           const r = db.reservations.find((x) => x.id === e.reservationId);
+          const accepted = e.outcome === 'accepted';
           return (
             <ListRow
               key={e.id}
               divided={index > 0}
               icon={e.direction === 'entry' ? 'log-in-outline' : 'log-out-outline'}
-              title={`${e.outcome === 'accepted' ? 'Opened' : 'Refused'} · ${g?.name.split(' · ')[0]} ${e.direction}`}
-              lines={[`${r?.guest?.name ?? r?.reference ?? 'Unknown pass'} · ${formatDateTime(e.at)}`, e.operatorOverride ? `Override: ${e.operatorOverride.reason}` : e.message]}
-              statusLabel={e.outcome === 'accepted' ? 'Opened' : 'Refused'}
-              statusTone={e.outcome === 'accepted' ? 'teal' : 'red'}
+              title={copy.logTitleFor(accepted, gateShort(e.gateId), e.direction === 'entry')}
+              lines={[
+                `${r?.guest?.name ?? r?.reference ?? copy.unknownPass} · ${dateTimeIn(e.at, lang)}`,
+                e.operatorOverride
+                  ? copy.override(e.operatorOverride.reason)
+                  : gateResultIn({ code: e.code, title: '', message: e.message }, lang).message,
+              ]}
+              statusLabel={accepted ? copy.logOpened : copy.logRefused}
+              statusTone={accepted ? 'teal' : 'red'}
             />
           );
         })}

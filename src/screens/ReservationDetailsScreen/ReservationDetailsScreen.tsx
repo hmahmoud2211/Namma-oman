@@ -13,11 +13,12 @@ import { Timeline } from '../../components/parking/Rows';
 import { chargingStateLabel } from '../../components/parking/presenters';
 import { StatusChip } from '../../components/parking/compat/StatusChip';
 import { useAppTheme } from '../../components/parking/compat/theme';
+import { useParkingLang } from '../../components/parking/useParkingLang';
 import { useParking } from '../../hooks/useParking';
-import type { Lang } from '../../services/parking/i18n';
+import { dateTimeIn, digitsIn, gateNameIn, nameIn, parkingErrorIn, plateIn, propertyIn, rangeIn, timeIn, chargerNameIn, failedIn, type Lang } from '../../services/parking/i18n';
 import { siteInfo } from '../../services/parking/policy';
 import { findReservation, inviteUrl, reservationView } from '../../services/parking/selectors';
-import { MINUTE_MS, formatDateTime, formatRange, formatTime, ms } from '../../services/parking/time';
+import { MINUTE_MS, ms } from '../../services/parking/time';
 import { encodePassSnapshot } from '../../services/parking/passLink';
 import { guestTracker, type ShareChannel } from '../../services/parking/tracking';
 import { ParkingError } from '../../services/parking/tx';
@@ -33,12 +34,9 @@ import {
 import {
   EXTEND_OPTIONS,
   MESSAGE_LANGUAGES,
-  bookedSendTitle,
-  detailsCopy as copy,
-  openFailed,
+  detailsCopy,
   passLink,
   passMessage,
-  sendTo,
   timelineFor,
 } from './ReservationDetailsScreen.data';
 import { createStyles } from './ReservationDetailsScreen.styles';
@@ -57,21 +55,25 @@ export function ReservationDetailsScreen() {
   const navigation = useNavigation<RootStackScreenProps<'ReservationDetails'>['navigation']>();
   const { params } = useRoute<RootStackScreenProps<'ReservationDetails'>['route']>();
   const { db, now, service, inviteOrigin, storageKind } = useParking();
+  // The page reads in the app's language; `lang` below is the message and pass language.
+  const ui = useParkingLang();
+  const copy = detailsCopy[ui];
+  const time = (value: string | number) => timeIn(value, ui);
   const [message, setMessage] = useState<{ tone: NoticeTone; text: string } | null>(null);
   const [confirming, setConfirming] = useState<Confirming>(null);
   const [busy, setBusy] = useState<string | null>(null);
-  const [lang, setLang] = useState<Lang>('en');
+  const [lang, setLang] = useState<Lang>(ui);
   const [showActivity, setShowActivity] = useState(false);
 
   const reservation = findReservation(db, params.reservationId);
-  const view = useMemo(() => (reservation ? reservationView(db, reservation, now) : null), [db, reservation, now]);
-  const timeline = useMemo(() => (reservation ? timelineFor(db, reservation) : []), [db, reservation]);
+  const view = useMemo(() => (reservation ? reservationView(db, reservation, now, ui) : null), [db, reservation, now, ui]);
+  const timeline = useMemo(() => (reservation ? timelineFor(db, reservation, ui) : []), [db, reservation, ui]);
 
   if (!reservation || !view) {
     return (
       <ParkingFrame title={copy.title}>
-        <Notice tone="warning" title="Booking not found">
-          It may have been removed when the demo data was reset.
+        <Notice tone="warning" title={copy.notFoundTitle}>
+          {copy.notFoundBody}
         </Notice>
       </ParkingFrame>
     );
@@ -82,8 +84,8 @@ export function ReservationDetailsScreen() {
   const isGuest = r.bookedFor === 'guest';
   const link = view.invitation ? passLink(inviteUrl(inviteOrigin, view.invitation), lang, encodePassSnapshot(view)) : undefined;
   const phoneDigits = internationalDigits(r.guest?.phone, siteInfo.countryCallingCode);
-  const firstName = r.guest?.name.trim().split(/\s+/)[0] ?? 'your guest';
-  const [gateShort, gateRest] = view.gate.name.split(' · ');
+  const firstName = r.guest?.name.trim().split(/\s+/)[0] ?? copy.yourGuest;
+  const [gateShort, gateRest] = gateNameIn(view.gate.id, ui).split(' · ');
 
   const run = async (key: string, action: () => Promise<unknown>, success: string) => {
     setBusy(key);
@@ -92,7 +94,7 @@ export function ReservationDetailsScreen() {
       await action();
       setMessage({ tone: 'success', text: success });
     } catch (e) {
-      setMessage({ tone: 'error', text: e instanceof ParkingError ? e.message : 'That did not work. Please try again.' });
+      setMessage({ tone: 'error', text: e instanceof ParkingError ? parkingErrorIn(e, ui) : failedIn(ui) });
     } finally {
       setBusy(null);
       setConfirming(null);
@@ -108,15 +110,15 @@ export function ReservationDetailsScreen() {
     if (opened) {
       await recordShare('whatsapp');
     }
-    setMessage(opened ? { tone: 'info', text: copy.whatsappOpened } : { tone: 'error', text: openFailed('WhatsApp') });
+    setMessage(opened ? { tone: 'info', text: copy.whatsappOpened } : { tone: 'error', text: copy.openFailed(ui === 'ar' ? 'واتساب' : 'WhatsApp') });
   };
   const sharePass = async () => {
     if (!link) return;
-    const outcome = await shareText('Parking pass', passMessage(view, lang), link);
+    const outcome = await shareText(copy.passWord, passMessage(view, lang), link);
     if (outcome === 'shared' || outcome === 'copied') {
       await recordShare(outcome === 'shared' ? 'share' : 'copy');
     }
-    setMessage({ tone: outcome === 'failed' ? 'error' : 'info', text: shareOutcomeMessage(outcome, 'Pass link') });
+    setMessage({ tone: outcome === 'failed' ? 'error' : 'info', text: shareOutcomeMessage(outcome, copy.passLinkWord, ui) });
   };
   const copyLink = async () => {
     if (!link) return;
@@ -124,7 +126,7 @@ export function ReservationDetailsScreen() {
     if (ok) {
       await recordShare('copy');
     }
-    setMessage({ tone: ok ? 'info' : 'error', text: ok ? 'Link copied.' : `Could not copy. The link is: ${link}` });
+    setMessage({ tone: ok ? 'info' : 'error', text: ok ? copy.linkCopied : copy.copyFailed(link) });
   };
 
   /** Only what needs attention gets a banner; the good news is said where the next step is. */
@@ -133,41 +135,41 @@ export function ReservationDetailsScreen() {
       return (
         <Notice
           tone="warning"
-          title="This booking needs another bay"
+          title={copy.needsBayTitle}
           actions={
             <ParkingButton
               compact
               tone="primary"
               icon="swap-horizontal-outline"
-              label="Move to the nearest free bay"
+              label={copy.moveBay}
               loading={busy === 'reassign'}
-              onPress={() => void run('reassign', () => service.reassign(r.id, 'resident'), 'Moved. The pass and directions now show the new bay.')}
+              onPress={() => void run('reassign', () => service.reassign(r.id, 'resident'), copy.moved)}
             />
           }
         >
-          {r.needsReassignment.reason}
+          {ui === 'ar' ? copy.needsBayBody : r.needsReassignment.reason}
         </Notice>
       );
     }
     if (view.overdue) {
       return (
-        <Notice tone="error" title={`Overdue since ${formatTime(r.scheduledEnd)}`}>
-          {`${view.title} is still parked in ${view.space.label}. The bay stays held until the car leaves. Extend below if the bay is free, or ask your guest to leave.`}
+        <Notice tone="error" title={copy.overdueTitle(time(r.scheduledEnd))}>
+          {copy.overdueBody(view.title, view.space.label)}
         </Notice>
       );
     }
     if (r.status === 'no-show') {
       return (
-        <Notice tone="warning" title="Guest did not arrive">
-          {`Arrival was held until ${formatTime(r.noShowAt!)}. The space was released and the pass no longer works.`}
+        <Notice tone="warning" title={copy.noShowTitle}>
+          {copy.noShowBody(time(r.noShowAt!))}
         </Notice>
       );
     }
     if (params.justBooked && !isGuest) {
-      return <Notice tone="success" title={copy.justBooked}>Your EV bay and charger are reserved.</Notice>;
+      return <Notice tone="success" title={copy.justBooked}>{copy.evReserved}</Notice>;
     }
     if (params.justEdited) {
-      return <Notice tone="success" title={copy.justEdited}>{isGuest ? copy.justEditedBody : 'Your EV bay and charger are updated.'}</Notice>;
+      return <Notice tone="success" title={copy.justEdited}>{isGuest ? copy.justEditedBody : copy.evUpdated}</Notice>;
     }
     return null;
   };
@@ -175,34 +177,34 @@ export function ReservationDetailsScreen() {
   const extendTo = (minutes: number) => ms(r.scheduledEnd) + minutes * MINUTE_MS;
 
   const actual = [
-    r.actualEntryAt ? `In ${formatTime(r.actualEntryAt)}` : '',
-    r.bayVacatedAt && !r.actualExitAt ? `left bay ${formatTime(r.bayVacatedAt)}` : '',
-    r.actualExitAt ? `out ${formatTime(r.actualExitAt)}` : '',
+    r.actualEntryAt ? copy.arrivedIn(time(r.actualEntryAt)) : '',
+    r.bayVacatedAt && !r.actualExitAt ? copy.leftBay(time(r.bayVacatedAt)) : '',
+    r.actualExitAt ? copy.out(time(r.actualExitAt)) : '',
   ]
     .filter(Boolean)
     .join(' · ');
   const facts: Fact[] = [
-    { icon: 'time-outline', label: 'When (Muscat)', value: formatRange(r.scheduledStart, r.scheduledEnd), detail: actual || undefined, wide: true },
-    { icon: 'location-outline', label: 'Bay', value: view.space.label, detail: `${view.zone.name} · ${view.zone.level}` },
-    { icon: 'enter-outline', label: 'Entrance', value: gateShort, detail: gateRest },
-    { icon: 'car-outline', label: 'Vehicle', value: r.vehiclePlate ?? 'Guest adds it', wide: true },
+    { icon: 'time-outline', label: copy.when, value: rangeIn(r.scheduledStart, r.scheduledEnd, ui), detail: actual || undefined, wide: true },
+    { icon: 'location-outline', label: copy.bay, value: view.space.label, detail: `${nameIn(view.zone.name, ui)} · ${nameIn(view.zone.level, ui)}` },
+    { icon: 'enter-outline', label: copy.entrance, value: gateShort, detail: gateRest },
+    { icon: 'car-outline', label: copy.vehicle, value: r.vehiclePlate ? plateIn(r.vehiclePlate, ui) : copy.guestAddsIt, wide: true },
   ];
 
   const sendCard =
     isGuest && link && live ? (
       <Panel
-        title={params.justBooked ? bookedSendTitle(firstName) : copy.sendTitle}
+        title={params.justBooked ? copy.bookedSendTitle(firstName) : copy.sendTitle}
         icon="paper-plane-outline"
-        subtitle={r.guest?.phone && phoneDigits ? sendTo(r.guest.phone) : copy.noPhoneShort}
+        subtitle={r.guest?.phone && phoneDigits ? copy.sendTo(r.guest.phone) : copy.noPhoneShort}
       >
         <ChipGroup fill options={MESSAGE_LANGUAGES} value={lang} onChange={setLang} />
-        <ParkingButton label="Send on WhatsApp" icon="logo-whatsapp" tone="primary" onPress={() => void sendWhatsApp()} />
+        <ParkingButton label={copy.sendWhatsApp} icon="logo-whatsapp" tone="primary" onPress={() => void sendWhatsApp()} />
         <View style={styles.row}>
-          <ParkingButton compact label="Share" icon="share-social-outline" onPress={() => void sharePass()} style={styles.grow} />
-          <ParkingButton compact label="Copy link" icon="link-outline" onPress={() => void copyLink()} style={styles.grow} />
+          <ParkingButton compact label={copy.share} icon="share-social-outline" onPress={() => void sharePass()} style={styles.grow} />
+          <ParkingButton compact label={copy.copyLink} icon="link-outline" onPress={() => void copyLink()} style={styles.grow} />
           <ParkingButton
             compact
-            label="Preview"
+            label={copy.preview}
             icon="eye-outline"
             onPress={() => navigation.navigate('GuestPass', { invite: view.invitation!.inviteToken, lang })}
             style={styles.grow}
@@ -224,14 +226,14 @@ export function ReservationDetailsScreen() {
 
       <Panel
         title={view.title}
-        subtitle={`${r.reference} · ${view.property.label}`}
+        subtitle={`${r.reference} · ${propertyIn(view.property.label, ui)}`}
         icon={r.parkingType === 'ev' ? 'flash-outline' : 'people-outline'}
         trailing={<StatusChip label={view.status.label} tone={view.status.tone} glow />}
       >
         <FactGrid facts={facts} />
         {isGuest ? (
           <View style={styles.divided}>
-            <GuestTrackerStrip tracker={guestTracker(db, r, now)} />
+            <GuestTrackerStrip tracker={guestTracker(db, r, now, ui)} />
           </View>
         ) : null}
         <View style={styles.row}>
@@ -245,7 +247,7 @@ export function ReservationDetailsScreen() {
           {timeline.length > 0 ? (
             <ParkingButton
               compact
-              label={showActivity ? 'Hide activity' : `Activity (${timeline.length})`}
+              label={showActivity ? copy.hideActivity : copy.activity(digitsIn(timeline.length, ui))}
               icon={showActivity ? 'chevron-up' : 'list-outline'}
               onPress={() => setShowActivity((v) => !v)}
               style={styles.grow}
@@ -263,49 +265,49 @@ export function ReservationDetailsScreen() {
       {!sendFirst ? sendCard : null}
 
       {view.allocation && view.charging ? (
-        <Panel title="Charging" icon="flash-outline" subtitle={chargingStateLabel[view.charging.state]}>
+        <Panel title={copy.charging} icon="flash-outline" subtitle={chargingStateLabel(view.charging.state, ui)}>
           <InfoRow
             icon="battery-charging-outline"
-            label="Charging slot"
-            value={`${formatTime(view.allocation.start)}–${formatTime(view.allocation.end)}`}
-            detail={`${view.charger?.label} · ${view.connector?.type}${view.allocation.targetKwh ? ` · ${view.allocation.targetKwh} kWh requested` : ''}`}
+            label={copy.chargingSlot}
+            value={`${time(view.allocation.start)}–${time(view.allocation.end)}`}
+            detail={`${chargerNameIn(view.charger?.label, ui)} · ${view.connector?.type}${view.allocation.targetKwh ? copy.requested(digitsIn(view.allocation.targetKwh, ui)) : ''}`}
           />
           {r.status === 'checked-in' || view.charging.state !== 'reserved' ? (
-            <ParkingButton compact label="Open charging session" icon="speedometer-outline" onPress={() => navigation.navigate('ChargingSession', { reservationId: r.id })} />
+            <ParkingButton compact label={copy.openSession} icon="speedometer-outline" onPress={() => navigation.navigate('ChargingSession', { reservationId: r.id })} />
           ) : null}
         </Panel>
       ) : null}
 
       {live ? (
-        <Panel title="Manage" icon="settings-outline">
+        <Panel title={copy.manage} icon="settings-outline">
           {r.status === 'confirmed' ? (
             <View style={styles.row}>
               <ParkingButton
                 compact
-                label="Edit"
+                label={copy.edit}
                 icon="create-outline"
                 onPress={() => navigation.navigate('ReserveParking', { mode: r.parkingType === 'ev' ? 'ev' : 'guest', reservationId: r.id })}
                 style={styles.grow}
               />
-              {isGuest ? <ParkingButton compact label="Replace QR" icon="refresh-outline" onPress={() => setConfirming('replace')} style={styles.grow} /> : null}
-              <ParkingButton compact label="Cancel" icon="close-circle-outline" tone="danger" onPress={() => setConfirming('cancel')} style={styles.grow} />
+              {isGuest ? <ParkingButton compact label={copy.replaceQr} icon="refresh-outline" onPress={() => setConfirming('replace')} style={styles.grow} /> : null}
+              <ParkingButton compact label={copy.cancel} icon="close-circle-outline" tone="danger" onPress={() => setConfirming('cancel')} style={styles.grow} />
             </View>
           ) : null}
 
           {!r.bayVacatedAt ? (
             <View style={styles.extend}>
               <AppText variant="label" color={theme.colors.textSupport}>
-                {`Extend (ends ${formatTime(r.scheduledEnd)})`}
+                {copy.extend(time(r.scheduledEnd))}
               </AppText>
               <View style={styles.row}>
                 {EXTEND_OPTIONS.map((minutes) => (
                   <ParkingButton
                     key={minutes}
                     compact
-                    label={`+${minutes < 60 ? `${minutes} min` : `${minutes / 60} h`}`}
+                    label={copy.extendBy(minutes)}
                     loading={busy === `extend-${minutes}`}
                     onPress={() =>
-                      void run(`extend-${minutes}`, () => service.extendReservation(r.id, extendTo(minutes), r.version), `Extended to ${formatTime(extendTo(minutes))}.`)
+                      void run(`extend-${minutes}`, () => service.extendReservation(r.id, extendTo(minutes), r.version), copy.extended(time(extendTo(minutes))))
                     }
                     style={styles.grow}
                   />
@@ -316,26 +318,26 @@ export function ReservationDetailsScreen() {
 
           {r.status === 'checked-in' ? (
             <AppText variant="label" color={theme.colors.textMuted}>
-              The visitor is inside. The visit ends when they exit, or when security records it.
+              {copy.inside}
             </AppText>
           ) : null}
 
           {confirming ? (
             <Notice
               tone="warning"
-              title={confirming === 'cancel' ? 'Cancel booking?' : 'Replace QR?'}
+              title={confirming === 'cancel' ? copy.cancelTitle : copy.replaceTitle}
               actions={
                 <>
-                  <ParkingButton compact label="Keep it" onPress={() => setConfirming(null)} />
+                  <ParkingButton compact label={copy.keep} onPress={() => setConfirming(null)} />
                   <ParkingButton
                     compact
                     tone={confirming === 'cancel' ? 'danger' : 'primary'}
-                    label={confirming === 'cancel' ? 'Yes, cancel' : 'Issue new QR'}
+                    label={confirming === 'cancel' ? copy.yesCancel : copy.issueQr}
                     loading={busy === confirming}
                     onPress={() =>
                       void (confirming === 'cancel'
-                        ? run('cancel', () => service.cancelReservation(r.id), 'Booking cancelled. The pass no longer works.')
-                        : run('replace', () => service.replacePass(r.id), 'New QR issued. Share the pass again; the old QR is refused at the gate.'))
+                        ? run('cancel', () => service.cancelReservation(r.id), copy.cancelled)
+                        : run('replace', () => service.replacePass(r.id), copy.replaced))
                     }
                   />
                 </>
@@ -350,12 +352,12 @@ export function ReservationDetailsScreen() {
           {r.status === 'cancelled' || r.status === 'completed' ? (
             <AppText variant="label" color={theme.colors.textSupport} style={styles.endNote}>
               {r.status === 'cancelled'
-                ? `Cancelled ${formatDateTime(r.cancelledAt!)}. The pass no longer works.`
-                : 'Visit completed. The pass can’t be used again.'}
+                ? copy.cancelledAt(dateTimeIn(r.cancelledAt!, ui))
+                : copy.completed}
             </AppText>
           ) : null}
           <ParkingButton
-            label="Book again"
+            label={copy.bookAgain}
             icon="repeat-outline"
             tone="primary"
             onPress={() => navigation.navigate('ReserveParking', { mode: r.parkingType === 'ev' ? 'ev' : 'guest' })}

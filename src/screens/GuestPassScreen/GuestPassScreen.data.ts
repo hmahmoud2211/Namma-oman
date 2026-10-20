@@ -231,7 +231,7 @@ const ar: PassCopy = {
   building: 'المبنى',
   entrance: 'المدخل',
   directions: 'الاتجاهات',
-  indoorNote: 'لا يستطيع GPS الهاتف تحديد المواقف في البدروم. اتبع لافتات الأدوار والمسار على الخريطة.',
+  indoorNote: 'لا يستطيع GPS الهاتف تحديد المواقف في الطابق السفلي. اتبع لافتات الأدوار والمسار على الخريطة.',
   navigateToGate: 'الطريق إلى البوابة',
   openMap: 'افتح الخريطة',
   fictionalGates: 'مواقع البوابات في هذا العرض التجريبي غير حقيقية.',
@@ -252,7 +252,7 @@ const ar: PassCopy = {
   delivered: (kwh, target) =>
     arabicDigits(`تم شحن ${kwh} كيلوواط ساعة${target ? ` من ${target} كيلوواط ساعة` : ''}.`),
   demoValues: 'أرقام الشحن قيم تجريبية.',
-  enterDoesntCharge: 'الدخول إلى الكمبوند لا يبدأ الشحن. وصّل الشاحن في موقفك، ثم ابدأ الشحن من هنا.',
+  enterDoesntCharge: 'الدخول إلى المجمع لا يبدأ الشحن. وصّل الشاحن في موقفك، ثم ابدأ الشحن من هنا.',
   plugIn: 'وصّل الشاحن وابدأ الشحن',
   plugInDone: 'بدأ الشحن.',
   stop: 'أوقف الشحن وافصل الشاحن',
@@ -289,13 +289,4 @@ const ar: PassCopy = {
 
 export const passCopy: Record<Lang, PassCopy> = { en, ar };
 
-/**
- * "Charger A · AC 22 kW" in the reader's language. In Arabic a right-to-left
- * mark after the letter keeps "A" and "AC" from running together as one
- * left-to-right phrase.
- */
-export function chargerNameIn(label: string | undefined, lang: Lang): string {
-  if (!label) return '';
-  if (lang === 'en') return label;
-  return arabicDigits(label.replace(/^Charger (\S+)/, 'الشاحن $1\u200F').replace(/ kW\b/, ' كيلوواط'));
-}
+export { chargerNameIn } from '../../services/parking/i18n';

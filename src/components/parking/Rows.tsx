@@ -1,11 +1,12 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
 import { useAppTheme } from './compat/theme';
 import type { AppTheme } from './compat/theme';
 import type { QrImageSource } from '../../utils/passImage.shared';
+import { LayoutDirectionContext } from '../common/DirectionView';
 import { AppText } from './compat/AppText';
 import { StatusChip, type StatusTone } from './compat/StatusChip';
 
@@ -24,6 +25,8 @@ export interface ListRowProps {
 
 /** One booking, event or alert in a list, with readable type and its status. */
 export function ListRow({ icon, title, lines = [], statusLabel, statusTone, onPress, divided, accessibilityHint }: ListRowProps) {
+  // Forward points the reading way: left in an Arabic page.
+  const rtl = useContext(LayoutDirectionContext) === 'rtl';
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   return (
@@ -49,7 +52,7 @@ export function ListRow({ icon, title, lines = [], statusLabel, statusTone, onPr
         ))}
       </View>
       {statusLabel && statusTone ? <StatusChip label={statusLabel} tone={statusTone} style={styles.chip} /> : null}
-      {onPress ? <Ionicons name="chevron-forward" size={15} color={theme.colors.textSupport} /> : null}
+      {onPress ? <Ionicons name={rtl ? 'chevron-back' : 'chevron-forward'} size={15} color={theme.colors.textSupport} /> : null}
     </Pressable>
   );
 }

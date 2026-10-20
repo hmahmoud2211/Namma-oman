@@ -1,17 +1,28 @@
+import type { Lang } from '../../services/parking/i18n';
 import type { Reservation } from '../../services/parking/types';
 
 export type HistoryFilter = 'all' | 'upcoming' | 'active' | 'past';
 
-export const historyCopy = {
-  title: 'Reservation History',
-  empty: 'No bookings here yet.',
-} as const;
+export const historyCopy: Record<Lang, { title: string; empty: string; note: string; reserveGuest: string }> = {
+  en: {
+    title: 'Reservation History',
+    empty: 'No bookings here yet.',
+    note: 'Times are shown in Muscat time. Booked times and actual gate times are both kept for every visit.',
+    reserveGuest: 'Reserve Guest Parking',
+  },
+  ar: {
+    title: 'سجل الحجوزات',
+    empty: 'لا توجد حجوزات هنا بعد.',
+    note: 'الأوقات بتوقيت مسقط. يُحفظ وقت الحجز ووقت البوابة الفعلي لكل زيارة.',
+    reserveGuest: 'حجز موقف لضيف',
+  },
+};
 
-export const filterOptions: { value: HistoryFilter; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'upcoming', label: 'Upcoming' },
-  { value: 'active', label: 'Active' },
-  { value: 'past', label: 'Past' },
+export const filterOptions: { value: HistoryFilter; label: Record<Lang, string> }[] = [
+  { value: 'all', label: { en: 'All', ar: 'الكل' } },
+  { value: 'upcoming', label: { en: 'Upcoming', ar: 'القادمة' } },
+  { value: 'active', label: { en: 'Active', ar: 'الحالية' } },
+  { value: 'past', label: { en: 'Past', ar: 'السابقة' } },
 ];
 
 export function matchesFilter(r: Reservation, filter: HistoryFilter): boolean {

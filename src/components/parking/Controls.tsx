@@ -16,6 +16,7 @@ import { useAppTheme } from './compat/theme';
 import type { AppTheme } from './compat/theme';
 import { AppText } from './compat/AppText';
 import { GlassSurface } from './compat/GlassSurface';
+import { useParkingLang } from './useParkingLang';
 
 /* ------------------------------------------------------------ Chips */
 
@@ -190,6 +191,7 @@ export function Stepper({
 }: StepperProps) {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const ar = useParkingLang() === 'ar';
 
   const button = (icon: 'remove' | 'add', onPress: () => void, enabled: boolean, a11y: string) => (
     <Pressable
@@ -210,7 +212,7 @@ export function Stepper({
         {label}
       </AppText>
       <View style={styles.stepper} accessible={false}>
-        {button('remove', onDecrement, canDecrement, `Earlier ${label.toLowerCase()}`)}
+        {button('remove', onDecrement, canDecrement, ar ? `${label}: أبكر` : `Earlier ${label.toLowerCase()}`)}
         <View style={styles.stepValue} accessible accessibilityLabel={`${label}: ${display}${detail ? `, ${detail}` : ''}`}>
           <AppText variant="subheading">{display}</AppText>
           {detail ? (
@@ -219,7 +221,7 @@ export function Stepper({
             </AppText>
           ) : null}
         </View>
-        {button('add', onIncrement, canIncrement, `Later ${label.toLowerCase()}`)}
+        {button('add', onIncrement, canIncrement, ar ? `${label}: لاحقًا` : `Later ${label.toLowerCase()}`)}
       </View>
     </View>
   );

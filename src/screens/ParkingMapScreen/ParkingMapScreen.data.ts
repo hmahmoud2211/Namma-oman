@@ -1,6 +1,6 @@
 import type { Lang } from '../../services/parking/i18n';
 
-/** The map page's own words. Arabic only reaches it from a guest's pass. */
+/** The map page's own words: the app's language for residents, the pass's for a guest. */
 export interface MapCopy {
   title: string;
   gpsNote: string;
@@ -27,7 +27,7 @@ const en: MapCopy = {
 const ar: MapCopy = {
   title: 'اعثر على موقفك',
   gpsNote:
-    'تعرض الخريطة تخطيط الكمبوند وليس موقعك المباشر: لا يستطيع GPS الهاتف تحديد مكانك في البدروم. اتبع لافتات الأدوار والمسار المضيء على الخريطة.',
+    'تعرض الخريطة تخطيط المجمع وليس موقعك المباشر: لا يستطيع GPS الهاتف تحديد مكانك في الطابق السفلي. اتبع لافتات الأدوار والمسار المضيء على الخريطة.',
   outdoorNote: 'يمكن لتطبيق الخرائط إرشادك إلى البوابة؛ وفي الداخل اتبع المسار المضيء على الخريطة.',
   fictional: 'التخطيط وإحداثيات البوابات في هذا العرض التجريبي غير حقيقية.',
   notFound: 'لا يوجد موقف لعرضه لهذا الرابط.',
