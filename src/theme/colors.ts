@@ -141,7 +141,6 @@ export interface ColorTokens {
   /** Themed glass cards (weather, My Unit, service tiles): cream glass in light, green glass in dark. */
   surfaceGradient: Gradient3;
   surfaceBorder: string;
-  surfaceInnerHighlight: string;
   surfaceShadow: string;
   surfaceText: string;
   surfaceTextMuted: string;
@@ -390,7 +389,6 @@ export const darkColors: ColorTokens = {
 
   surfaceGradient: ['rgba(26, 92, 78, 0.22)', 'rgba(6, 46, 40, 0.18)', 'rgba(0, 26, 22, 0.28)'],
   surfaceBorder: 'rgba(80, 170, 140, 0.45)',
-  surfaceInnerHighlight: 'rgba(160, 235, 205, 0.2)',
   surfaceShadow: 'rgba(0, 0, 0, 0.35)',
   surfaceText: palette.white,
   surfaceTextMuted: 'rgba(255, 255, 255, 0.86)',
@@ -599,7 +597,6 @@ export const lightColors: ColorTokens = {
     'rgba(255, 248, 236, 0.46)',
   ],
   surfaceBorder: 'rgba(176, 138, 62, 0.55)',
-  surfaceInnerHighlight: 'rgba(255, 255, 255, 0.95)',
   surfaceShadow: 'rgba(110, 82, 36, 0.24)',
   surfaceText: palette.charcoal,
   // Darker than mode 2's grey so it stays readable on the thinner glass.

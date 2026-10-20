@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { GlassLayer } from '@/components/common/GlassLayer';
 import { GoldRim } from '@/components/common/GoldRim';
@@ -43,30 +43,17 @@ export function SurfaceCard({ children, radius, rim = 'plain', style }: SurfaceC
   return (
     <View style={[styles.card, rim === 'feature' && styles.featureGlow, { borderRadius }, style]}>
       <GlassLayer borderRadius={borderRadius} colors={colors.surfaceGradient} />
-      {/* Faint light along the inside of the top edge. */}
-      <View
-        style={[
-          StyleSheet.absoluteFill,
-          styles.innerHighlight,
-          { borderRadius, margin: borderWidth, borderTopWidth: borderWidth },
-        ]}
-        pointerEvents="none"
-      />
       <GoldRim radius={borderRadius} width={borderWidth} />
       {children}
     </View>
   );
 }
 
-const useStyles = makeStyles(({ colors, shadows }, { scale }) => ({
+const useStyles = makeStyles(({ shadows }, { scale }) => ({
   card: {
     boxShadow: toBoxShadow(shadows.surfaceShadow, scale),
   },
   featureGlow: {
     boxShadow: toBoxShadow(shadows.featureCardGlow, scale),
-  },
-  innerHighlight: {
-    borderColor: colors.transparent,
-    borderTopColor: colors.surfaceInnerHighlight,
   },
 }));
